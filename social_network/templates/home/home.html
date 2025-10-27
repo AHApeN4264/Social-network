@@ -1,0 +1,1714 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Главный экран</title>
+<link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+#menu-toggle,
+#profile-toggle,
+#setting-toggle,
+#form1-toggle,
+#form2-toggle,
+#wallet-toggle,
+#subscribe-month-toggle,
+#subscribe-year-toggle,
+#deposit-toggle {
+    display: none;
+}
+
+/* Гамбургер */
+.hamburger {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 30px;
+    height: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.hamburger span {
+    display: block;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(2) {
+    opacity: 0;
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Боковое меню */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+    transition: 0.3s;
+    z-index: 1002;
+}
+
+#menu-toggle:checked ~ .side-menu {
+    left: 0;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+#menu-toggle:checked ~ .overlay {
+    display: block;
+}
+
+.content {
+    padding: 50px;
+}
+
+.side-menu .avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.side-menu .username-line {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.side-menu .profile-btn,
+.side-menu .setting-btn {
+    display: block;
+    background: white;
+    color: #333;
+    text-align: center;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    transition: 0.2s;
+}
+
+.side-menu .profile-btn:hover,
+.side-menu .setting-btn:hover {
+    background: #e0e0e0;
+}
+
+/* Формы */
+.profile-form,
+.setting-form,
+.form1,
+.form2 {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 400px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Small avatar inside edit profile form to avoid layout break */
+.form1 img.avatar,
+.form2 img.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+#profile-toggle:checked ~ .profile-form {
+    display: flex;
+}
+
+#setting-toggle:checked ~ .setting-form {
+    display: flex;
+}
+
+#form1-toggle:checked ~ .form1 {
+    display: flex;
+}
+
+#form2-toggle:checked ~ .form2 {
+    display: flex;
+}
+
+/* Оверлеи */
+.profile-overlay,
+.setting-overlay,
+.form1-overlay,
+.form2-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1500;
+}
+
+#profile-toggle:checked ~ .profile-overlay {
+    display: block;
+}
+
+#setting-toggle:checked ~ .setting-overlay {
+    display: block;
+}
+
+#form1-toggle:checked ~ .form1-overlay {
+    display: block;
+}
+
+#form2-toggle:checked ~ .form2-overlay {
+    display: block;
+}
+
+/* Кнопки форм */
+.profile-form button,
+.setting-form button,
+.form1 button,
+.form2 button,
+.setting-form .profile-btn {
+    background: white;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.profile-form button:hover,
+.setting-form button:hover,
+.form1 button:hover,
+.form2 button:hover,
+.setting-form .profile-btn:hover {
+    background: #e0e0e0;
+}
+
+/* Заголовок профиля */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.profile-header img.avatar {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-header .info {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-header .info h2 {
+    margin: 0;
+    font-size: 26px;
+    color: #333;
+}
+
+.profile-header .info p {
+    margin: 5px 0 0 0;
+    color: #777;
+    font-size: 15px;
+}
+
+.profile-divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 25px 0 15px 0;
+}
+
+.profile-body p {
+    margin: 10px 0;
+    color: #444;
+    font-size: 15px;
+}
+
+.tag-copy {
+    font-weight: bold;
+    color: #007bff;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.profile-body textarea {
+    resize: none;
+    font-family: Arial, sans-serif;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+.language-form {
+  margin: 10px 0 20px 0;
+}
+
+.language-form select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+/* Кошелёк */
+.wallet button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.wallet button:hover {
+  background: #008080cc;
+}
+
+.wallet {
+  margin: 10px 0 20px 0;
+}
+
+.wallet select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.wallet button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.wallet button:hover {
+  background: #008080cc;
+}
+
+.wallet {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wallet-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.wallet-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 300px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wallet.active {
+    display: flex;
+}
+.wallet-overlay.active {
+    display: block;
+}
+
+#wallet-toggle:checked ~ .wallet-form,
+#wallet-toggle:checked ~ .wallet {
+    display: flex;
+}
+#wallet-toggle:checked ~ .wallet-overlay {
+    display: block;
+}
+
+/* Пополнение кошелька */
+.deposit button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.deposit button:hover {
+  background: #008080cc;
+}
+
+.deposit {
+  margin: 10px 0 20px 0;
+}
+
+.deposit select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.deposit button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.deposit button:hover {
+  background: #008080cc;
+}
+
+.deposit {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.deposit-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.deposit-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 300px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.deposit-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.deposit-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.deposit.active {
+    display: flex;
+}
+.deposit-overlay.active {
+    display: block;
+}
+
+#deposit-toggle:checked ~ .deposit-form,
+#deposit-toggle:checked ~ .deposit {
+    display: flex;
+}
+#deposit-toggle:checked ~ .deposit-overlay {
+    display: block;
+}
+
+
+/* кнопки в подписке */
+.subscribe-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.subscribe-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+
+/* Підписка на місяць */
+.subscribe-form-month button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.subscribe-form-month button:hover {
+  background: #008080cc;
+}
+
+.subscribe-form-month {
+  margin: 10px 0 20px 0;
+}
+
+.subscribe-form-month select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.subscribe-form-month button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.subscribe-form-month button:hover {
+  background: #008080cc;
+}
+
+.subscribe-form-month {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.subscribe-month-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.subscribe-form-month.active {
+    display: flex;
+}
+.subscribe-month-overlay.active {
+    display: block;
+}
+
+#subscribe-month-toggle:checked ~ .subscribe-form-month {
+    display: flex;
+}
+
+#subscribe-month-toggle:checked ~ .subscribe-month-overlay {
+    display: block;
+}
+
+
+/* Підписка на рік */
+.subscribe-form-year button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.subscribe-form-year button:hover {
+  background: #008080cc;
+}
+
+.subscribe-form-year {
+  margin: 10px 0 20px 0;
+}
+
+.subscribe-form-year select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.subscribe-form-year button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.subscribe-form-year button:hover {
+  background: #008080cc;
+}
+
+.subscribe-form-year {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.subscribe-year-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.subscribe-form-year.active {
+    display: flex;
+}
+.subscribe-year-overlay.active {
+    display: block;
+}
+
+#subscribe-year-toggle:checked ~ .subscribe-form-year {
+    display: flex;
+}
+
+#subscribe-year-toggle:checked ~ .subscribe-year-overlay {
+    display: block;
+}
+
+
+/* кнопки в подписке */
+.subscribe-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.subscribe-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* From Uiverse.io by Yaya12085 */ 
+.plan {
+  border-radius: 16px;
+  box-shadow: 0 30px 30px -25px rgba(0, 38, 255, 0.205);
+  padding: 10px;
+  background-color: #fff;
+  color: #697e91;
+  max-width: 300px;
+}
+
+.plan strong {
+  font-weight: 600;
+  color: #425275;
+}
+
+.plan .inner {
+  align-items: center;
+  padding: 20px;
+  padding-top: 40px;
+  background-color: #ecf0ff;
+  border-radius: 12px;
+  position: relative;
+}
+
+.plan .pricing {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #bed6fb;
+  border-radius: 99em 0 0 99em;
+  display: flex;
+  align-items: center;
+  padding: 0.625em 0.75em;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #425475;
+}
+
+.plan .pricing small {
+  color: #707a91;
+  font-size: 0.75em;
+  margin-left: 0.25em;
+}
+
+.plan .title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #425675;
+}
+
+.plan .title + * {
+  margin-top: 0.75rem;
+}
+
+.plan .info + * {
+  margin-top: 1rem;
+}
+
+.plan .features {
+  display: flex;
+  flex-direction: column;
+}
+
+.plan .features li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plan .features li + * {
+  margin-top: 0.75rem;
+}
+
+.plan .features .icon {
+  background-color: #1FCAC5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+.plan .features .icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.plan .features + * {
+  margin-top: 1.25rem;
+}
+
+.plan .action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
+.plan .button {
+  background-color: #6558d3;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 500;
+  font-size: 1.125rem;
+  text-align: center;
+  border: 0;
+  outline: 0;
+  width: 100%;
+  padding: 0.625em 0.75em;
+  text-decoration: none;
+}
+
+.plan .button:hover, .plan .button:focus {
+  background-color: #4133B7;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<input type="checkbox" id="menu-toggle">
+<input type="checkbox" id="profile-toggle">
+<input type="checkbox" id="setting-toggle">
+<input type="checkbox" id="form1-toggle">
+<input type="checkbox" id="form2-toggle">
+<input type="checkbox" id="wallet-toggle">
+<input type="checkbox" id="subscribe-month-toggle">
+<input type="checkbox" id="subscribe-year-toggle">
+<input type="checkbox" id="deposit-toggle">
+
+<div class="profile-overlay"></div>
+<div class="setting-overlay"></div>
+<div class="form1-overlay"></div>
+<div class="form2-overlay"></div>
+<div class="wallet-overlay"></div>
+<div class="subscribe-month-overlay"></div>
+<div class="subscribe-year-overlay"></div>
+<div class="deposit-overlay"></div>
+{% with lang=user.language|default:"English" %}
+    {% if lang == "English"|default:"English" %}
+
+        <label class="hamburger" for="menu-toggle"><span></span><span></span><span></span></label>
+        <label for="menu-toggle" class="overlay"></label>
+
+        <div class="side-menu">
+            <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
+            <div class="username-line">{{ user.username }}</div>
+            <label for="profile-toggle" class="profile-btn">My profile</label>
+            <label for="wallet-toggle" class="profile-btn">Balance</label>
+            <label for="setting-toggle" class="profile-btn">Setting</label>
+        </div>
+
+        <div class="profile-form">
+            <div class="profile-header">
+                <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
+                <div class="info">
+                    <h2>{{ user.username }}</h2>
+                    <p style="color: {% if user.status == 'Online' %}green{% else %}red{% endif %};">{{ user.status|default:"Offline" }}</p>
+                </div>
+            </div>
+            <hr class="profile-divider">
+            <div class="profile-body">
+                <p><strong>Description:</strong>{{ user.description }}</p>
+                <p><strong>Teg:</strong> <span class="tag-copy" id="user-tag">{{ user.your_tag }}</span></p>
+                <p><strong>Birthday:</strong> {{ user.birthday|default:"Not specified" }}</p>
+            </div>
+        </div>
+
+        <div class="setting-form">
+            <h2>Setting</h2>
+            <label for="form1-toggle" class="profile-btn">Edit profile</label>
+            <label for="form2-toggle" class="profile-btn">Language</label>
+            <label for="subscribe-month-toggle" class="profile-btn">Subscribe</label>
+        </div>
+
+        <div class="form1">
+            <h2>Edit profile</h2>
+            <form method="POST">{% csrf_token %}
+                <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
+                <p><strong>Username:</strong></p>
+                <input type="text" name="username" value="{{ user.username }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                
+                <p><strong>Description:</strong></p>
+                <textarea name="description" rows="3" style="resize: none; width: 100%;">{{ user.description }}</textarea>
+
+                <p><strong>Teg:</strong></p>
+                <div style="display:flex; gap:5px; align-items:center;">
+                    <input type="text" name="your_tag" value="{{ user.your_tag }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                </div>
+
+                <p><strong>Birthday:</strong></p>
+                <div style="display:flex; gap:10px;">
+                    <select name="day">{% for d in days %}<option value="{{ d }}" {% if birthday.day == d %}selected{% endif %}>{{ d }}</option>{% endfor %}</select>
+                    <select name="month">{% for m in months %}<option value="{{ m }}" {% if birthday.month == m %}selected{% endif %}>{{ m }}</option>{% endfor %}</select>
+                    <select name="year">{% for y in years %}<option value="{{ y }}" {% if birthday.year == y %}selected{% endif %}>{{ y }}</option>{% endfor %}</select>
+                </div>
+
+                <button type="submit" style="margin-top:15px; padding:10px 20px; border-radius:8px; border:none; background:teal; color:white;">Save</button>
+            </form>
+        </div>
+
+        <div class="form2">
+            <form class="language-form" method="POST" action="{% url 'change-language' %}">
+                {% csrf_token %}
+                <select name="language">
+                    <option value="English" {% if lang == "English" %}selected{% endif %}>English</option>
+                    <option value="Українська" {% if lang == "Українська" %}selected{% endif %}>Українська</option>
+                </select>
+                <button type="submit">Change</button>
+            </form>
+        </div>
+
+        <div class="wallet wallet-form">
+            <p id="wallet-amount">Wallet: {{ price_converted }}</p>
+            <form action="{% url 'change-currency' %}" method="post">
+                {% csrf_token %}
+                <select name="currency" onchange="this.form.submit()">
+                    <option value="USD" {% if user.currency == 'USD' %}selected{% endif %}>USD $</option>
+                    <option value="UAH" {% if user.currency == 'UAH' %}selected{% endif %}>UAH ₴</option>
+                </select>
+            </form>
+            <button type="button" class="deposit-btn" onclick="openSubscribe('deposit')">Deposit to card</button>
+        </div>
+
+        <div class="deposit deposit-form">
+            <h2>Deposit</h2>
+            <p>wallet: <span id="deposit-wallet">{{ price_converted }}</span></p>
+            <input id="deposit-amount" type="number" placeholder="Amount" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+            <p id="deposit-result" style="margin-top:8px;color:#333;font-weight:600;"></p>
+            <button type="button" class="deposit-btn" onclick="performDeposit()">Deposit</button>
+        </div>
+
+        <div class="subscribe-form-month">
+            <!-- Кнопки выбора периода -->
+            <div class="subscribe-buttons" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                <button type="button" class="subscribe-btn" onclick="openSubscribe('month')">Month</button>
+                <button type="button" class="subscribe-btn" onclick="openSubscribe('year')">Year</button>
+            </div>
+            <div class="plans-container" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+
+                <!-- From Uiverse.io by Yaya12085 --> 
+                <div class="plan">
+                    <div class="inner">
+                        <span class="pricing">
+                            <span>
+                                $4.99 <small>/ m</small>
+                            </span>
+                        </span>
+                        <p class="title">Bin+</p>
+                        <p class="info">This plan is for those who have a team already and running a large business.</p>
+                        <ul class="features">
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span><strong>20</strong> team members</span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>Plan <strong>team meetings</strong></span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>File sharing</span>
+                            </li>
+                        </ul>
+                        <div class="action">
+                            <a class="button" href="#">Choose plan</a>
+                        </div>
+                    </div>
+                </div>      
+
+                <!-- From Uiverse.io by Yaya12085 --> 
+                <div class="plan">
+                    <div class="inner">
+                        <span class="pricing">
+                            <span>
+                                $9.99 <small>/ m</small>
+                            </span>
+                        </span>
+                        <p class="title">Bin premium</p>
+                        <p class="info">This plan is for those who have a team already and running a large business.</p>
+                        <ul class="features">
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span><strong>20</strong> team members</span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>Plan <strong>team meetings</strong></span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>File sharing</span>
+                            </li>
+                        </ul>
+                        <div class="action">
+                            <a class="button" href="#">Choose plan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Підписка на рік -->
+        <div class="subscribe-form-year">
+            <!-- Кнопки выбора периода -->
+            <div class="subscribe-buttons" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                <button type="button" class="subscribe-btn" onclick="openSubscribe('month')">Month</button>
+                <button type="button" class="subscribe-btn" onclick="openSubscribe('year')">Year</button>
+            </div>
+
+            <div class="plans-container" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                <!-- From Uiverse.io by Yaya12085 --> 
+                <div class="plan">
+                    <div class="inner">
+                        <span class="pricing">
+                            <span>
+                                $49.99 <small>/ y</small>
+                            </span>
+                        </span>
+                        <p class="title">Bin+</p>
+                        <p class="info">This plan is for those who have a team already and running a large business.</p>
+                        <ul class="features">
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span><strong>20</strong> team members</span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>Plan <strong>team meetings</strong></span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>File sharing</span>
+                            </li>
+                        </ul>
+                        <div class="action">
+                            <a class="button" href="#">Choose plan</a>
+                        </div>
+                    </div>
+                </div>      
+
+                <!-- From Uiverse.io by Yaya12085 --> 
+                <div class="plan">
+                    <div class="inner">
+                        <span class="pricing">
+                            <span>
+                                $99.99 <small>/ y</small>
+                            </span>
+                        </span>
+                        <p class="title">Bin premium</p>
+                        <p class="info">This plan is for those who have a team already and running a large business.</p>
+                        <ul class="features">
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span><strong>20</strong> team members</span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>Plan <strong>team meetings</strong></span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>File sharing</span>
+                            </li>
+                        </ul>
+                        <div class="action">
+                            <a class="button" href="#">Choose plan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form3">
+        </div>
+            <div class="content">
+                <h1>Welcome to the main page!</h1>
+                <p>Click on the three lines in the top left corner to open the side menu with the form.</p>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        {% elif lang == "Українська" %}
+        <label class="hamburger" for="menu-toggle"><span></span><span></span><span></span></label>
+        <label for="menu-toggle" class="overlay"></label>       
+
+        <div class="side-menu">
+            <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Аватар">
+            <div class="username-line">{{ user.username }}</div>
+            <label for="profile-toggle" class="profile-btn">Мій профіль</label>
+            <label for="wallet-toggle" class="profile-btn">Гаманець</label>
+            <label for="setting-toggle" class="profile-btn">Налаштування</label>
+        </div>      
+
+        <div class="profile-form">
+            <div class="profile-header">
+                <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Аватар">
+                <div class="info">
+                    <h2>{{ user.username }}</h2>
+                    <p style="color: {% if user.status == 'Online' %}green{% else %}red{% endif %};">
+                        {{ user.status|default:"Без статусу" }}
+                    </p>
+                </div>
+            </div>
+            <hr class="profile-divider">
+            <div class="profile-body">
+                <p><strong>Опис:</strong> {{ user.description }}</p>
+                <p><strong>Тег:</strong> <span class="tag-copy" id="user-tag">{{ user.your_tag }}</span></p>
+                <p><strong>Дата народження:</strong> {{ user.birthday|default:"Не вказано" }}</p>
+            </div>
+        </div>      
+
+        <div class="setting-form">
+            <h2>Налаштування</h2>
+            <label for="form1-toggle" class="profile-btn">Редагувати профіль</label>
+            <label for="form2-toggle" class="profile-btn">Мова</label>
+            <label for="subscribe-month-toggle" class="profile-btn">Підписки</label>
+        </div>      
+
+        <div class="form1">
+            <h2>Редагувати профіль</h2>
+            <form method="POST">{% csrf_token %}
+                <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
+                <p><strong>Username:</strong></p>
+                <input type="text" name="username" value="{{ user.username }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                
+                <p><strong>Опис:</strong></p>
+                <textarea name="description" rows="3" style="resize: none; width: 100%;">{{ user.description }}</textarea>      
+
+                <p><strong>Тег:</strong></p>
+                <div style="display:flex; gap:5px; align-items:center;">
+                    <input type="text" name="your_tag" value="{{ user.your_tag }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                </div>      
+
+                <p><strong>Дата народження:</strong></p>
+                <div style="display:flex; gap:10px;">
+                    <select name="day">{% for d in days %}<option value="{{ d }}" {% if birthday.day == d %}selected{% endif %}>{{ d }}</option>{% endfor %}</select>
+                    <select name="month">{% for m in months %}<option value="{{ m }}" {% if birthday.month == m %}selected{% endif %}>{{ m }}</option>{% endfor %}</select>
+                    <select name="year">{% for y in years %}<option value="{{ y }}" {% if birthday.year == y %}selected{% endif %}>{{ y }}</option>{% endfor %}</select>
+                </div>      
+
+                <button type="submit" style="margin-top:15px; padding:10px 20px; border-radius:8px; border:none; background:teal; color:white;">Зберегти</button>
+            </form>
+        </div>      
+
+        <div class="form2">
+            <form class="language-form" method="POST" action="{% url 'change-language' %}">
+              {% csrf_token %}
+              <select name="language">
+                <option value="English" {% if lang == "English" %}selected{% endif %}>English</option>
+                <option value="Українська" {% if lang == "Українська" %}selected{% endif %}>Українська</option>
+              </select>
+              <button type="submit">{% if lang == "English" %}Change{% else %}Змінити{% endif %}</button>
+            </form>
+        </div>  
+        
+        <div class="wallet wallet-form">
+            <p id="wallet-amount">Гаманець: {{ price_converted }}</p>
+            <form action="{% url 'change-currency' %}" method="post">
+                {% csrf_token %}
+                <select name="currency" onchange="this.form.submit()">
+                    <option value="USD" {% if user.currency == 'USD' %}selected{% endif %}>USD $</option>
+                    <option value="UAH" {% if user.currency == 'UAH' %}selected{% endif %}>UAH ₴</option>
+                </select>
+            </form>
+            <button type="button" class="deposit-btn" onclick="openSubscribe('deposit')">Покласти гроші на карту</button>
+        </div>
+
+        <div class="deposit deposit-form">
+            <h2>Поповнення грошей</h2>
+            <p>Гаманець: <span id="deposit-wallet">{{ price_converted }}</span></p>
+            <input id="deposit-amount" type="number" placeholder="Amount" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+            <p id="deposit-result" style="margin-top:8px;color:#333;font-weight:600;"></p>
+            <button type="button" class="deposit-btn" onclick="performDeposit()">Поповнити</button>
+        </div>
+
+        <div class="subscribe-form-month">
+            <!-- Кнопки выбора периода -->
+            <div class="subscribe-buttons" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                <button type="button" class="subscribe-btn" onclick="openSubscribe('month')">Month</button>
+                <button type="button" class="subscribe-btn" onclick="openSubscribe('year')">Year</button>
+            </div>
+            <div class="plans-container" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+
+                <!-- From Uiverse.io by Yaya12085 --> 
+                <div class="plan">
+                    <div class="inner">
+                        <span class="pricing">
+                            <span>
+                                $4.99 <small>/ m</small>
+                            </span>
+                        </span>
+                        <p class="title">Bin+</p>
+                        <p class="info">This plan is for those who have a team already and running a large business.</p>
+                        <ul class="features">
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span><strong>20</strong> team members</span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>Plan <strong>team meetings</strong></span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>File sharing</span>
+                            </li>
+                        </ul>
+                        <div class="action">
+                            <a class="button" href="#">Choose plan</a>
+                        </div>
+                    </div>
+                </div>      
+
+                <!-- From Uiverse.io by Yaya12085 --> 
+                <div class="plan">
+                    <div class="inner">
+                        <span class="pricing">
+                            <span>
+                                $9.99 <small>/ m</small>
+                            </span>
+                        </span>
+                        <p class="title">Bin premium</p>
+                        <p class="info">This plan is for those who have a team already and running a large business.</p>
+                        <ul class="features">
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span><strong>20</strong> team members</span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>Plan <strong>team meetings</strong></span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>File sharing</span>
+                            </li>
+                        </ul>
+                        <div class="action">
+                            <a class="button" href="#">Choose plan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Підписка на рік -->
+        <div class="subscribe-form-year">
+            <!-- Кнопки выбора периода -->
+            <div class="subscribe-buttons" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                <button type="button" class="subscribe-btn" onclick="openSubscribe('month')">Month</button>
+                <button type="button" class="subscribe-btn" onclick="openSubscribe('year')">Year</button>
+            </div>
+
+            <div class="plans-container" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                <!-- From Uiverse.io by Yaya12085 --> 
+                <div class="plan">
+                    <div class="inner">
+                        <span class="pricing">
+                            <span>
+                                $49.99 <small>/ y</small>
+                            </span>
+                        </span>
+                        <p class="title">Bin+</p>
+                        <p class="info">This plan is for those who have a team already and running a large business.</p>
+                        <ul class="features">
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span><strong>20</strong> team members</span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>Plan <strong>team meetings</strong></span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>File sharing</span>
+                            </li>
+                        </ul>
+                        <div class="action">
+                            <a class="button" href="#">Choose plan</a>
+                        </div>
+                    </div>
+                </div>      
+
+                <!-- From Uiverse.io by Yaya12085 --> 
+                <div class="plan">
+                    <div class="inner">
+                        <span class="pricing">
+                            <span>
+                                $99.99 <small>/ y</small>
+                            </span>
+                        </span>
+                        <p class="title">Bin premium</p>
+                        <p class="info">This plan is for those who have a team already and running a large business.</p>
+                        <ul class="features">
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span><strong>20</strong> team members</span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>Plan <strong>team meetings</strong></span>
+                            </li>
+                            <li>
+                                <span class="icon">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                    </svg>
+                                </span>
+                                <span>File sharing</span>
+                            </li>
+                        </ul>
+                        <div class="action">
+                            <a class="button" href="#">Choose plan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1>Ласкаво просимо на головну сторінку!</h1>
+            <p>Натисніть на три лінії у верхньому лівому куті, щоб відкрити бічне меню з формою.</p>
+        </div>
+        {% endif %}
+{% endwith %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const tagElement = document.getElementById('user-tag');
+    if (tagElement) {
+        tagElement.addEventListener('click', () => {
+            const text = tagElement.textContent;
+            navigator.clipboard.writeText(text)
+                .then(() => alert('Tag copied!'))
+                .catch(err => console.error('Error copying tag:', err));
+        });
+    }
+
+    const overlays = document.querySelectorAll('.overlay, .profile-overlay, .setting-overlay, .form1-overlay, .form2-overlay, .wallet-overlay, .subscribe-month-overlay, .subscribe-year-overlay');
+    overlays.forEach(overlay => {
+        overlay.addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('#menu-toggle, #profile-toggle, #setting-toggle, #form1-toggle, #form2-toggle, #wallet-toggle, #subscribe-month-toggle, #subscribe-year-toggle');
+            checkboxes.forEach(cb => {
+                if(cb) cb.checked = false;
+            });
+        });
+    });
+
+    const depositInput = document.getElementById('deposit-amount');
+    const depositResult = document.getElementById('deposit-result');
+    const depositWalletSpan = document.getElementById('deposit-wallet');
+    const currencySelect = document.querySelector('.wallet form select');
+
+    function parseAmountAndCurrency(text) {
+        if (!text) return { amount: 0, currency: ("{{ user.currency|default:'USD' }}") };
+        const t = text.replace(/,/g, '').trim();
+        const uah = t.indexOf('₴') !== -1 || /UAH/i.test(t);
+        const usd = t.indexOf('$') !== -1 || /USD/i.test(t);
+        const m = t.match(/([-+]?\d*\.?\d+)/);
+        const amount = m ? Number(m[0]) : 0;
+        const currency = uah ? 'UAH' : (usd ? 'USD' : ("{{ user.currency|default:'USD' }}"));
+        return { amount, currency };
+    }
+
+    function formatCurrency(amount, currency) {
+        if (amount === null || amount === undefined) return '';
+        const a = Number(amount) || 0;
+        if (currency === 'UAH') return a.toFixed(2) + ' ₴';
+        return a.toFixed(2) + ' $';
+    }
+
+    function convertAmount(value, sourceCurrency, targetCurrency) {
+        const v = Number(value) || 0;
+        if (sourceCurrency === targetCurrency) return v;
+        if (sourceCurrency === 'USD' && targetCurrency === 'UAH') return v * 42.1;
+        if (sourceCurrency === 'UAH' && targetCurrency === 'USD') return v / 42.1;
+        return v;
+    }
+
+    function updateDepositResult() {
+        if (!depositInput || !depositResult || !depositWalletSpan) return;
+
+        const walletRaw = depositWalletSpan.textContent || depositWalletSpan.innerText || '';
+        const wallet = parseAmountAndCurrency(walletRaw);
+
+        const depositVal = Number(depositInput.value) || 0;
+        const depositCurrency = (currencySelect && currencySelect.value) ? currencySelect.value : ("{{ user.currency|default:'USD' }}");
+
+    const depositConverted = convertAmount(depositVal, depositCurrency, wallet.currency);
+    const total = (Number(wallet.amount) || 0) + depositConverted;
+
+    const pageLang = "{{ user.language|default:'English' }}";
+    const willBeText = pageLang === 'Українська' ? 'Буде' : 'Will be';
+    depositResult.textContent = depositVal ? `${willBeText}: ${formatCurrency(total, wallet.currency)}` : '';
+    }
+
+    if (depositInput) {
+        depositInput.addEventListener('input', updateDepositResult);
+    }
+    if (currencySelect) {
+        currencySelect.addEventListener('change', updateDepositResult);
+    }
+
+    window.performDeposit = function() {
+        if (!depositInput || !depositWalletSpan) return;
+        const v = Number(depositInput.value) || 0;
+        if (v <= 0) {
+            alert('Please enter an amount greater than 0');
+            return;
+        }
+
+        const depositCurrency = (currencySelect && currencySelect.value) ? currencySelect.value : ("{{ user.currency|default:'USD' }}");
+
+        const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        const csrf = csrfInput ? csrfInput.value : '';
+
+        const formData = new FormData();
+        formData.append('amount', v);
+        formData.append('currency', depositCurrency);
+
+        fetch('{% url "deposit-funds" %}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrf,
+            },
+            body: formData,
+        })
+        .then(resp => {
+            if (!resp.ok) throw new Error('Network response was not ok');
+            return resp.json();
+        })
+        .then(data => {
+            if (data && data.price_converted) {
+                depositWalletSpan.textContent = data.price_converted;
+                const walletAmountEl = document.getElementById('wallet-amount');
+                if (walletAmountEl) walletAmountEl.textContent = 'Wallet: ' + data.price_converted;
+                const depositToggle = document.getElementById('deposit-toggle');
+                const walletToggle = document.getElementById('wallet-toggle');
+                if (depositToggle) depositToggle.checked = false;
+                if (walletToggle) walletToggle.checked = true;
+                depositInput.value = '';
+                if (depositResult) depositResult.textContent = '';
+            } else if (data && data.error) {
+                alert('Deposit failed: ' + data.error);
+            }
+        })
+        .catch(err => {
+            console.error('Deposit failed:', err);
+            alert('Deposit failed');
+        });
+    };
+
+    window.openSubscribe = function(period) {
+        const monthToggle = document.getElementById('subscribe-month-toggle');
+        const yearToggle = document.getElementById('subscribe-year-toggle');
+
+            if (period === 'month') {
+                if (monthToggle) monthToggle.checked = true;
+                if (yearToggle) yearToggle.checked = false;
+                const depositToggle = document.getElementById('deposit-toggle');
+                if (depositToggle) depositToggle.checked = false;
+            } else if (period === 'year') {
+                if (yearToggle) yearToggle.checked = true;
+                if (monthToggle) monthToggle.checked = false;
+                const depositToggle = document.getElementById('deposit-toggle');
+                if (depositToggle) depositToggle.checked = false;
+            } else if (period === 'deposit') {
+                const depositToggle = document.getElementById('deposit-toggle');
+                if (depositToggle) depositToggle.checked = true;
+                if (monthToggle) monthToggle.checked = false;
+                if (yearToggle) yearToggle.checked = false;
+            }
+    };
+
+    const sideMenuLinks = document.querySelectorAll('.side-menu label, .side-menu a');
+    sideMenuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const menuToggle = document.getElementById('menu-toggle');
+            if(menuToggle) menuToggle.checked = false;
+        });
+    });
+
+    const formCheckboxes = ['profile-toggle', 'setting-toggle', 'form1-toggle', 'form2-toggle', 'subscribe-month-toggle', 'subscribe-year-toggle'];
+    formCheckboxes.forEach(id => {
+        const cb = document.getElementById(id);
+        if(cb) {
+            cb.addEventListener('change', () => {
+                if(cb.checked) {
+                    formCheckboxes.forEach(otherId => {
+                        if(otherId !== id) {
+                            const otherCb = document.getElementById(otherId);
+                            if(otherCb) otherCb.checked = false;
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    const walletForm = document.querySelector('.wallet form');
+    if (walletForm) {
+        walletForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(walletForm);
+            const csrf = formData.get('csrfmiddlewaretoken');
+
+            fetch(walletForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrf,
+                },
+                body: formData,
+            })
+            .then(resp => {
+                if (!resp.ok) throw new Error('Network response was not ok');
+                return resp.json();
+            })
+            .then(data => {
+                if (data && data.price_converted) {
+                    const el = document.getElementById('wallet-amount');
+                    if (el) el.textContent = 'Wallet: ' + data.price_converted;
+                    const depositWallet = document.getElementById('deposit-wallet');
+                    if (depositWallet) depositWallet.textContent = data.price_converted;
+                    updateDepositResult();
+                }
+            })
+            .catch(err => console.error('Currency change failed:', err));
+        });
+    }
+});
+</script>
+
+{% endblock %}

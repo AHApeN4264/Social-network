@@ -1,0 +1,18 @@
+/* Основные стили */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+.main-container {
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Стили для мобильных устройств */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 10px;
+    }
+}

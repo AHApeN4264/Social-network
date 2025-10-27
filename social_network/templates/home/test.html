@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Test Page</title>
+{% endblock %}
+
+{% block body %}
+<div style="padding: 20px;">
+    <h1>Test Content</h1>
+    <p>This is a test page to verify template inheritance.</p>
+    
+    <div class="menu-test">
+        <input type="checkbox" id="menu-toggle">
+        <label for="menu-toggle" class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
+        
+        <div class="side-menu">
+            <h2>Menu Works!</h2>
+        </div>
+    </div>
+</div>
+
+<style>
+.menu-test {
+    position: relative;
+}
+
+#menu-toggle {
+    display: none;
+}
+
+.hamburger {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 30px;
+    height: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.hamburger span {
+    display: block;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(2) {
+    opacity: 0;
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+#menu-toggle:checked ~ .side-menu {
+    left: 0;
+}
+</style>
+{% endblock %}
