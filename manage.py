@@ -15,8 +15,6 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-git config --global user.email "kofanandrej3@example.com"
-git config --global user.name "AHApeN4264"
 
 def main():
     """Run administrative tasks."""
