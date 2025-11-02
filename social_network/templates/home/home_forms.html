@@ -1,0 +1,78 @@
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block body %}
+<form method="post" action="{% url 'add-card' %}" class="add_card-form">
+    {% csrf_token %}
+    <label class="close-button" for="add_card-toggle">×</label>
+    <h2>{% if lang == "Українська" %}Додати картку{% else %}Add card{% endif %}</h2>
+    
+    <input type="text" id="card-number" name="card_number" 
+           class="form-input" 
+           placeholder="1234 5678 9012 3456"
+           required>
+           
+    <input type="text" id="card-cardholder" name="cardholder" 
+           class="form-input" 
+           placeholder="{% if lang == 'Українська' %}Власник картки{% else %}Card Holder{% endif %}"
+           required>
+           
+    <div class="form-row">
+        <select id="card-expiry-month" name="expiry_month" class="form-input">
+            {% for m in "123456789101112"|make_list %}
+            <option value="{{ m }}">{{ m }}</option>
+            {% endfor %}
+        </select>
+        
+        <select id="card-expiry-year" name="expiry_year" class="form-input">
+            {% for y in "23242526272829"|make_list %}
+            <option value="20{{ y }}">20{{ y }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <p id="add-card-result" class="form-message"></p>
+    <button type="submit" class="form-button">
+        {% if lang == "Українська" %}Додати{% else %}Add{% endif %}
+    </button>
+</form>
+
+<form method="post" action="{% url 'deposit-funds' %}" class="deposit-form">
+    {% csrf_token %}
+    <label class="close-button" for="deposit-toggle">×</label>
+    <h2>{% if lang == "Українська" %}Поповнення{% else %}Deposit{% endif %}</h2>
+    
+    <p>{% if lang == "Українська" %}Гаманець{% else %}Wallet{% endif %}: 
+        <span id="deposit-wallet">{{ price_converted }}</span>
+    </p>
+    
+    <select id="deposit-card" name="card_id" class="form-input" required>
+        {% for card in cards %}
+        <option value="{{ card.id }}">**** **** **** {{ card.last4 }}</option>
+        {% endfor %}
+    </select>
+    
+    <input type="number" id="deposit-amount" name="amount" 
+           class="form-input" 
+           min="0.01" step="0.01"
+           placeholder="{% if lang == 'Українська' %}Сума{% else %}Amount{% endif %}"
+           required>
+           
+    <p id="deposit-result" class="form-message"></p>
+    <button type="submit" class="form-button">
+        {% if lang == "Українська" %}Поповнити{% else %}Deposit{% endif %}
+    </button>
+</form>
+
+{% for card in cards %}
+<div class="card-item">
+    <div class="card-number">**** **** **** {{ card.last4 }}</div>
+    <div class="card-holder">{{ card.cardholder }}</div>
+    <div class="card-expiry">{{ card.expiry }}</div>
+</div>
+{% endfor %}
+
+{% endblock %}

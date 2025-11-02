@@ -1,0 +1,72 @@
+# ============================
+# 🐍 Python / Django ignore file
+# ============================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environments (do NOT upload)
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+
+# Django-related files
+*.log
+*.pot
+*.pyc
+db.sqlite3
+*.sqlite3
+/staticfiles/
+/media/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# IDE / editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# MyPy / Pyre type checker
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Jupyter notebooks
+.ipynb_checkpoints
+
+# VS Code Python environment
+.python-version
+
+# Local environment configs
+.env
+.env.bak
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local

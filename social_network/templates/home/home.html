@@ -2,9 +2,25 @@
 {% load static %}
 
 {% block title %}
-<title>Главный экран</title>
-<link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+<title>Main</title>
+<link rel="icon" href="{% static 'icons/Bin.jpg' %}" type="image/png">
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'js/home.js' %}">
+
 <style>
+.username {
+    text-align: left;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.username-line {
+    align-self: flex-start;
+    text-align: left;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -17,9 +33,15 @@ body {
 #form1-toggle,
 #form2-toggle,
 #wallet-toggle,
+#check-subscription-toggle,
 #subscribe-month-toggle,
 #subscribe-year-toggle,
-#deposit-toggle {
+#bin_mouth-toggle,
+#bin_premium_mouth-toggle,
+#bin_years-toggle,
+#bin_premium_years-toggle,
+#deposit-toggle,
+#add_card-toggle {
     display: none;
 }
 
@@ -151,7 +173,23 @@ body {
     gap: 20px;
 }
 
-/* Small avatar inside edit profile form to avoid layout break */
+.profile-form .info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.profile-form .info h2 {
+    font-size: 1.4rem;
+    margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: anywhere; 
+    white-space: normal;
+    text-align: left;
+}
+
+
 .form1 img.avatar,
 .form2 img.avatar {
     width: 80px;
@@ -407,6 +445,111 @@ body {
     display: block;
 }
 
+
+/* Добавление карты */
+.add_card button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add_card button:hover {
+  background: #008080cc;
+}
+
+.add_card {
+  margin: 10px 0 20px 0;
+}
+
+.add_card select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.add_card button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add_card button:hover {
+  background: #008080cc;
+}
+
+.add_card {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.add_card-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.add_card-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 300px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.add_card.active {
+    display: flex;
+}
+.add_card-overlay.active {
+    display: block;
+}
+
+#add_card-toggle:checked ~ .add_card-form,
+#add_card-toggle:checked ~ .add_card {
+    display: flex;
+}
+#add_card-toggle:checked ~ .add_card-overlay {
+    display: block;
+}
 /* Пополнение кошелька */
 .deposit button {
   padding: 8px 12px;
@@ -529,6 +672,127 @@ body {
     display: block;
 }
 
+/* проверка статуса подписки */
+.check-subscription button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.check-subscription button:hover {
+  background: #008080cc;
+}
+
+.check-subscription {
+  margin: 10px 0 20px 0;
+}
+
+.check-subscription select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.check-subscription button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.check-subscription button:hover {
+  background: #008080cc;
+}
+
+.check-subscription {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.check-subscription-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.check-subscription-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 300px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.check-subscription-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.check-subscription-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.check-subscription.active {
+    display: flex;
+}
+.check-subscription-overlay.active {
+    display: block;
+}
+
+#check-subscription-toggle:checked ~ .check-subscription-form,
+#check-subscription-toggle:checked ~ .check-subscription {
+    display: flex;
+}
+#check-subscription-toggle:checked ~ .check-subscription-overlay {
+    display: block;
+}
 
 /* кнопки в подписке */
 .subscribe-btn {
@@ -727,6 +991,7 @@ body {
 
 /* кнопки в подписке */
 .subscribe-btn {
+    position: relative;
     padding: 10px 20px;
     border-radius: 8px;
     border: 2px solid #007bff;
@@ -742,6 +1007,549 @@ body {
     background-color: #0056b3;
     border-color: #0056b3;
 }
+
+.year-btn .discount {
+    position: absolute;
+    top: -11px;  
+    right: -10px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Bin+ mouth */
+.bin_mouth button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bin_mouth button:hover {
+  background: #008080cc;
+}
+
+.bin_mouth {
+  margin: 10px 0 20px 0;
+}
+
+.bin_mouth select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.bin_mouth button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bin_mouth button:hover {
+  background: #008080cc;
+}
+
+.bin_mouth {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin_mouth-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.bin_mouth-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 350px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin_mouth.active {
+    display: flex;
+}
+.bin_mouth-overlay.active {
+    display: block;
+}
+
+#bin_mouth-toggle:checked ~ .bin_mouth-form,
+#bin_mouth-toggle:checked ~ .bin_mouth {
+    display: flex;
+}
+#bin_mouth-toggle:checked ~ .bin_mouth-overlay {
+    display: block;
+}
+
+
+/* bin premium mouth */
+.bin_premium_mouth button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bin_premium_mouth button:hover {
+  background: #008080cc;
+}
+
+.bin_premium_mouth {
+  margin: 10px 0 20px 0;
+}
+
+.bin_premium_mouth select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.bin_premium_mouth button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bin_premium_mouth button:hover {
+  background: #008080cc;
+}
+
+.bin_premium_mouth {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin_premium_mouth-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.bin_premium_mouth-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 450px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin_premium_mouth.active {
+    display: flex;
+}
+.bin_premium_mouth-overlay.active {
+    display: block;
+}
+
+#bin_premium_mouth-toggle:checked ~ .bin_premium_mouth-form,
+#bin_premium_mouth-toggle:checked ~ .bin_premium_mouth {
+    display: flex;
+}
+#bin_premium_mouth-toggle:checked ~ .bin_premium_mouth-overlay {
+    display: block;
+}
+
+
+
+/* Bin+ years */
+.bin_years button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bin_years button:hover {
+  background: #008080cc;
+}
+
+.bin_years {
+  margin: 10px 0 20px 0;
+}
+
+.bin_years select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.bin_years button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bin_years button:hover {
+  background: #008080cc;
+}
+
+.bin_years {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin_years-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.bin_years-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 430px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin_years.active {
+    display: flex;
+}
+.bin_years-overlay.active {
+    display: block;
+}
+
+#bin_years-toggle:checked ~ .bin_years-form,
+#bin_years-toggle:checked ~ .bin_years {
+    display: flex;
+}
+#bin_years-toggle:checked ~ .bin_years-overlay {
+    display: block;
+}
+
+
+/* bin premium years */
+.bin_premium_years button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bin_premium_years button:hover {
+  background: #008080cc;
+}
+
+.bin_premium_years {
+  margin: 10px 0 20px 0;
+}
+
+.bin_premium_years select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.bin_premium_years button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bin_premium_years button:hover {
+  background: #008080cc;
+}
+
+.bin_premium_years {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin_premium_years-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.bin_premium_years-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 520px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin_premium_years.active {
+    display: flex;
+}
+.bin_premium_years-overlay.active {
+    display: block;
+}
+
+#bin_premium_years-toggle:checked ~ .bin_premium_years-form,
+#bin_premium_years-toggle:checked ~ .bin_premium_years {
+    display: flex;
+}
+#bin_premium_years-toggle:checked ~ .bin_premium_years-overlay {
+    display: block;
+}
+
+/* Кнопка подписки */
+.Subscribe-switching-button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    position: relative; /* чтобы внутри кнопки можно было позиционировать span */
+}
+
+.Subscribe-switching-button:hover:enabled {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.Subscribe-switching-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Стиль для скидки внутри кнопки */
+.Subscribe-switching-button .discount {
+    position: absolute;
+    top: -9px;
+    right: -18px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+/* Кнопка подписки */
+.subscribe-btn {
+    margin-top: 15px;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    
+    /* Новый стиль для растяжения */
+    width: 100%;
+    box-sizing: border-box; /* чтобы padding не вылазил за контейнер */
+}
+
+.subscribe-btn:hover:enabled {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.subscribe-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* зачёркнутая цена */
+.pricing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1.2rem;
+}
+
+.old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 1rem;
+}
+
+.new-price {
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+
+/* проверка статуса подписки */
+.check-subscription-btn {
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    background-color: #1900ff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.check-subscription-btn:hover {
+    background-color: #1200b1;
+    transform: scale(1.05);
+}
+
 
 /* From Uiverse.io by Yaya12085 */ 
 .plan {
@@ -870,29 +1678,74 @@ body {
 <input type="checkbox" id="form1-toggle">
 <input type="checkbox" id="form2-toggle">
 <input type="checkbox" id="wallet-toggle">
+<input type="checkbox" id="check-subscription-toggle">
 <input type="checkbox" id="subscribe-month-toggle">
 <input type="checkbox" id="subscribe-year-toggle">
 <input type="checkbox" id="deposit-toggle">
+<input type="checkbox" id="add_card-toggle">
+<input type="checkbox" id="bin_mouth-toggle">
+<input type="checkbox" id="bin_premium_mouth-toggle">
+<input type="checkbox" id="bin_years-toggle">
+<input type="checkbox" id="bin_premium_years-toggle">
 
 <div class="profile-overlay"></div>
 <div class="setting-overlay"></div>
 <div class="form1-overlay"></div>
 <div class="form2-overlay"></div>
 <div class="wallet-overlay"></div>
+<div class="check-subscription-overlay"></div>
 <div class="subscribe-month-overlay"></div>
 <div class="subscribe-year-overlay"></div>
 <div class="deposit-overlay"></div>
+<div class="add_card-overlay"></div>
+<div class="bin_mouth-overlay"></div>
+<div class="bin_premium_mouth-overlay"></div>
+<div class="bin_years-overlay"></div>
+<div class="bin_premium_years-overlay"></div>
 {% with lang=user.language|default:"English" %}
     {% if lang == "English"|default:"English" %}
+
+    {% if messages %}
+        <div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+            {% for message in messages %}
+                <div style="background: {% if message.tags == 'error' %}#f44336{% else %}#4CAF50{% endif %}; color: white; padding: 15px 20px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); animation: slideIn 0.3s;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        <style>
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        </style>
+        <script>
+            setTimeout(() => {
+                document.querySelectorAll('[style*="slideIn"]').forEach(el => {
+                    el.style.animation = 'slideOut 0.3s';
+                    setTimeout(() => el.remove(), 300);
+                });
+            }, 5000);
+        </script>
+    {% endif %}
 
         <label class="hamburger" for="menu-toggle"><span></span><span></span><span></span></label>
         <label for="menu-toggle" class="overlay"></label>
 
         <div class="side-menu">
             <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
-            <div class="username-line">{{ user.username }}</div>
+            <div class="username">{{ user.username }}</div>
+            {% if user.subscribe == "Bin+" %}
+                <div style="color:#0056b3" class="username-line">{{ user.subscribe }}</div>
+            {% elif user.subscribe == "Bin_premium" %}
+                <div style="color:#b3009b" class="username-line">{{ user.subscribe }}</div>
+            {% endif %}
             <label for="profile-toggle" class="profile-btn">My profile</label>
-            <label for="wallet-toggle" class="profile-btn">Balance</label>
+            <label for="wallet-toggle" class="profile-btn">Wallet</label>
             <label for="setting-toggle" class="profile-btn">Setting</label>
         </div>
 
@@ -900,46 +1753,61 @@ body {
             <div class="profile-header">
                 <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
                 <div class="info">
-                    <h2>{{ user.username }}</h2>
-                    <p style="color: {% if user.status == 'Online' %}green{% else %}red{% endif %};">{{ user.status|default:"Offline" }}</p>
+                    <h2 class="username-text">{{ user.username }}</h2>
+                    <p class="status" style="color: {% if user.status == 'Online' %}green{% else %}red{% endif %};">
+                        {{ user.status|default:"Offline" }}
+                    </p>
+                    <br>
+                    <label style="color:#0056b3" for="form1-toggle" class="cursor-pointer edit-icon">Edit profile</label>  
                 </div>
             </div>
             <hr class="profile-divider">
             <div class="profile-body">
-                <p><strong>Description:</strong>{{ user.description }}</p>
+                <p><strong>Description:</strong> {{ user.description }}</p>
                 <p><strong>Teg:</strong> <span class="tag-copy" id="user-tag">{{ user.your_tag }}</span></p>
                 <p><strong>Birthday:</strong> {{ user.birthday|default:"Not specified" }}</p>
             </div>
-        </div>
+        </div>      
 
         <div class="setting-form">
             <h2>Setting</h2>
             <label for="form1-toggle" class="profile-btn">Edit profile</label>
             <label for="form2-toggle" class="profile-btn">Language</label>
             <label for="subscribe-month-toggle" class="profile-btn">Subscribe</label>
+            <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+            {% csrf_token %}
+            </form>
+            <label class="profile-btn" a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    Logout
+                </a>
+            </label>
         </div>
 
         <div class="form1">
             <h2>Edit profile</h2>
-            <form method="POST">{% csrf_token %}
+            <form method="POST" enctype="multipart/form-data">{% csrf_token %}
                 <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
+                <br>
+                <label>Select new avatar:
+                  <input type="file" id="avatarInput" name="photo" accept="image/*">
+                </label>
                 <p><strong>Username:</strong></p>
-                <input type="text" name="username" value="{{ user.username }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
-                
+                <input type="text" name="username" value="{{ user.username }}" maxlength="18" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+
                 <p><strong>Description:</strong></p>
-                <textarea name="description" rows="3" style="resize: none; width: 100%;">{{ user.description }}</textarea>
+                <textarea name="description" rows="3" style="resize: none; width: 100%;">{{ user.description }}</textarea>      
 
                 <p><strong>Teg:</strong></p>
                 <div style="display:flex; gap:5px; align-items:center;">
                     <input type="text" name="your_tag" value="{{ user.your_tag }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
-                </div>
+                </div>      
 
                 <p><strong>Birthday:</strong></p>
                 <div style="display:flex; gap:10px;">
                     <select name="day">{% for d in days %}<option value="{{ d }}" {% if birthday.day == d %}selected{% endif %}>{{ d }}</option>{% endfor %}</select>
                     <select name="month">{% for m in months %}<option value="{{ m }}" {% if birthday.month == m %}selected{% endif %}>{{ m }}</option>{% endfor %}</select>
                     <select name="year">{% for y in years %}<option value="{{ y }}" {% if birthday.year == y %}selected{% endif %}>{{ y }}</option>{% endfor %}</select>
-                </div>
+                </div>      
 
                 <button type="submit" style="margin-top:15px; padding:10px 20px; border-radius:8px; border:none; background:teal; color:white;">Save</button>
             </form>
@@ -965,12 +1833,76 @@ body {
                     <option value="UAH" {% if user.currency == 'UAH' %}selected{% endif %}>UAH ₴</option>
                 </select>
             </form>
-            <button type="button" class="deposit-btn" onclick="openSubscribe('deposit')">Deposit to card</button>
+            <button type="button" class="deposit-btn" onclick="checkCardsAndOpenDeposit()">Deposit to wallet</button>
+            <button type="button" class="add_card-btn" onclick="openAdd_card('add_card')">Add card</button>
+            <div id="cards-list" style="margin-top:12px;">
+                <strong>{% if lang == "Українська" %}Картки:{% else %}Cards:{% endif %}</strong>
+                <div style="margin-top:6px;">
+                    {% if cards and cards.count %}
+                        {% for c in cards %}
+                            <div class="card-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">
+                                <span>**** **** ****{{ c.last4 }} — {{ c.cardholder|default:'-' }} — {{ c.expiry_month|stringformat:"02d" }}/{{ c.expiry_year }}</span>
+                                <button type="button" onclick="deleteCard('{{ c.last4 }}')" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">🗑️</button>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="card-item" style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">{% if lang == "Українська" %}Карт не додано{% else %}No cards added{% endif %}</div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
+        <label for="add_card-toggle" class="add_card-overlay"></label>
+        <div class="add_card add_card-form">
+            <h2>{% if lang == "Українська" %}Додати картку{% else %}Add card{% endif %}</h2>
+            <form id="add-card-form" onsubmit="return false;">
+                <label>{% if lang == "Українська" %}Номер картки{% else %}Card number{% endif %}</label>
+                <input id="card-number" type="text" inputmode="numeric" pattern="[0-9\s]*" maxlength="19" placeholder="1235 9864 2134 1253" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+
+                <label style="margin-top:8px;">{% if lang == "Українська" %}Ім'я власника{% else %}Cardholder name{% endif %}</label>
+                <input id="card-cardholder" type="text" placeholder="NAME SURNAME" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    <div style="flex:1;">
+                        <label>{% if lang == "Українська" %}Місяць{% else %}Month{% endif %}</label>
+                        <select id="card-expiry-month" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                            {% for m in months %}
+                                <option value="{{ m }}">{{ m|stringformat:"02d" }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label>{% if lang == "Українська" %}Рік{% else %}Year{% endif %}</label>
+                        <select id="card-expiry-year" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                            {% for y in expiry_years %}
+                                <option value="{{ y }}">{{ y }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <label style="margin-top:8px;">{% if lang == "Українська" %}CVV (не зберігається){% else %}CVV (not stored){% endif %}</label>
+                <input id="card-cvv" type="password" maxlength="4" placeholder="123" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button type="button" class="deposit-btn" onclick="submitAddCard()">{% if lang == "Українська" %}Додати{% else %}Add{% endif %}</button>
+                    <button type="button" class="deposit-btn" onclick="(function(){ const cb=document.getElementById('add_card-toggle'); if(cb) cb.checked=false; })()">{% if lang == "Українська" %}Відмінити{% else %}Cancel{% endif %}</button>
+                </div>
+                <p id="add-card-result" style="margin-top:8px;color:#333;font-weight:600;"></p>
+            </form>
+        </div>
+
+        <label for="deposit-toggle" class="deposit-overlay"></label>
         <div class="deposit deposit-form">
             <h2>Deposit</h2>
             <p>wallet: <span id="deposit-wallet">{{ price_converted }}</span></p>
+            <select id="deposit-card" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-bottom:10px;">
+                {% if cards and cards.count %}
+                    {% for c in cards %}
+                        <option value="{{ c.last4 }}">**** **** **** {{ c.last4 }} — {{ c.cardholder|default:'-' }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
             <input id="deposit-amount" type="number" placeholder="Amount" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
             <p id="deposit-result" style="margin-top:8px;color:#333;font-weight:600;"></p>
             <button type="button" class="deposit-btn" onclick="performDeposit()">Deposit</button>
@@ -979,9 +1911,13 @@ body {
         <div class="subscribe-form-month">
             <!-- Кнопки выбора периода -->
             <div class="subscribe-buttons" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
-                <button type="button" class="subscribe-btn" onclick="openSubscribe('month')">Month</button>
-                <button type="button" class="subscribe-btn" onclick="openSubscribe('year')">Year</button>
+                <button type="button" class="Subscribe-switching-button" onclick="openSubscribe('month')">Month</button>
+                <button type="button" class="Subscribe-switching-button year-btn" onclick="openSubscribe('year')">
+                    Year
+                    <span class="discount">-17%</span>
+                </button>
             </div>
+
             <div class="plans-container" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
 
                 <!-- From Uiverse.io by Yaya12085 --> 
@@ -989,7 +1925,11 @@ body {
                     <div class="inner">
                         <span class="pricing">
                             <span>
-                                $4.99 <small>/ m</small>
+                                {% if user.currency == 'USD' %}
+                                    $4.99 <small>/ m</small>
+                                {% elif user.currency == 'UAH' %}
+                                    ₴209.99 <small>/ m</small>
+                                {% endif %}
                             </span>
                         </span>
                         <p class="title">Bin+</p>
@@ -1024,7 +1964,7 @@ body {
                             </li>
                         </ul>
                         <div class="action">
-                            <a class="button" href="#">Choose plan</a>
+                            <label for="bin_mouth-toggle" class="button">Choose plan</label>
                         </div>
                     </div>
                 </div>      
@@ -1034,7 +1974,11 @@ body {
                     <div class="inner">
                         <span class="pricing">
                             <span>
-                                $9.99 <small>/ m</small>
+                                {% if user.currency == 'USD' %}
+                                    $9.99 <small>/ m</small>
+                                {% elif user.currency == 'UAH' %}
+                                    ₴419.99 <small>/ m</small>
+                                {% endif %}
                             </span>
                         </span>
                         <p class="title">Bin premium</p>
@@ -1069,10 +2013,13 @@ body {
                             </li>
                         </ul>
                         <div class="action">
-                            <a class="button" href="#">Choose plan</a>
+                            <label for="bin_premium_mouth-toggle" class="button">Choose plan</label>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <label for="check-subscription-toggle" class="check-subscription-btn">Check subscription status</label>
             </div>
         </div>
 
@@ -1080,8 +2027,11 @@ body {
         <div class="subscribe-form-year">
             <!-- Кнопки выбора периода -->
             <div class="subscribe-buttons" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
-                <button type="button" class="subscribe-btn" onclick="openSubscribe('month')">Month</button>
-                <button type="button" class="subscribe-btn" onclick="openSubscribe('year')">Year</button>
+                <button type="button" class="Subscribe-switching-button" onclick="openSubscribe('month')">Month</button>
+                <button type="button" class="Subscribe-switching-button year-btn" onclick="openSubscribe('year')">
+                    Year
+                    <span class="discount">-17%</span>
+                </button>
             </div>
 
             <div class="plans-container" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
@@ -1090,7 +2040,13 @@ body {
                     <div class="inner">
                         <span class="pricing">
                             <span>
-                                $49.99 <small>/ y</small>
+                                {% if user.currency == 'USD' %}
+                                    <span class="old-price">$59.88</span>
+                                    <span class="new-price">$49.99</span> <small>/ y</small>
+                                {% elif user.currency == 'UAH' %}
+                                    <span class="old-price">₴2519.88</span>
+                                    <span class="new-price">₴2099.99</span> <small>/ y</small>
+                                {% endif %}
                             </span>
                         </span>
                         <p class="title">Bin+</p>
@@ -1125,7 +2081,7 @@ body {
                             </li>
                         </ul>
                         <div class="action">
-                            <a class="button" href="#">Choose plan</a>
+                            <label for="bin_years-toggle" class="button">Choose plan</label>
                         </div>
                     </div>
                 </div>      
@@ -1135,7 +2091,13 @@ body {
                     <div class="inner">
                         <span class="pricing">
                             <span>
-                                $99.99 <small>/ y</small>
+                                {% if user.currency == 'USD' %}
+                                    <span class="old-price">$119.88</span>
+                                    <span class="new-price">$99.99</span> <small>/ y</small>
+                                {% elif user.currency == 'UAH' %}
+                                    <span class="old-price">₴5039.88</span>
+                                    <span class="new-price">₴4199.99</span> <small>/ y</small>
+                                {% endif %}
                             </span>
                         </span>
                         <p class="title">Bin premium</p>
@@ -1170,13 +2132,16 @@ body {
                             </li>
                         </ul>
                         <div class="action">
-                            <a class="button" href="#">Choose plan</a>
+                            <label for="bin_premium_years-toggle" class="button">Choose plan</label>
                         </div>
                     </div>
                 </div>
             </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <label for="check-subscription-toggle" class="check-subscription-btn">Check subscription status</label>
+            </div>
         </div>
-
+        
         <div class="form3">
         </div>
             <div class="content">
@@ -1184,8 +2149,88 @@ body {
                 <p>Click on the three lines in the top left corner to open the side menu with the form.</p>
             </div>
 
+<div class="check-subscription-form">
+    <h2>Your subscription status: {{ user.subscribe }}</h2>
 
+    {% if user.subscription_end %}
+        <p>Time left: <span id="countdown"></span></p>
+    {% else %}
+        <p>Your subscription is Basic</p>
+    {% endif %}
+</div>
 
+<div class="bin_mouth-form">
+    <h2>Update your plan to Bin+</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Wallet: <span>{{ price_converted }}</span></p>
+        {% if user.currency == 'USD' %}
+            $4.99 <small>/ m</small>
+        {% elif user.currency == 'UAH' %}
+            ₴209.99 <small>/ m</small>
+        {% endif %}
+        <div>
+            <input type="checkbox" id="terms-bin">
+            <label for="terms-bin">I agree with the <a href="/terms" target="_blank">terms and conditions</a></label>
+        </div>
+        <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button>
+        <!-- <button type="submit" name="subscription_plan" value="bin_plus_test" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button> -->
+    </form>
+</div>
+
+<div class="bin_premium_mouth-form">
+    <h2>Update your plan to Bin Premium</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Wallet: <span>{{ price_converted }}</span></p>
+        {% if user.currency == 'USD' %}
+            $9.99 <small>/ m</small>
+        {% elif user.currency == 'UAH' %}
+            ₴419.99 <small>/ m</small>
+        {% endif %}
+        <div>
+            <input type="checkbox" id="terms-premium">
+            <label for="terms-premium">I agree with the <a href="/terms" target="_blank">terms and conditions</a></label>
+        </div>
+        <button type="submit" name="subscription_plan" value="bin_premium_monthly" id="subscribe-premium" disabled class="subscribe-btn">Subscribe</button>
+    </form>
+</div>
+
+<div class="bin_years-form">
+    <h2>Update your plan to Bin+ Yearly</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Wallet: <span>{{ price_converted }}</span></p>
+        {% if user.currency == 'USD' %}
+            $49.99 <small>/ y</small>
+        {% elif user.currency == 'UAH' %}
+            ₴2099.99 <small>/ y</small>
+        {% endif %}
+        <div>
+            <input type="checkbox" id="terms-bin-year">
+            <label for="terms-bin-year">I agree with the <a href="/terms" target="_blank">terms and conditions</a></label>
+        </div>
+        <button type="submit" name="subscription_plan" value="bin_plus_yearly" id="subscribe-bin-year" disabled class="subscribe-btn">Subscribe</button>
+    </form>
+</div>
+
+<div class="bin_premium_years-form">
+    <h2>Update your plan to Bin Premium Yearly</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Wallet: <span>{{ price_converted }}</span></p>
+        {% if user.currency == 'USD' %}
+            $99.99 <small>/ y</small>
+        {% elif user.currency == 'UAH' %}
+            ₴4199.99 <small>/ y</small>
+        {% endif %}
+        <div>
+            <input type="checkbox" id="terms-premium-year">
+            <label for="terms-premium-year">I agree with the <a href="/terms" target="_blank">terms and conditions</a></label>
+        </div>
+        <button type="submit" name="subscription_plan" value="bin_premium_yearly" id="subscribe-premium-year" disabled class="subscribe-btn">Subscribe</button>
+    </form>
+</div>
 
 
 
@@ -1207,7 +2252,12 @@ body {
 
         <div class="side-menu">
             <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Аватар">
-            <div class="username-line">{{ user.username }}</div>
+            <div class="username">{{ user.username }}</div>
+            {% if user.subscribe == "Bin+" %}
+                <div style="color:#0056b3" class="username-line">{{ user.subscribe }}</div>
+            {% elif user.subscribe == "Bin_premium" %}
+                <div style="color:#b3009b" class="username-line">{{ user.subscribe }}</div>
+            {% endif %}
             <label for="profile-toggle" class="profile-btn">Мій профіль</label>
             <label for="wallet-toggle" class="profile-btn">Гаманець</label>
             <label for="setting-toggle" class="profile-btn">Налаштування</label>
@@ -1219,8 +2269,10 @@ body {
                 <div class="info">
                     <h2>{{ user.username }}</h2>
                     <p style="color: {% if user.status == 'Online' %}green{% else %}red{% endif %};">
-                        {{ user.status|default:"Без статусу" }}
+                        {{ user.status|default:"Оффлайн" }}
                     </p>
+                    <br>
+                    <label style="color:#0056b3" for="form1-toggle" class="cursor-pointer edit-icon">Редагувати профіль</label>  
                 </div>
             </div>
             <hr class="profile-divider">
@@ -1236,13 +2288,23 @@ body {
             <label for="form1-toggle" class="profile-btn">Редагувати профіль</label>
             <label for="form2-toggle" class="profile-btn">Мова</label>
             <label for="subscribe-month-toggle" class="profile-btn">Підписки</label>
+            {% csrf_token %}
+            </form>
+            <label class="profile-btn" a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    Вийти з акаунту
+                </a>
+            </label>
         </div>      
 
         <div class="form1">
-            <h2>Редагувати профіль</h2>
-            <form method="POST">{% csrf_token %}
+            <h2>Редагування профілю</h2>
+            <form method="POST" enctype="multipart/form-data">{% csrf_token %}
                 <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
-                <p><strong>Username:</strong></p>
+                <br>
+                <label>Виберіть нову аватарку:
+                  <input type="file" id="avatarInput" name="photo" accept="image/*">
+                </label>
+                <p><strong>Ім'я:</strong></p>
                 <input type="text" name="username" value="{{ user.username }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
                 
                 <p><strong>Опис:</strong></p>
@@ -1284,7 +2346,79 @@ body {
                     <option value="UAH" {% if user.currency == 'UAH' %}selected{% endif %}>UAH ₴</option>
                 </select>
             </form>
-            <button type="button" class="deposit-btn" onclick="openSubscribe('deposit')">Покласти гроші на карту</button>
+            <button type="button" class="deposit-btn" onclick="checkCardsAndOpenDeposit()">Поповнити гаманець</button>
+            <button type="button" class="add_card-btn" onclick="openAdd_card('add_card')">Додати картку</button>
+            <div id="cards-list" style="margin-top:12px;">
+                <strong>{% if lang == "Українська" %}Картки:{% else %}Cards:{% endif %}</strong>
+                <div style="margin-top:6px;">
+                    {% if cards and cards.count %}
+                        {% for c in cards %}
+                            <div class="card-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">
+                                <span>**** **** ****{{ c.last4 }} — {{ c.cardholder|default:'-' }} — {{ c.expiry_month|stringformat:"02d" }}/{{ c.expiry_year }}</span>
+                                <button type="button" onclick="deleteCard('{{ c.last4 }}')" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">🗑️</button>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="card-item" style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">{% if lang == "Українська" %}Карт не додано{% else %}No cards added{% endif %}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <label for="add_card-toggle" class="add_card-overlay"></label>
+        <div class="add_card add_card-form">
+            <h2>{% if lang == "Українська" %}Додати картку{% else %}Add card{% endif %}</h2>
+            <form id="add-card-form" onsubmit="return false;">
+                <label>{% if lang == "Українська" %}Номер картки{% else %}Card number{% endif %}</label>
+                <input id="card-number" type="text" inputmode="numeric" pattern="[0-9\s]*" maxlength="19" placeholder="1235 9864 2134 1253" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+
+                <label style="margin-top:8px;">{% if lang == "Українська" %}Ім'я власника{% else %}Cardholder name{% endif %}</label>
+                <input id="card-cardholder" type="text" placeholder="NAME SURNAME" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    <div style="flex:1;">
+                        <label>{% if lang == "Українська" %}Місяць{% else %}Month{% endif %}</label>
+                        <select id="card-expiry-month" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                            {% for m in months %}
+                                <option value="{{ m }}">{{ m|stringformat:"02d" }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label>{% if lang == "Українська" %}Рік{% else %}Year{% endif %}</label>
+                        <select id="card-expiry-year" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                            {% for y in expiry_years %}
+                                <option value="{{ y }}">{{ y }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <label style="margin-top:8px;">{% if lang == "Українська" %}CVV (не зберігається){% else %}CVV (not stored){% endif %}</label>
+                <input id="card-cvv" type="password" maxlength="4" placeholder="123" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button type="button" class="deposit-btn" onclick="submitAddCard()">{% if lang == "Українська" %}Додати{% else %}Add{% endif %}</button>
+                    <button type="button" class="deposit-btn" onclick="(function(){ const cb=document.getElementById('add_card-toggle'); if(cb) cb.checked=false; })()">{% if lang == "Українська" %}Відмінити{% else %}Cancel{% endif %}</button>
+                </div>
+                <p id="add-card-result" style="margin-top:8px;color:#333;font-weight:600;"></p>
+            </form>
+        </div>
+
+        <label for="deposit-toggle" class="deposit-overlay"></label>
+        <div class="deposit deposit-form">
+            <h2>Deposit</h2>
+            <p>wallet: <span id="deposit-wallet">{{ price_converted }}</span></p>
+            <select id="deposit-card" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-bottom:10px;">
+                {% if cards and cards.count %}
+                    {% for c in cards %}
+                        <option value="{{ c.last4 }}">**** **** **** {{ c.last4 }} — {{ c.cardholder|default:'-' }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+            <input id="deposit-amount" type="number" placeholder="Amount" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+            <p id="deposit-result" style="margin-top:8px;color:#333;font-weight:600;"></p>
+            <button type="button" class="deposit-btn" onclick="performDeposit()">Deposit</button>
         </div>
 
         <div class="deposit deposit-form">
@@ -1298,9 +2432,13 @@ body {
         <div class="subscribe-form-month">
             <!-- Кнопки выбора периода -->
             <div class="subscribe-buttons" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
-                <button type="button" class="subscribe-btn" onclick="openSubscribe('month')">Month</button>
-                <button type="button" class="subscribe-btn" onclick="openSubscribe('year')">Year</button>
+                <button type="button" class="Subscribe-switching-button" onclick="openSubscribe('month')">Місяць</button>
+                <button type="button" class="Subscribe-switching-button year-btn" onclick="openSubscribe('year')">
+                    Рік
+                    <span class="discount">-17%</span>
+                </button>
             </div>
+
             <div class="plans-container" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
 
                 <!-- From Uiverse.io by Yaya12085 --> 
@@ -1308,7 +2446,11 @@ body {
                     <div class="inner">
                         <span class="pricing">
                             <span>
-                                $4.99 <small>/ m</small>
+                                {% if user.currency == 'USD' %}
+                                    $4.99 <small>/ м</small>
+                                {% elif user.currency == 'UAH' %}
+                                    ₴209.99 <small>/ м</small>
+                                {% endif %}
                             </span>
                         </span>
                         <p class="title">Bin+</p>
@@ -1343,7 +2485,7 @@ body {
                             </li>
                         </ul>
                         <div class="action">
-                            <a class="button" href="#">Choose plan</a>
+                            <label for="bin_mouth-toggle" class="button">Вибрати підписку</label>
                         </div>
                     </div>
                 </div>      
@@ -1353,7 +2495,11 @@ body {
                     <div class="inner">
                         <span class="pricing">
                             <span>
-                                $9.99 <small>/ m</small>
+                                {% if user.currency == 'USD' %}
+                                    $9.99 <small>/ м</small>
+                                {% elif user.currency == 'UAH' %}
+                                    ₴419.99 <small>/ м</small>
+                                {% endif %}
                             </span>
                         </span>
                         <p class="title">Bin premium</p>
@@ -1388,10 +2534,13 @@ body {
                             </li>
                         </ul>
                         <div class="action">
-                            <a class="button" href="#">Choose plan</a>
+                            <label for="bin_premium_mouth-toggle" class="button">Вибрати підписку</label>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <label for="check-subscription-toggle" class="check-subscription-btn">Перевірте статус підписки</label>
             </div>
         </div>
 
@@ -1399,8 +2548,11 @@ body {
         <div class="subscribe-form-year">
             <!-- Кнопки выбора периода -->
             <div class="subscribe-buttons" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
-                <button type="button" class="subscribe-btn" onclick="openSubscribe('month')">Month</button>
-                <button type="button" class="subscribe-btn" onclick="openSubscribe('year')">Year</button>
+                <button type="button" class="Subscribe-switching-button" onclick="openSubscribe('month')">Місяць</button>
+                <button type="button" class="Subscribe-switching-button year-btn" onclick="openSubscribe('year')">
+                    Рік
+                    <span class="discount">-17%</span>
+                </button>
             </div>
 
             <div class="plans-container" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
@@ -1409,7 +2561,13 @@ body {
                     <div class="inner">
                         <span class="pricing">
                             <span>
-                                $49.99 <small>/ y</small>
+                                {% if user.currency == 'USD' %}
+                                    <span class="old-price">$59.88</span>
+                                    <span class="new-price">$49.99</span> <small>/ y</small>
+                                {% elif user.currency == 'UAH' %}
+                                    <span class="old-price">₴2519.88</span>
+                                    <span class="new-price">₴2099.99</span> <small>/ y</small>
+                                {% endif %}
                             </span>
                         </span>
                         <p class="title">Bin+</p>
@@ -1444,7 +2602,7 @@ body {
                             </li>
                         </ul>
                         <div class="action">
-                            <a class="button" href="#">Choose plan</a>
+                            <label for="bin_years-toggle" class="button">Вибрати підписку</label>
                         </div>
                     </div>
                 </div>      
@@ -1454,7 +2612,13 @@ body {
                     <div class="inner">
                         <span class="pricing">
                             <span>
-                                $99.99 <small>/ y</small>
+                                {% if user.currency == 'USD' %}
+                                    <span class="old-price">$119.88</span>
+                                    <span class="new-price">$99.99</span> <small>/ y</small>
+                                {% elif user.currency == 'UAH' %}
+                                    <span class="old-price">₴5039.88</span>
+                                    <span class="new-price">₴4199.99</span> <small>/ y</small>
+                                {% endif %}
                             </span>
                         </span>
                         <p class="title">Bin premium</p>
@@ -1489,12 +2653,98 @@ body {
                             </li>
                         </ul>
                         <div class="action">
-                            <a class="button" href="#">Choose plan</a>
+                            <label for="bin_premium_years-toggle" class="button">Вибрати підписку</label>
                         </div>
                     </div>
                 </div>
             </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <label for="check-subscription-toggle" class="check-subscription-btn">Перевірте статус підписки</label>
+            </div>
         </div>
+
+<div class="check-subscription-form">
+    <h2>Ваш статус підписки: {{ user.subscribe }}</h2>
+
+    {% if user.subscription_end %}
+        <p>Залишилось: <span id="countdown"></span></p>
+    {% else %}
+        <p>У вас немає підписки</p>
+    {% endif %}
+</div>
+
+<div class="bin_mouth-form">
+    <h2>Оновіть свій план до Bin+</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Гаманець: <span>{{ price_converted }}</span></p>
+        {% if user.currency == 'USD' %}
+            $4.99 <small>/ м</small>
+        {% elif user.currency == 'UAH' %}
+            ₴209.99 <small>/ м</small>
+        {% endif %}
+        <div>
+            <input type="checkbox" id="terms-bin">
+            <label for="terms-bin">Я згоден з <a href="/terms" target="_blank">умовами використання</a></label>
+        </div>
+        <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">Підписаться</button>
+        <!-- <button type="submit" name="subscription_plan" value="bin_plus_test" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button> -->
+    </form>
+</div>
+
+<div class="bin_premium_mouth-form">
+    <h2>Оновіть свій план до Bin Premium</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Гаманець: <span>{{ price_converted }}</span></p>
+        {% if user.currency == 'USD' %}
+            $9.99 <small>/ м</small>
+        {% elif user.currency == 'UAH' %}
+            ₴419.99 <small>/ м</small>
+        {% endif %}
+        <div>
+            <input type="checkbox" id="terms-premium">
+            <label for="terms-premium">Я згоден з <a href="/terms" target="_blank">умовами використання</a></label>
+        </div>
+        <button type="submit" name="subscription_plan" value="bin_premium_monthly" id="subscribe-premium" disabled class="subscribe-btn">Підписаться</button>
+    </form>
+</div>
+
+<div class="bin_years-form">
+    <h2>Оновіть свій план до Bin+ Yearly</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Гаманець: <span>{{ price_converted }}</span></p>
+        {% if user.currency == 'USD' %}
+            $49.99 <small>/ р</small>
+        {% elif user.currency == 'UAH' %}
+            ₴2099.99 <small>/ р</small>
+        {% endif %}
+        <div>
+            <input type="checkbox" id="terms-bin-year">
+            <label for="terms-bin-year">Я згоден з <a href="/terms" target="_blank">умовами використання</a></label>
+        </div>
+        <button type="submit" name="subscription_plan" value="bin_plus_yearly" id="subscribe-bin-year" disabled class="subscribe-btn">Підписаться</button>
+    </form>
+</div>
+
+<div class="bin_premium_years-form">
+    <h2>Оновіть свій план до Premium Yearly</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Гаманець: <span>{{ price_converted }}</span></p>
+        {% if user.currency == 'USD' %}
+            $99.99 <small>/ р</small>
+        {% elif user.currency == 'UAH' %}
+            ₴4199.99 <small>/ р</small>
+        {% endif %}
+        <div>
+            <input type="checkbox" id="terms-premium-year">
+            <label for="terms-premium-year">Я згоден з <a href="/terms" target="_blank">умовами використання</a></label>
+        </div>
+        <button type="submit" name="subscription_plan" value="bin_premium_yearly" id="subscribe-premium-year" disabled class="subscribe-btn">Підписаться</button>
+    </form>
+</div>
 
         <div class="content">
             <h1>Ласкаво просимо на головну сторінку!</h1>
@@ -1504,7 +2754,158 @@ body {
 {% endwith %}
 
 <script>
+{% if user.subscription_end %}
+    // Таймер обратного отсчета
+    const endDate = new Date("{{ user.subscription_end|date:'Y-m-d H:i:s' }}").getTime();
+    const countdownEl = document.getElementById('countdown');
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = endDate - now;
+
+        if (distance < 0) {
+            countdownEl.innerHTML = "Expired";
+            location.reload(); // Обновляем страницу, чтобы подписка стала Basic
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+{% endif %}
+
+// Функция удаления карты
+window.deleteCard = function(last4) {
+    const lang = "{{ user.language|default:'English' }}";
+    const confirmMsg = lang === 'Українська' 
+        ? `Ви впевнені, що хочете видалити картку ****${last4}?`
+        : `Are you sure you want to delete card ****${last4}?`;
+    
+    if (!confirm(confirmMsg)) return;
+
+    const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    const csrf = csrfInput ? csrfInput.value : '';
+
+    fetch('/delete-card/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrf,
+        },
+        body: JSON.stringify({ last4: last4 })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+        
+        // Обновляем список карт
+        const cardsList = document.getElementById('cards-list');
+        const cardMessages = {
+            cards_label: lang === 'Українська' ? 'Картки:' : 'Cards:',
+            no_cards: lang === 'Українська' ? 'Карт не додано' : 'No cards added',
+        };
+        
+        if (cardsList && data.cards !== undefined) {
+            let html = `<strong>${cardMessages.cards_label}</strong><div style="margin-top:6px;">`;
+            if (data.cards.length === 0) {
+                html += `<div class="card-item" style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">${cardMessages.no_cards}</div>`;
+            } else {
+                data.cards.forEach(c => {
+                    html += `<div class="card-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">
+                        <span>**** **** ****${c.last4} — ${c.cardholder || '-'} — ${c.expiry}</span>
+                        <button type="button" onclick="deleteCard('${c.last4}')" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">🗑️</button>
+                    </div>`;
+                });
+            }
+            html += '</div>';
+            cardsList.innerHTML = html;
+        }
+        
+        const successMsg = lang === 'Українська' ? 'Картку видалено!' : 'Card deleted!';
+        alert(successMsg);
+    })
+    .catch(err => {
+        console.error('Delete card failed', err);
+        const errorMsg = lang === 'Українська' ? 'Помилка видалення картки' : 'Error deleting card';
+        alert(errorMsg);
+    });
+};
+
+function checkCardsAndOpenDeposit() {
+    const cardsList = document.getElementById('cards-list');
+    const noCardsMessage = '{% if lang == "Українська" %}Карт не додано{% else %}No cards added{% endif %}';
+    
+    if (cardsList.textContent.includes(noCardsMessage)) {
+        // No cards - redirect to add card form
+        openAdd_card('add_card');
+        document.getElementById('add-card-result').textContent = '{% if lang == "Українська" %}Спочатку додайте картку{% else %}Please add a card first{% endif %}';
+    } else {
+        // Has cards - open deposit form
+        openSubscribe('deposit');
+    }
+}
+function performDeposit() {
+    const amount = document.getElementById('deposit-amount').value;
+    const cardSelect = document.getElementById('deposit-card');
+    
+    if (!cardSelect || !cardSelect.value) {
+        document.getElementById('deposit-result').textContent = '{% if lang == "Українська" %}Будь ласка, додайте картку{% else %}Please add a card first{% endif %}';
+        return;
+    }
+    
+    if (!amount || isNaN(amount) || amount <= 0) {
+        document.getElementById('deposit-result').textContent = '{% if lang == "Українська" %}Будь ласка, введіть правильну суму{% else %}Please enter a valid amount{% endif %}';
+        return;
+    }
+    fetch('/deposit-funds/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            amount: amount,
+            card_last4: cardSelect.value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('wallet-amount').textContent = `{% if lang == "Українська" %}Гаманець{% else %}Wallet{% endif %}: ${data.new_balance}`;
+            document.getElementById('deposit-wallet').textContent = data.new_balance;
+            document.getElementById('deposit-amount').value = '';
+            document.getElementById('deposit-result').textContent = '{% if lang == "Українська" %}Успішно поповнено!{% else %}Successfully deposited!{% endif %}';
+        } else {
+            document.getElementById('deposit-result').textContent = data.error || '{% if lang == "Українська" %}Помилка при поповненні{% else %}Error depositing funds{% endif %}';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('deposit-result').textContent = '{% if lang == "Українська" %}Помилка при поповненні{% else %}Error depositing funds{% endif %}';
+    });
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
+    // localized card messages (from view)
+    const cardMessages = {
+        invalid_card_number: "{{ card_messages.invalid_card_number }}",
+        card_added: "{{ card_messages.card_added }}",
+        add_card_failed: "{{ card_messages.add_card_failed }}",
+        cards_label: "{{ card_messages.cards_label }}",
+        no_cards: "{{ card_messages.no_cards }}",
+    };
     const tagElement = document.getElementById('user-tag');
     if (tagElement) {
         tagElement.addEventListener('click', () => {
@@ -1515,10 +2916,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const overlays = document.querySelectorAll('.overlay, .profile-overlay, .setting-overlay, .form1-overlay, .form2-overlay, .wallet-overlay, .subscribe-month-overlay, .subscribe-year-overlay');
+    // Close forms when clicking outside
+    document.addEventListener('mousedown', (event) => {
+        const forms = [
+            { form: '.side-menu', toggle: '#menu-toggle' },
+            { form: '.wallet-form', toggle: '#wallet-toggle' },
+            { form: '.profile-form', toggle: '#profile-toggle' },
+            { form: '.setting-form', toggle: '#setting-toggle' },
+            { form: '.form1', toggle: '#form1-toggle' },
+            { form: '.form2', toggle: '#form2-toggle' },
+            { form: '.deposit-form', toggle: '#deposit-toggle' },
+            { form: '.add_card-form', toggle: '#add_card-toggle' }
+        ];
+
+        forms.forEach(({form, toggle}) => {
+            const formElement = document.querySelector(form);
+            const toggleElement = document.querySelector(toggle);
+            
+            if (formElement && toggleElement && toggleElement.checked) {
+                if (!formElement.contains(event.target) && !event.target.closest(form)) {
+                    toggleElement.checked = false;
+                }
+            }
+        });
+    });
+
+    const overlays = document.querySelectorAll('.overlay, .profile-overlay, .setting-overlay, .form1-overlay, .form2-overlay, .wallet-overlay, .check-subscription-overlay, .subscribe-month-overlay, .subscribe-year-overlay, .bin_mouth-overlay, .bin_premium_mouth-overlay, .bin_years-overlay, .bin_premium_years-overlay, .deposit-overlay, .add_card-overlay');
     overlays.forEach(overlay => {
         overlay.addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('#menu-toggle, #profile-toggle, #setting-toggle, #form1-toggle, #form2-toggle, #wallet-toggle, #subscribe-month-toggle, #subscribe-year-toggle');
+            const checkboxes = document.querySelectorAll('#menu-toggle, #profile-toggle, #setting-toggle, #form1-toggle, #form2-toggle, #wallet-toggle, #check-subscription-toggle ,#subscribe-month-toggle, #subscribe-year-toggle, #bin_mouth-toggle, #bin_premium_mouth-toggle, #bin_years-toggle, #bin_premium_years-toggle, #deposit-toggle, #add_card-toggle');
             checkboxes.forEach(cb => {
                 if(cb) cb.checked = false;
             });
@@ -1571,6 +2997,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageLang = "{{ user.language|default:'English' }}";
     const willBeText = pageLang === 'Українська' ? 'Буде' : 'Will be';
     depositResult.textContent = depositVal ? `${willBeText}: ${formatCurrency(total, wallet.currency)}` : '';
+    }
+
+    // Card number auto-format: add space every 4 digits and preserve caret
+    function formatCardNumber(val) {
+        // limit to 16 digits (typical card length). Format as '#### #### #### ####'
+        const digits = val.replace(/\D/g, '').slice(0, 16);
+        return digits.replace(/(.{4})/g, '$1 ').trim();
+    }
+
+    const cardNumberInput = document.getElementById('card-number');
+    if (cardNumberInput) {
+        // format on input and on paste
+        cardNumberInput.addEventListener('input', (e) => {
+            const el = e.target;
+            const selectionStart = el.selectionStart || 0;
+            // count digits before cursor
+            const rawBefore = el.value.slice(0, selectionStart).replace(/\D/g, '');
+            const formatted = formatCardNumber(el.value);
+            el.value = formatted;
+            // set caret after same number of digits
+            let pos = 0;
+            let digitsSeen = 0;
+            while (digitsSeen < rawBefore.length && pos < el.value.length) {
+                if (/\d/.test(el.value.charAt(pos))) digitsSeen++;
+                pos++;
+            }
+            el.setSelectionRange(pos, pos);
+        });
+        cardNumberInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const paste = (e.clipboardData || window.clipboardData).getData('text') || '';
+            const digits = paste.replace(/\D/g, '').slice(0, 16);
+            cardNumberInput.value = formatCardNumber(digits);
+        });
     }
 
     if (depositInput) {
@@ -1652,6 +3112,87 @@ document.addEventListener('DOMContentLoaded', () => {
             }
     };
 
+    // Open add-card popup
+    window.openAdd_card = function() {
+        const addToggle = document.getElementById('add_card-toggle');
+        if (addToggle) addToggle.checked = true;
+        // close other popups
+        const monthToggle = document.getElementById('subscribe-month-toggle');
+        const yearToggle = document.getElementById('subscribe-year-toggle');
+        if (monthToggle) monthToggle.checked = false;
+        if (yearToggle) yearToggle.checked = false;
+        const depositToggle = document.getElementById('deposit-toggle');
+        if (depositToggle) depositToggle.checked = false;
+    };
+
+    // Submit add card via AJAX
+    window.submitAddCard = function() {
+        const numberEl = document.getElementById('card-number');
+        const holderEl = document.getElementById('card-cardholder');
+        const monthEl = document.getElementById('card-expiry-month');
+        const yearEl = document.getElementById('card-expiry-year');
+        const resultEl = document.getElementById('add-card-result');
+
+        if (!numberEl || !monthEl || !yearEl) return;
+        const number = (numberEl.value || '').replace(/\s+/g, '');
+        const holder = holderEl ? holderEl.value : '';
+        const month = monthEl.value;
+        const year = yearEl.value;
+
+        // enforce 13..16 digits allowed (max 16 digits). Client-side limit reduces chance of extra-digit input.
+        if (number.length < 13 || number.length > 16 || !/^[0-9]+$/.test(number)) {
+            if (resultEl) resultEl.textContent = cardMessages.invalid_card_number;
+            return;
+        }
+
+        const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        const csrf = csrfInput ? csrfInput.value : '';
+
+        const fd = new FormData();
+        fd.append('card_number', number);
+        fd.append('cardholder', holder);
+        fd.append('expiry_month', month);
+        fd.append('expiry_year', year);
+
+        fetch('{% url "add-card" %}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrf,
+            },
+            body: fd,
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                if (resultEl) resultEl.textContent = data.error;
+                return;
+            }
+            // rebuild cards list
+            const cardsList = document.getElementById('cards-list');
+            if (cardsList && data.cards) {
+                let html = '<strong>' + cardMessages.cards_label + '</strong><div style="margin-top:6px;">';
+                if (data.cards.length === 0) html += '<div class="card-item">' + cardMessages.no_cards + '</div>';
+                data.cards.forEach(c => {
+                    html += `<div class="card-item" style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">**** **** ****${c.last4} — ${c.cardholder || '-'} — ${c.expiry}</div>`;
+                });
+                html += '</div>';
+                cardsList.innerHTML = html;
+            }
+            // close add card form
+            const addToggle = document.getElementById('add_card-toggle');
+            if (addToggle) addToggle.checked = false;
+            if (resultEl) resultEl.textContent = cardMessages.card_added;
+            // clear inputs
+            if (numberEl) numberEl.value = '';
+            if (holderEl) holderEl.value = '';
+        })
+        .catch(err => {
+            console.error('Add card failed', err);
+            if (resultEl) resultEl.textContent = cardMessages.add_card_failed;
+        });
+    };
+
     const sideMenuLinks = document.querySelectorAll('.side-menu label, .side-menu a');
     sideMenuLinks.forEach(link => {
         link.addEventListener('click', () => {
@@ -1660,7 +3201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const formCheckboxes = ['profile-toggle', 'setting-toggle', 'form1-toggle', 'form2-toggle', 'subscribe-month-toggle', 'subscribe-year-toggle'];
+    const formCheckboxes = ['profile-toggle', 'setting-toggle', 'form1-toggle', 'form2-toggle', 'check-subscription-toggle', 'subscribe-month-toggle', 'subscribe-year-toggle', 'bin_mouth-toggle', 'bin_premium_mouth-toggle', 'bin_years-toggle', 'bin_premium_years-toggle', 'deposit-toggle', 'add_card-toggle'];
     formCheckboxes.forEach(id => {
         const cb = document.getElementById(id);
         if(cb) {
@@ -1709,6 +3250,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function setupSubscription(checkboxId, buttonId) {
+    const checkbox = document.getElementById(checkboxId);
+    const button = document.getElementById(buttonId);
+
+    button.disabled = true;
+
+    checkbox.addEventListener('change', () => {
+        button.disabled = !checkbox.checked;
+    });
+}
+
+setupSubscription('terms-bin', 'subscribe-bin');
+setupSubscription('terms-premium', 'subscribe-premium');
+setupSubscription('terms-bin-year', 'subscribe-bin-year');
+setupSubscription('terms-premium-year', 'subscribe-premium-year');
 </script>
 
 {% endblock %}

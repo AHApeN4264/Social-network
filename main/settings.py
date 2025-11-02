@@ -37,7 +37,7 @@ ROOT_URLCONF = 'main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'social_network', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -1,0 +1,131 @@
+{% load static %}
+
+{% block title %}
+    <title>Terms and Conditions</title>
+    <link rel="icon" href="{% static 'icons/570170.png' %}" type="image/png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .terms-container {
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border: 2px solid #ff4d4d;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .terms-container h1 {
+            margin-bottom: 20px;
+            color: #ff4d4d;
+        }
+
+        .terms-container p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .agree-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .agree-section input {
+            margin-right: 10px;
+        }
+
+        .language-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .language-form select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+            cursor: pointer;
+        }
+
+        .language-form button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background-color: #ff4d4d;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .language-form button:hover {
+            background-color: #e60000;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+{% with lang=user.language|default:"English" %}
+    {% if lang == "English" %}
+        <div class="terms-container">
+            <h1>Terms and Conditions</h1>
+
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Donec a diam nec elit commodo dapibus. Sed non metus eu justo bibendum vehicula.</p>
+            <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Duis nec malesuada turpis. Integer vel ipsum eget libero posuere fermentum.</p>
+            <p>Morbi euismod, turpis a dignissim hendrerit, libero est efficitur odio, vitae imperdiet ligula sapien nec lorem. Cras tincidunt turpis non sapien vehicula, et volutpat justo vehicula.</p>
+
+            <form class="language-form" method="POST" action="{% url 'change-language' %}">
+                {% csrf_token %}
+                <select name="language">
+                    <option value="English" {% if lang == "English" %}selected{% endif %}>English</option>
+                    <option value="Українська" {% if lang == "Українська" %}selected{% endif %}>Українська</option>
+                </select>
+                <button type="submit">Change</button>
+            </form>
+        </div>
+
+    {% elif lang == "Українська" %}
+        <div class="terms-container">
+            <h1>Умови та положення</h1>
+
+            <p>Лорем іпсум долор сіту амет, консектетур адіпісцінг елит. Нулла фасілісі. Донек а діам нек елит комодо дапібус. Сед нон метус еу джусто бібендум вехікула.</p>
+            <p>Вестибулум анте іпсум приміс ін фаубіцус орці луксус ет ультріцес посуєре кюрає; Дуйс нек малесуада турпис. Інтегер вел іпсум еґет ліберо посуєре ферментум.</p>
+            <p>Морбі еуїсмод, турпис а дінгіссім хендрері, ліберо ест ефіцітур одіо, вітає імпердіет лігулá сапієн нек лорем. Краc тінцідунт турпис нон сапієн вехікула, ет волутпат джусто вехікула.</p>
+
+            <form class="language-form" method="POST" action="{% url 'change-language' %}">
+                {% csrf_token %}
+                <select name="language">
+                    <option value="English" {% if lang == "English" %}selected{% endif %}>English</option>
+                    <option value="Українська" {% if lang == "Українська" %}selected{% endif %}>Українська</option>
+                </select>
+                <button type="submit">Змінити</button>
+            </form>
+        </div>
+    {% endif %}
+{% endwith %}
+
+<script>
+    const checkbox = document.getElementById('agree-checkbox');
+    const subscribeBtn = document.getElementById('subscribe-btn');
+
+    checkbox.addEventListener('change', () => {
+        subscribeBtn.disabled = !checkbox.checked;
+    });
+</script>
+
+{% endblock %}

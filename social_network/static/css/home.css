@@ -1,0 +1,961 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+#menu-toggle,
+#profile-toggle,
+#setting-toggle,
+#form1-toggle,
+#form2-toggle,
+#wallet-toggle,
+#subscribe-month-toggle,
+#subscribe-year-toggle,
+#deposit-toggle,
+#add_card {
+    display: none;
+}
+
+/* Гамбургер */
+.hamburger {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 30px;
+    height: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.hamburger span {
+    display: block;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(2) {
+    opacity: 0;
+}
+
+#menu-toggle:checked + .hamburger span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Боковое меню */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+    transition: 0.3s;
+    z-index: 1002;
+}
+
+#menu-toggle:checked ~ .side-menu {
+    left: 0;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+#menu-toggle:checked ~ .overlay {
+    display: block;
+}
+
+.content {
+    padding: 50px;
+}
+
+.side-menu .avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.side-menu .username-line {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.side-menu .profile-btn,
+.side-menu .setting-btn {
+    display: block;
+    background: white;
+    color: #333;
+    text-align: center;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    transition: 0.2s;
+}
+
+.side-menu .profile-btn:hover,
+.side-menu .setting-btn:hover {
+    background: #e0e0e0;
+}
+
+/* Формы */
+.profile-form,
+.setting-form,
+.form1,
+.form2 {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 400px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Small avatar inside edit profile form to avoid layout break */
+.form1 img.avatar,
+.form2 img.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+#profile-toggle:checked ~ .profile-form {
+    display: flex;
+}
+
+#setting-toggle:checked ~ .setting-form {
+    display: flex;
+}
+
+#form1-toggle:checked ~ .form1 {
+    display: flex;
+}
+
+#form2-toggle:checked ~ .form2 {
+    display: flex;
+}
+
+/* Оверлеи */
+.profile-overlay,
+.setting-overlay,
+.form1-overlay,
+.form2-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1500;
+}
+
+#profile-toggle:checked ~ .profile-overlay {
+    display: block;
+}
+
+#setting-toggle:checked ~ .setting-overlay {
+    display: block;
+}
+
+#form1-toggle:checked ~ .form1-overlay {
+    display: block;
+}
+
+#form2-toggle:checked ~ .form2-overlay {
+    display: block;
+}
+
+/* Кнопки форм */
+.profile-form button,
+.setting-form button,
+.form1 button,
+.form2 button,
+.setting-form .profile-btn {
+    background: white;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.profile-form button:hover,
+.setting-form button:hover,
+.form1 button:hover,
+.form2 button:hover,
+.setting-form .profile-btn:hover {
+    background: #e0e0e0;
+}
+
+/* Заголовок профиля */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.profile-header img.avatar {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-header .info {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-header .info h2 {
+    margin: 0;
+    font-size: 26px;
+    color: #333;
+}
+
+.profile-header .info p {
+    margin: 5px 0 0 0;
+    color: #777;
+    font-size: 15px;
+}
+
+.profile-divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 25px 0 15px 0;
+}
+
+.profile-body p {
+    margin: 10px 0;
+    color: #444;
+    font-size: 15px;
+}
+
+.tag-copy {
+    font-weight: bold;
+    color: #007bff;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.profile-body textarea {
+    resize: none;
+    font-family: Arial, sans-serif;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+.language-form {
+  margin: 10px 0 20px 0;
+}
+
+.language-form select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+/* Кошелёк */
+.wallet button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.wallet button:hover {
+  background: #008080cc;
+}
+
+.wallet {
+  margin: 10px 0 20px 0;
+}
+
+.wallet select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.wallet button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.wallet button:hover {
+  background: #008080cc;
+}
+
+.wallet {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wallet-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.wallet-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 300px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wallet.active {
+    display: flex;
+}
+.wallet-overlay.active {
+    display: block;
+}
+
+#wallet-toggle:checked ~ .wallet-form,
+#wallet-toggle:checked ~ .wallet {
+    display: flex;
+}
+#wallet-toggle:checked ~ .wallet-overlay {
+    display: block;
+}
+
+
+/* Добавление карты */
+.add_card button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add_card button:hover {
+  background: #008080cc;
+}
+
+.add_card {
+  margin: 10px 0 20px 0;
+}
+
+.add_card select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.add_card button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add_card button:hover {
+  background: #008080cc;
+}
+
+.add_card {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.add_card-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.add_card-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 300px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.add_card.active {
+    display: flex;
+}
+.add_card-overlay.active {
+    display: block;
+}
+
+#add_card-toggle:checked ~ .add_card-form,
+#add_card-toggle:checked ~ .add_card {
+    display: flex;
+}
+#add_card-toggle:checked ~ .add_card-overlay {
+    display: block;
+}
+/* Пополнение кошелька */
+.deposit button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.deposit button:hover {
+  background: #008080cc;
+}
+
+.deposit {
+  margin: 10px 0 20px 0;
+}
+
+.deposit select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.deposit button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.deposit button:hover {
+  background: #008080cc;
+}
+
+.deposit {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.deposit-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.deposit-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 300px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.deposit-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.deposit-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.deposit.active {
+    display: flex;
+}
+.deposit-overlay.active {
+    display: block;
+}
+
+#deposit-toggle:checked ~ .deposit-form,
+#deposit-toggle:checked ~ .deposit {
+    display: flex;
+}
+#deposit-toggle:checked ~ .deposit-overlay {
+    display: block;
+}
+
+
+/* кнопки в подписке */
+.subscribe-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.subscribe-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+
+/* Підписка на місяць */
+.subscribe-form-month button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.subscribe-form-month button:hover {
+  background: #008080cc;
+}
+
+.subscribe-form-month {
+  margin: 10px 0 20px 0;
+}
+
+.subscribe-form-month select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.subscribe-form-month button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.subscribe-form-month button:hover {
+  background: #008080cc;
+}
+
+.subscribe-form-month {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.subscribe-month-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.subscribe-form-month.active {
+    display: flex;
+}
+.subscribe-month-overlay.active {
+    display: block;
+}
+
+#subscribe-month-toggle:checked ~ .subscribe-form-month {
+    display: flex;
+}
+
+#subscribe-month-toggle:checked ~ .subscribe-month-overlay {
+    display: block;
+}
+
+
+/* Підписка на рік */
+.subscribe-form-year button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.subscribe-form-year button:hover {
+  background: #008080cc;
+}
+
+.subscribe-form-year {
+  margin: 10px 0 20px 0;
+}
+
+.subscribe-form-year select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.subscribe-form-year button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background: teal;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.subscribe-form-year button:hover {
+  background: #008080cc;
+}
+
+.subscribe-form-year {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    width: 700px;
+    max-width: 90%;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.subscribe-year-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 1500;
+}
+
+.subscribe-form-year.active {
+    display: flex;
+}
+.subscribe-year-overlay.active {
+    display: block;
+}
+
+#subscribe-year-toggle:checked ~ .subscribe-form-year {
+    display: flex;
+}
+
+#subscribe-year-toggle:checked ~ .subscribe-year-overlay {
+    display: block;
+}
+
+
+/* кнопки в подписке */
+.subscribe-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.subscribe-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* From Uiverse.io by Yaya12085 */ 
+.plan {
+  border-radius: 16px;
+  box-shadow: 0 30px 30px -25px rgba(0, 38, 255, 0.205);
+  padding: 10px;
+  background-color: #fff;
+  color: #697e91;
+  max-width: 300px;
+}
+
+.plan strong {
+  font-weight: 600;
+  color: #425275;
+}
+
+.plan .inner {
+  align-items: center;
+  padding: 20px;
+  padding-top: 40px;
+  background-color: #ecf0ff;
+  border-radius: 12px;
+  position: relative;
+}
+
+.plan .pricing {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #bed6fb;
+  border-radius: 99em 0 0 99em;
+  display: flex;
+  align-items: center;
+  padding: 0.625em 0.75em;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #425475;
+}
+
+.plan .pricing small {
+  color: #707a91;
+  font-size: 0.75em;
+  margin-left: 0.25em;
+}
+
+.plan .title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #425675;
+}
+
+.plan .title + * {
+  margin-top: 0.75rem;
+}
+
+.plan .info + * {
+  margin-top: 1rem;
+}
+
+.plan .features {
+  display: flex;
+  flex-direction: column;
+}
+
+.plan .features li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plan .features li + * {
+  margin-top: 0.75rem;
+}
+
+.plan .features .icon {
+  background-color: #1FCAC5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+.plan .features .icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.plan .features + * {
+  margin-top: 1.25rem;
+}
+
+.plan .action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
+.plan .button {
+  background-color: #6558d3;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 500;
+  font-size: 1.125rem;
+  text-align: center;
+  border: 0;
+  outline: 0;
+  width: 100%;
+  padding: 0.625em 0.75em;
+  text-decoration: none;
+}
+
+.plan .button:hover, .plan .button:focus {
+  background-color: #4133B7;
+}
