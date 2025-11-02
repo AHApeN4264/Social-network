@@ -4,7 +4,7 @@
 # python manage.py runserver 0.0.0.0:8000
 
 # создание ветки
-# git checkout -b Система-голосувань
+# git checkout -b add subscribe, edited profile and edited more
 
 # git add .
 # git commit -m "add subscribe, edited profile and edited more"
