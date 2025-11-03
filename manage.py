@@ -4,11 +4,11 @@
 # python manage.py runserver 0.0.0.0:8000
 
 # создание ветки
-# git checkout -b add subscribe, edited profile and edited more
+# git checkout -b register-profile-language-wallet-subscribe
 
 # git add .
 # git commit -m "add subscribe, edited profile and edited more"
-# git push
+# git push add_subscribe_edited_profile_and_edited_more
 
 #!/usr/bin/env python
 
