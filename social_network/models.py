@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.conf import settings
 from django import forms
+from django.contrib.sessions.models import Session
+from datetime import timedelta
+import random
 # import app.models as app_models
 
 # python manage.py makemigrations
@@ -15,6 +18,13 @@ class User(AbstractUser):
         null=True,
         blank=True,
         default='login.png'
+    )
+
+    background = models.ImageField(
+        upload_to='users/backgrounds/',
+        null=True,
+        blank=True,
+        default=None
     )
 
     description = models.TextField(max_length=100, blank=True, default='None')
@@ -85,6 +95,21 @@ class User(AbstractUser):
     )
 
     subscription_end = models.DateTimeField(null=True, blank=True)
+    subscription_purchase_time = models.DateTimeField(null=True, blank=True)
+    subscription_purchase_currency = models.CharField(
+        max_length=3,
+        choices=[('USD', 'USD'), ('UAH', 'UAH')],
+        default='USD',
+        null=True,
+        blank=True
+    )
+    subscription_purchase_amount = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        default=0.00,
+        null=True,
+        blank=True
+    )
 
     role = models.CharField(
         max_length=20,
@@ -96,6 +121,97 @@ class User(AbstractUser):
         default='User',
     )
 
+    # Security
+    two_factor_enabled = models.BooleanField(default=False)
+    two_factor_secret = models.CharField(max_length=32, blank=True, null=True)
+
+    def get_active_sessions(self):
+        """Get user's active sessions"""
+        sessions = []
+        try:
+            user_sessions = Session.objects.filter(expire_date__gte=timezone.now())
+
+            for session in user_sessions:
+                try:
+                    session_data = session.get_decoded()
+                    if '_auth_user_id' in session_data and str(self.id) == session_data['_auth_user_id']:
+                        session_info = {
+                            'key': session.session_key,
+                            'device': self._get_device_info(session_data),
+                            'location': self._get_location_info(session_data),
+                            'last_activity': session.expire_date - timedelta(seconds=settings.SESSION_COOKIE_AGE),
+                            'is_current': False
+                        }
+                        sessions.append(session_info)
+                except Exception:
+                    continue
+                
+        except Exception as e:
+            print(f"Error getting sessions: {e}")
+
+        return sessions
+
+    def _get_device_info(self, session):
+        """Получить информацию об устройстве из сессии"""
+        user_agent = getattr(session, 'user_agent', 'Unknown device')
+        if 'Mobile' in user_agent:
+            return 'Mobile'
+        elif 'Tablet' in user_agent:
+            return 'Tablet'
+        else:
+            return 'Desktop'
+
+    def _get_location_info(self, session):
+        """Получить информацию о местоположении"""
+        return 'Unknown location'
+
+    def _get_current_session_key(self):
+        """Получить ключ текущей сессии"""
+        return None
+
+    def get_login_history(self):
+        """Получить историю входов пользователя"""
+        return LoginHistory.objects.filter(user=self)[:20]
+
+    def record_login(self, request, success=True):
+        """Записать попытку входа в историю"""
+        device_info = request.META.get('HTTP_USER_AGENT', 'Unknown')[:200]
+        ip_address = self._get_client_ip(request)
+        
+        LoginHistory.objects.create(
+            user=self,
+            device=device_info,
+            ip_address=ip_address,
+            location=self._get_location_from_ip(ip_address),
+            success=success
+        )
+
+    def _get_client_ip(self, request):
+        """Получить IP-адрес клиента"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
+    def _get_location_from_ip(self, ip_address):
+        """Получить местоположение по IP-адресу"""
+        return 'Unknown'
+    
+class LoginHistory(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='login_history')
+    timestamp = models.DateTimeField(default=timezone.now)
+    device = models.CharField(max_length=200, blank=True)
+    location = models.CharField(max_length=100, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    success = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.timestamp}"
 
 class Card(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cards')
@@ -113,4 +229,52 @@ class Card(models.Model):
     def __str__(self):
         return f"**** **** ****{self.last4} ({self.cardholder or 'no-name'})"
 
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['timestamp']
+
+class UserMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages')
+    text = models.TextField()
+    level = models.CharField(
+        max_length=20, 
+        choices=[
+            ('success', 'Success'),
+            ('error', 'Error'), 
+            ('warning', 'Warning'),
+            ('info', 'Info')
+        ],
+        default='info'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username}: {self.text[:50]}"
+
+class EmailVerificationCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    email = models.EmailField()
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(default=timezone.now)
+    is_used = models.BooleanField(default=False)
+    
+    def is_valid(self):
+        return not self.is_used and timezone.now() < self.expires_at
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.expires_at = timezone.now() + timedelta(minutes=10)
+        super().save(*args, **kwargs)
+    
+    class Meta:
+        db_table = 'email_verification_codes'
