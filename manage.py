@@ -4,11 +4,11 @@
 # python manage.py runserver 0.0.0.0:8000
 
 # создание ветки
-# git checkout -b Система-голосувань
+# git checkout -b add_color-theme_chat_search-users_searsh-@tag-profile
 
 # git add .
-# git commit -m "add subscribe, edited profile and edited more"
-# git push
+# git commit -m "add_color-theme_chat_search-users_searsh-@tag-profile"
+# git push add_color-theme_chat_search-users_searsh-@tag-profile
 
 #!/usr/bin/env python
 

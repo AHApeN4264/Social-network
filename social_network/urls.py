@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
 from django.contrib.auth.views import LogoutView
+from social_network import consumers
 from . import views
 
 # Редирект для неизвестных URL
@@ -16,7 +17,7 @@ urlpatterns = [
     # Админка
     path('admin/', admin.site.urls),
 
-    # не нравильное напровление
+    # Страница ошибки
     path('error', views.error, name='error'),
 
     # Смена языка
@@ -29,27 +30,70 @@ urlpatterns = [
     path('delete-card/', views.delete_card, name='delete-card'),
     path('add-card/', views.add_card, name='add-card'),
     path('deposit-funds/', views.deposit_funds, name='deposit-funds'),
+    path('get_currency-conversion/', views.get_currency_conversion, name='get_currency-conversion'),
+    
     # Аутентификация
     path('register', views.register, name='register'),
     path('login', views.login, name='login'),
     path('forgot-password', views.forgot_password, name='forgot-password'),
+    path('enter-gmail', views.enter_gmail, name='enter-gmail'),
     path('logout', LogoutView.as_view(next_page='/login/'), name='logout'),
 
     # Условия подписки
-    path('terms', views.terms, name='terms'),
-    # Главная страница с редиректом
-    # path('', lambda request: redirect('home', id=request.user.id) if request.user.is_authenticated else redirect('login/')),
+    path('terms/', views.terms, name='terms'),
 
-    # Страница home с параметром id
+    # Поиск на главном экране
+    path('search-users/', views.search_users, name='search_users'),
+
+    # Редактирование профиля
+    path('upload_avatar/', views.upload_avatar, name='upload_avatar'),
+    path('update_profile/', views.update_profile, name='update_profile'),
+    path('upload_background/', views.upload_background, name='upload_background'),
+    path('reset-avatar/', views.reset_avatar, name='reset_avatar'),
+    path('remove_background/', views.remove_background, name='remove_background'),
+
+    # Чат
+    path('send-message/', views.send_message, name='send_message'),
+    path('get-chat-messages/', views.get_chat_messages, name='get_chat_messages'),
+    # история чатов
+    path('get-recent-contacts/', views.get_recent_contacts, name='get_recent_contacts'),
+    # просмотр профиля другого пользователя
+    path('get-user-profile/', views.get_user_profile, name='get_user_profile'),
+    # поиск по тегу
+    path('get-user-by-tag/', views.get_user_by_tag, name='get-user-profile'),
+    # файллы в чате
+    path('upload-chat-file/', views.upload_chat_file, name='upload_chat_file'),
+
+    path('get-user-profile/', views.get_user_profile, name='get_user_profile'),
+    path('get-user-by-tag/', views.get_user_by_tag, name='get_user_by_tag'),
+    path('get-chat-messages/', views.get_chat_messages, name='get_chat_messages'),
+    
+    # Додайте ці рядки до секції "Чат"
+    path('mark-messages-read/', views.mark_messages_read, name='mark_messages_read'),
+    path('save-note/', views.save_note, name='save_note'),
+    path('get-notes/', views.get_notes, name='get_notes'),
+    
+    # security
+    path('change-password/', views.change_password, name='change_password'),
+    path('enable-2fa/', views.enable_2fa, name='enable_2fa'),
+    path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
+    path('terminate-session/', views.terminate_session, name='terminate_session'),
+
+    path('email/', views.email, name='email'),
+    path('delete-message/<int:message_id>/', views.delete_message, name='delete-message'),
+
+    # Верификация email
+
+    # WebSocket для чата
+    re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer.as_asgi()),
+
+    # Главная страница
     path('', views.home, name='home'),
-
 ]
 
-# Медиафайлы в режиме DEBUG
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Catch-all редирект для любых других URL
 urlpatterns += [
     re_path(r'^(?P<path>.*)$', catch_all_redirect),
 ]

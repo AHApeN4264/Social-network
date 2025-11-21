@@ -23,7 +23,6 @@
             border: 2px solid #ff4d4d;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            text-align: center;
         }
 
         .terms-container h1 {
@@ -85,9 +84,10 @@
         <div class="terms-container">
             <h1>Terms and Conditions</h1>
 
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Donec a diam nec elit commodo dapibus. Sed non metus eu justo bibendum vehicula.</p>
-            <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Duis nec malesuada turpis. Integer vel ipsum eget libero posuere fermentum.</p>
-            <p>Morbi euismod, turpis a dignissim hendrerit, libero est efficitur odio, vitae imperdiet ligula sapien nec lorem. Cras tincidunt turpis non sapien vehicula, et volutpat justo vehicula.</p>
+            <ul>
+                <li>You can cancel your subscription for 24 hours after purchase.</li>
+                <li>All content in your account that requires a subscription will disappear once your subscription ends or is refunded.</li>
+            </ul>
 
             <form class="language-form" method="POST" action="{% url 'change-language' %}">
                 {% csrf_token %}
@@ -103,9 +103,10 @@
         <div class="terms-container">
             <h1>Умови та положення</h1>
 
-            <p>Лорем іпсум долор сіту амет, консектетур адіпісцінг елит. Нулла фасілісі. Донек а діам нек елит комодо дапібус. Сед нон метус еу джусто бібендум вехікула.</p>
-            <p>Вестибулум анте іпсум приміс ін фаубіцус орці луксус ет ультріцес посуєре кюрає; Дуйс нек малесуада турпис. Інтегер вел іпсум еґет ліберо посуєре ферментум.</p>
-            <p>Морбі еуїсмод, турпис а дінгіссім хендрері, ліберо ест ефіцітур одіо, вітає імпердіет лігулá сапієн нек лорем. Краc тінцідунт турпис нон сапієн вехікула, ет волутпат джусто вехікула.</p>
+            <ul>
+                <li>Ви можете повернути підписку протягом 24 годин після покупки.</li>
+                <li>Усе, що є на акаунті й потребує підписки, зникне після її закінчення або повернеться.</li>
+            </ul>
 
             <form class="language-form" method="POST" action="{% url 'change-language' %}">
                 {% csrf_token %}
