@@ -5,10 +5,9 @@
 <title>Main</title>
 <link rel="icon" href="{% static 'icons/Bin.jpg' %}" type="image/png">
 <!-- <link rel="stylesheet" href="{% static 'css/home.css' %}"> -->
-<link rel="stylesheet" href="{% static 'js/home.js' %}">
+<!-- <link rel="stylesheet" href="{% static 'js/home1.js' %}"> -->
 
 <style>
-/* Формы */
 .setting-form,
 .form1,
 .form2 {
@@ -35,11 +34,11 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: white; /* Добавляем фоновый цвет */
-    padding: 30px; /* Добавляем отступы */
-    border-radius: 10px; /* Добавляем скругление углов */
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-    display: none; /* По умолчанию скрыт */
+    display: none;
     z-index: 2000;
     width: 400px;
     max-width: 90%;
@@ -49,13 +48,10 @@
     transition: background 0.3s, color 0.3s;
 }
 
-/* Когда чекбокс отмечен - показываем форму */
 #profile-toggle:checked ~ .profile-form {
-    display: flex; /* Меняем на flex чтобы видеть */
+    display: flex;
 }
 
-/* цвета темы */
-/* ====================== LIGHT THEME ====================== */
 .theme-light {
   background-color: #ffffff;
   color: #000000;
@@ -158,7 +154,7 @@
     border-color: #666666;
     color: #000000;
 }
-/* ====================== DARK THEME ====================== */
+
 .theme-dark {
   background-color: #747474;
   color: #ffffff;
@@ -287,7 +283,6 @@
     color: #ffffff;
 }
 
-/* ====================== PINK THEME ====================== */
 .theme-pink {
   background: linear-gradient(to right, #ffb6c1, #b30086);
   color: #000000;
@@ -435,7 +430,6 @@
     color: #000000;
 }
 
-/* ====================== GREEN THEME ====================== */
 .theme-green {
   background: linear-gradient(to right, #a8ffbf, #008c3a);
   color: #777777;
@@ -543,7 +537,6 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-
 .username {
     text-align: left;
     margin: 5px 0;
@@ -583,7 +576,6 @@ body {
     display: none;
 }
 
-/* Гамбургер */
 .hamburger {
     position: fixed;
     top: 20px;
@@ -617,7 +609,6 @@ body {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* Боковое меню */
 .side-menu {
     position: fixed;
     top: 0;
@@ -705,7 +696,6 @@ body {
     text-align: left;
 }
 
-
 .form1 img.avatar,
 .form2 img.avatar {
     width: 80px;
@@ -731,7 +721,6 @@ body {
     display: flex;
 }
 
-/* Оверлеи */
 .profile-overlay,
 .setting-overlay,
 .form1-overlay,
@@ -762,7 +751,6 @@ body {
     display: block;
 }
 
-/* Кнопки форм */
 .profile-form button,
 .setting-form button,
 .form1 button,
@@ -785,7 +773,6 @@ body {
     background: #e0e0e0;
 }
 
-/* Заголовок профиля */
 .profile-header {
     display: flex;
     align-items: center;
@@ -866,7 +853,6 @@ body {
     transform: scale(0.96);
 }
 
-/* профиль другого пользователя */
 .other-profile-form {
     position: fixed;
     top: 50%;
@@ -892,6 +878,7 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.3);
     z-index: 1500;
+    cursor: pointer;
 }
 
 #other-profile-toggle:checked ~ .other-profile-form {
@@ -910,7 +897,6 @@ body {
     display: none;
 }
 
-/* Функция для закрытия профиля */
 .language-form {
   margin: 10px 0 20px 0;
 }
@@ -923,7 +909,6 @@ body {
   cursor: pointer;
 }
 
-/* Color theme */
 .color_theme button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1005,7 +990,6 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     display: none;
-    z-index: 2000;
     width: 520px;
     max-width: 90%;
     box-sizing: border-box;
@@ -1028,7 +1012,6 @@ body {
     display: block;
 }
 
-/* Кошелёк */
 .wallet button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1133,8 +1116,6 @@ body {
     display: block;
 }
 
-
-/* Добавление карты */
 .add_card button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1238,7 +1219,7 @@ body {
 #add_card-toggle:checked ~ .add_card-overlay {
     display: block;
 }
-/* Пополнение кошелька */
+
 .deposit button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1360,7 +1341,6 @@ body {
     display: block;
 }
 
-/* проверка статуса подписки */
 .check-subscription button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1482,7 +1462,6 @@ body {
     display: block;
 }
 
-/* кнопки в подписке */
 .subscribe-btn {
     padding: 10px 20px;
     border-radius: 8px;
@@ -1500,8 +1479,6 @@ body {
     border-color: #0056b3;
 }
 
-
-/* Підписка на місяць */
 .subscribe-form-month button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1588,8 +1565,6 @@ body {
     display: block;
 }
 
-
-/* Підписка на рік */
 .subscribe-form-year button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1676,8 +1651,6 @@ body {
     display: block;
 }
 
-
-/* кнопки в подписке */
 .subscribe-btn {
     position: relative;
     padding: 10px 20px;
@@ -1709,7 +1682,6 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* Bin+ mouth */
 .bin_mouth button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1814,8 +1786,6 @@ body {
     display: block;
 }
 
-
-/* bin premium mouth */
 .bin_premium_mouth button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -1920,9 +1890,6 @@ body {
     display: block;
 }
 
-
-
-/* Bin+ years */
 .bin_years button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -2027,8 +1994,6 @@ body {
     display: block;
 }
 
-
-/* bin premium years */
 .bin_premium_years button {
   padding: 8px 12px;
   margin-left: 8px;
@@ -2133,7 +2098,6 @@ body {
     display: block;
 }
 
-/* Кнопка подписки */
 .Subscribe-switching-button {
     margin-top: 15px;
     padding: 10px 25px;
@@ -2169,7 +2133,6 @@ body {
     border-radius: 4px;
 }
 
-/* Кнопка подписки */
 .subscribe-btn {
     margin-top: 15px;
     padding: 10px 25px;
@@ -2196,7 +2159,6 @@ body {
     cursor: not-allowed;
 }
 
-/* зачёркнутая цена */
 .pricing {
     display: flex;
     align-items: center;
@@ -2217,8 +2179,6 @@ body {
     font-size: 1.3rem;
 }
 
-
-/* проверка статуса подписки */
 .check-subscription-btn {
     padding: 12px 25px;
     font-size: 16px;
@@ -2236,7 +2196,6 @@ body {
     transform: scale(1.05);
 }
 
-/* кнопка возврата подписки */
 .btn-refund {
     background-color: #ff0000;
     color: white;             
@@ -2254,9 +2213,6 @@ body {
     transform: scale(1.05);      
 }
 
-
-
-/* From Uiverse.io by Yaya12085 */ /* Формы подписок */
 .plan {
   border-radius: 16px;
   box-shadow: 0 30px 30px -25px rgba(0, 38, 255, 0.205);
@@ -2374,7 +2330,6 @@ body {
   background-color: #4133B7;
 }
 
-/* редактирование профиля */
 .edit-profile-container {
     display: flex;
     gap: 30px;
@@ -2476,7 +2431,6 @@ body {
     cursor: not-allowed;
     opacity: 0.6;
 }
-
 
 .profile-preview-header {
     display: flex;
@@ -2662,7 +2616,21 @@ body {
     background: #c82333;
 }
 
-/* Чат */
+.chat-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+#chat-toggle:checked ~ .chat-overlay {
+    display: block;
+}
+
 .chat-container {
     position: fixed;
     top: 0;
@@ -2673,11 +2641,25 @@ body {
     height: 100vh;
     border: none;
     border-radius: 0;
-    background: white;
     display: none;
     flex-direction: column;
     box-shadow: none;
     z-index: 2000;
+    background: inherit !important;
+    color: inherit !important;
+    transition: none !important;
+}
+
+#chat-toggle:checked ~ .chat-container {
+    display: flex !important;
+}
+
+.chat-overlay {
+    display: none !important;
+}
+
+.close-chat {
+    display: none !important;
 }
 
 .chat-header {
@@ -2753,6 +2735,35 @@ body {
     text-align: left;
 }
 
+.chat-messages {
+    background: #f9f9f9 !important;
+}
+
+.chat-container .message.received {
+    background: #e9ecef !important;
+    color: black !important;
+}
+
+.chat-container .message.sent {
+    background: #d5ffa5 !important;
+    color: rgb(0, 0, 0) !important;
+}
+
+.chat-header {
+    background: white !important;
+}
+
+.chat-input-container {
+    background: white !important;
+    border-top: 1px solid #eee !important;
+}
+
+.chat-input {
+    background: white !important;
+    color: #000000 !important;
+    border: 1px solid #ddd !important;
+}
+
 .chat-input {
     flex: 1;
     padding: 12px;
@@ -2775,7 +2786,6 @@ body {
 .chat-send-btn:hover {
     background: #0056b3;
 }
-
 
 .chat-header h3 {
     margin: 0;
@@ -2823,28 +2833,161 @@ body {
     }
 }
 
+.attach-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+}
 
-/* Стили для упоминаний в чате */
+.attach-btn:hover {
+    background-color: #f0f0f0;
+    color: #007bff;
+    transform: scale(1.1);
+}
+
+.attach-btn:active {
+    transform: scale(0.95);
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 15px;
+    gap: 10px;
+    background: white;
+    border-top: 1px solid #eee;
+    margin-top: auto;
+    z-index: 2001;
+    align-items: center;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.chat-send-btn {
+    padding: 12px 24px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.chat-send-btn:hover {
+    background: #0056b3;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+body.chat-open-light .chat-container,
+body.chat-open-light .chat-container * {
+    background: linear-gradient(to right, #ffffff, #e0e0e0) !important;
+    color: #000000 !important;
+}
+
+
+.theme-light .chat-container,
+.theme-light .chat-header,
+.theme-light .chat-input-container {
+    background: linear-gradient(to right, #ffffff, #e0e0e0) !important;
+    color: #000000 !important;
+}
+
+.theme-light .chat-messages {
+    background: #f9f9f9 !important;
+}
+
+.theme-light .message.sent {
+    background: #d5ffa5 !important;
+    color: #000000 !important;
+}
+
+.theme-light .message.received {
+    background: #e9ecef !important;
+    color: #000000 !important;
+}
+
+.theme-dark .chat-container,
+.theme-dark .chat-header,
+.theme-dark .chat-input-container {
+    background: linear-gradient(to right, #2c2c2c, #1a1a1a) !important;
+    color: #ffffff !important;
+}
+
+.theme-dark .chat-messages {
+    background: #1a1a1a !important;
+}
+
+.theme-dark .message.sent {
+    background: #007bff !important;
+    color: #ffffff !important;
+}
+
+.theme-dark .message.received {
+    background: #3a3a3a !important;
+    color: #ffffff !important;
+}
+
+/* #chat-toggle:checked ~ .chat-container, */
+/* #chat-toggle:checked ~ .chat-container .chat-messages, */
+/* #chat-toggle:checked ~ .chat-container .chat-header, */
+/* #chat-toggle:checked ~ .chat-container .chat-input-container, */
+/* #chat-toggle:checked ~ .chat-container .message { */
+    /* background: inherit !important; */
+    /* color: inherit !important; */
+/* } */
+
+#chat-toggle:checked ~ .chat-container .message.received {
+    background: #e9ecef !important;
+    color: black !important;
+}
+
+#chat-toggle:checked ~ .chat-container .message.sent {
+    background: #d5ffa5 !important;
+    color: rgb(0, 0, 0) !important;
+}
+
 .message-mention {
     color: #007bff;
     font-weight: bold;
     cursor: pointer;
-    text-decoration: none;
     transition: color 0.2s ease;
-    padding: 2px 4px;
-    border-radius: 4px;
-    background-color: rgba(0, 123, 255, 0.1);
+    padding: 1px 3px;
+    border-radius: 3px;
 }
 
 .message-mention:hover {
     color: #0056b3;
-    text-decoration: underline;
-    background-color: rgba(0, 123, 255, 0.15);
 }
 
 .profile-link {
     color: #007bff;
-    text-decoration: none;
     cursor: pointer;
     transition: color 0.2s ease;
     font-weight: 500;
@@ -2852,10 +2995,8 @@ body {
 
 .profile-link:hover {
     color: #0056b3;
-    text-decoration: underline;
 }
 
-/* Темы для чата */
 .theme-light .chat-container {
     background: linear-gradient(to right, #ffffff, #e0e0e0);
     color: #000000;
@@ -2951,7 +3092,7 @@ body {
 #chat-toggle:checked ~ .chat-overlay {
     display: block;
 }
-/* история чатов */
+
 .recent-contact {
     padding: 12px;
     border: 1px solid #ddd;
@@ -3031,49 +3172,503 @@ body {
     margin-left: 8px;
 }
 
+.security-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 500px;
+    max-width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
 
+.security-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1500;
+}
 
+#security-toggle:checked ~ .security-form {
+    display: flex;
+}
 
-/* Формы */
+#security-toggle:checked ~ .security-overlay {
+    display: block;
+}
+
+.security-section {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.security-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.security-section h3 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 18px;
+}
+
+.security-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.security-btn:hover {
+    background: #0056b3;
+}
+
+.enable-btn {
+    background: #28a745;
+}
+
+.enable-btn:hover {
+    background: #218838;
+}
+
+.disable-btn {
+    background: #dc3545;
+}
+
+.disable-btn:hover {
+    background: #c82333;
+}
+
+.terminate-btn {
+    background: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.terminate-btn:hover {
+    background: #e0a800;
+}
+
+.session-item, .login-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+}
+
+.session-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.session-info span {
+    font-size: 12px;
+    color: #666;
+}
+
+.current-session {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.status.success {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status.failed {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.sessions-list, .login-history {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.theme-light .security-form {
+    background: linear-gradient(to right, #ffffff, #e0e0e0);
+    color: #000000;
+}
+
+.theme-dark .security-form {
+    background: linear-gradient(to right, #2c2c2c, #1a1a1a);
+    color: #ffffff;
+}
+
+.theme-pink .security-form {
+    background: linear-gradient(to right, #ffb6c1, #b30086);
+    color: #000000;
+}
+
+.theme-green .security-form {
+    background: linear-gradient(to right, #a8e6a2, #2e7d32);
+    color: #ffffff;
+}
+
+.theme-light .security-form input {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    border: 1px solid #999999;
+}
+
+.theme-dark .security-form input {
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    border: 1px solid #555555;
+}
+
+.theme-pink .security-form input {
+    background: rgba(255, 255, 255, 0.2);
+    color: #000000;
+    border: 1px solid #000000;
+}
+
+.theme-green .security-form input {
+    background: rgba(255, 255, 255, 0.2);
+    color: #000000;
+    border: 1px solid #2e7d32;
+}
+
+.password-section {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    max-height: 50px;
+    transition: all 0.4s ease-in-out;
+    min-height: 50px;
+}
+
+.password-section.expanded {
+    max-height: 600px;
+    padding-bottom: 25px;
+    min-height: 380px;
+}
+
+.password-form {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease 0.1s;
+    height: 0;
+    overflow: hidden;
+    display: none;
+    min-height: 280px;
+}
+
+.password-section.expanded .password-form {
+    opacity: 1;
+    transform: translateY(0);
+    height: auto;
+    margin-top: 15px;
+    display: block;
+    min-height: 280px;
+}
+
+.password-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 0;
+    user-select: none;
+    min-height: 40px;
+}
+
+.password-toggle h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.4;
+}
+
+.password-toggle-arrow {
+    transition: transform 0.3s ease;
+    font-size: 18px;
+    color: #666;
+    min-width: 20px;
+}
+
+.password-section.expanded .password-toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.password-form .form-group {
+    margin-bottom: 20px;
+    min-height: 70px;
+}
+
+.password-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+    font-size: 14px;
+}
+
+.password-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-height: 44px;
+}
+
+.password-form input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.security-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s;
+    width: 100%;
+    min-height: 50px;
+    margin-top: 10px;
+}
+
+.security-btn:hover {
+    background: #0056b3;
+}
+
+.password-form-content {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.theme-light .password-toggle h4 { color: #000000; }
+.theme-light .password-toggle-arrow { color: #000000; }
+.theme-light .password-form input { 
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    border: 1px solid #999999;
+}
+
+.theme-dark .password-toggle h4 { color: #ffffff; }
+.theme-dark .password-toggle-arrow { color: #ffffff; }
+.theme-dark .password-form input { 
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    border: 1px solid #555555;
+}
+
+.theme-pink .password-toggle h4 { color: #000000; }
+.theme-pink .password-toggle-arrow { color: #000000; }
+.theme-pink .password-form input { 
+    background: rgba(255, 255, 255, 0.2);
+    color: #000000;
+    border: 1px solid #000000;
+}
+
+.theme-green .password-toggle h4 { color: #ffffff; }
+.theme-green .password-toggle-arrow { color: #ffffff; }
+.theme-green .password-form input { 
+    background: rgba(255, 255, 255, 0.2);
+    color: #000000;
+    border: 1px solid #2e7d32;
+}
+
+.other-profile-form .message-mention,
+.other-profile-form .profile-mention {
+    color: #007bff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
+.other-profile-form .message-mention:hover,
+.other-profile-form .profile-mention:hover {
+    color: #0056b3;
+}
+
+body.modal-open .chat-container {
+    opacity: 0.7;
+    filter: brightness(0.8);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.file-preview {
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.message img {
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.message img:hover {
+    transform: scale(1.02);
+}
+
+.file-attachment {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+.file-attachment a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.file-attachment a:hover {
+    text-decoration: underline;
+}
+
+.attach-btn {
+    transition: all 0.2s;
+}
+
+.attach-btn:hover {
+    color: #007bff;
+    transform: scale(1.1);
+}
+
+.attach-btn:active {
+    transform: scale(0.95);
+}
+
+#chat-toggle:checked ~ .profile-form,
+#chat-toggle:checked ~ .setting-form,
+#chat-toggle:checked ~ .form1,
+#chat-toggle:checked ~ .form2,
+#chat-toggle:checked ~ .wallet-form,
+#chat-toggle:checked ~ .other-profile-form,
+#chat-toggle:checked ~ .security-form,
+#chat-toggle:checked ~ .color_theme-form,
+#chat-toggle:checked ~ .deposit-form,
+#chat-toggle:checked ~ .add_card-form,
+#chat-toggle:checked ~ .subscribe-form-month,
+#chat-toggle:checked ~ .subscribe-form-year,
+#chat-toggle:checked ~ .bin_mouth-form,
+#chat-toggle:checked ~ .bin_premium_mouth-form,
+#chat-toggle:checked ~ .bin_years-form,
+#chat-toggle:checked ~ .bin_premium_years-form,
+#chat-toggle:checked ~ .check-subscription-form {
+    pointer-events: auto;
+    z-index: 2001;
+}
+
 .profile-form,
 .setting-form,
 .form1,
 .form2,
-.color_theme-form,
 .wallet-form,
+.other-profile-form,
+.security-form,
+.color_theme-form,
 .deposit-form,
+.add_card-form,
 .subscribe-form-month,
 .subscribe-form-year,
 .bin_mouth-form,
 .bin_premium_mouth-form,
 .bin_years-form,
 .bin_premium_years-form,
-.check-subscription-form,
-.other-profile-form,
-.add_card-form {
-    z-index: 2100;
+.check-subscription-form {
+    z-index: 2001;
 }
 
-/* Оверлеи для форм */
-.profile-overlay,
-.other-profile-overlay,
-.setting-overlay,
-.form1-overlay,
-.form2-overlay,
-.color_theme-overlay,
-.wallet-overlay,
-.check-subscription-overlay,
-.subscribe-month-overlay,
-.subscribe-year-overlay,
-.deposit-overlay,
-.add_card-overlay,
-.bin_mouth-overlay,
-.bin_premium_mouth-overlay,
-.bin_years-overlay,
-.bin_premium_years-overlay {
-    z-index: 2099;
+#chat-toggle:checked ~ .profile-overlay,
+#chat-toggle:checked ~ .other-profile-overlay,
+#chat-toggle:checked ~ .setting-overlay,
+#chat-toggle:checked ~ .form1-overlay,
+#chat-toggle:checked ~ .form2-overlay,
+#chat-toggle:checked ~ .color_theme-overlay,
+#chat-toggle:checked ~ .wallet-overlay,
+#chat-toggle:checked ~ .check-subscription-overlay,
+#chat-toggle:checked ~ .subscribe-month-overlay,
+#chat-toggle:checked ~ .subscribe-year-overlay,
+#chat-toggle:checked ~ .deposit-overlay,
+#chat-toggle:checked ~ .add_card-overlay,
+#chat-toggle:checked ~ .bin_mouth-overlay,
+#chat-toggle:checked ~ .bin_premium_mouth-overlay,
+#chat-toggle:checked ~ .bin_years-overlay,
+#chat-toggle:checked ~ .bin_premium_years-overlay,
+#chat-toggle:checked ~ .security-overlay {
+    z-index: 2000;
 }
 
+#menu-toggle,
+#profile-toggle,
+#other-profile-toggle,
+#setting-toggle,
+#form1-toggle,
+#form2-toggle,
+#color_theme-toggle,
+#wallet-toggle,
+#check-subscription-toggle,
+#subscribe-month-toggle,
+#subscribe-year-toggle,
+#bin_mouth-toggle,
+#bin_premium_mouth-toggle,
+#bin_years-toggle,
+#bin_premium_years-toggle,
+#deposit-toggle,
+#add_card-toggle,
+#security-toggle,
+#chat-toggle {
+    display: none;
+}
 </style>
 {% endblock %}
 
@@ -3095,7 +3690,9 @@ body {
 <input type="checkbox" id="bin_premium_mouth-toggle">
 <input type="checkbox" id="bin_years-toggle">
 <input type="checkbox" id="bin_premium_years-toggle">
+<input type="checkbox" id="security-toggle">
 <input type="checkbox" id="chat-toggle">
+<input type="checkbox" id="security-toggle">
 
 
 <div class="profile-overlay"></div>
@@ -3113,7 +3710,10 @@ body {
 <div class="bin_mouth-overlay"></div>
 <div class="bin_premium_mouth-overlay"></div>
 <div class="bin_years-overlay"></div>
+<div class="security-overlay"></div>
 <div class="bin_premium_years-overlay"></div>
+<div class="chat-overlay"></div>
+<div class="security-overlay"></div>
 <!-- <div class="chat-overlay"></div> -->
 {% with lang=user.language|default:"English" %}
     {% if lang == "English"|default:"English" %}
@@ -3188,8 +3788,8 @@ body {
 
                 <div class="profile-preview-section">
                     <div class="profile-preview-label">Description</div>
-                    <div class="profile-preview-value">
-                        {{ description_html|safe }}
+                    <div class="profile-preview-value" id="my-profile-description">
+                        {{ user.description }}
                     </div>
                 </div>      
 
@@ -3264,6 +3864,7 @@ body {
             <label for="form2-toggle" class="profile-btn">Language</label>
             <label for="color_theme-toggle" class="profile-btn">Color theme</label>
             <label for="subscribe-month-toggle" class="profile-btn">Subscribe</label>
+            <label for="security-toggle" class="profile-btn">Security</label>
             <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
             {% csrf_token %}
             </form>
@@ -3296,19 +3897,19 @@ body {
                             </button>                       
 
                             <!-- Фон -->
-                            <label for="backgroundInput" style="display: inline-block; padding: 8px 16px; background: #28a745; color: white; border-radius: 6px; cursor: pointer; margin-top: 10px; {% if user.subscribe == 'Basic' %}opacity: 0.6; cursor: not-allowed;{% endif %}"
-                                   title="{% if user.subscribe == 'Basic' %}Backgrounds available for Bin+ and Bin Premium{% elif user.subscribe == 'Bin+' %}Images only (GIF for Bin Premium){% else %}All image formats including GIF{% endif %}">
-                                Choose New Background
-                                <input type="file" id="backgroundInput" name="background" 
-                                       accept="{% if user.subscribe == 'Bin+' %}image/*{% else %}image/*,image/gif{% endif %}"
-                                       {% if user.subscribe == 'Basic' %}disabled{% endif %} 
-                                       style="display: none;">
-                            </label>
-                            <button type="button" class="btn-delete-background" onclick="confirmBackgroundReset()" 
-                                    style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px;"
-                                    {% if not user.background or not user.background.url %}disabled{% endif %}>
-                                Remove Background
-                            </button>       
+                            <!-- <label for="backgroundInput" style="display: inline-block; padding: 8px 16px; background: #28a745; color: white; border-radius: 6px; cursor: pointer; margin-top: 10px; {% if user.subscribe == 'Basic' %}opacity: 0.6; cursor: not-allowed;{% endif %}" -->
+                                   <!-- title="{% if user.subscribe == 'Basic' %}Backgrounds available for Bin+ and Bin Premium{% elif user.subscribe == 'Bin+' %}Images only (GIF for Bin Premium){% else %}All image formats including GIF{% endif %}"> -->
+                                <!-- Choose New Background -->
+                                <!-- <input type="file" id="backgroundInput" name="background"  -->
+                                       <!-- accept="{% if user.subscribe == 'Bin+' %}image/*{% else %}image/*,image/gif{% endif %}" -->
+                                       <!-- {% if user.subscribe == 'Basic' %}disabled{% endif %}  -->
+                                       <!-- style="display: none;"> -->
+                            <!-- </label> -->
+                            <!-- <button type="button" class="btn-delete-background" onclick="confirmBackgroundReset()"  -->
+                                    <!-- style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px;" -->
+                                    <!-- {% if not user.background or not user.background.url %}disabled{% endif %}> -->
+                                <!-- Remove Background -->
+                            <!-- </button>        -->
                         </div>    
 
                         <div class="form-group">
@@ -3778,24 +4379,29 @@ body {
                         placeholder="Search"
                         onkeyup="searchUsers()">
                 </div>      
-                
+
                 <div id="recent-contacts" style="margin-top:20px; margin-left:-50px; width:300px;">
                     <div id="recent-contacts-list">
                     </div>
                 </div>
-                
-                <div id="searchResults" style="margin-top:10px;"></div>
+
+                <div id="searchResults" style="margin-top:20px; margin-left:-50px; width:300px;"></div>
             </div>
-        </div>  
+        </div>
 
         <div class="chat-container">
-            <div class="chat-header">
+            <div class="chat-header" onclick="openUserProfile(currentChatUser)">
                 <h3><span id="chat-username"></span></h3>
             </div>
             <div class="chat-messages" id="chat-messages">
                 <div class="chat-messages-spacer"></div>
             </div>
             <div class="chat-input-container">
+                <button type="button" class="attach-btn" onclick="openFileInput()" title="Прикрепить файл">
+                    📎
+                </button>
+                <input type="file" id="chat-file-input" style="display: none;" onchange="handleFileSelect(event)">
+
                 <input type="text" class="chat-input" id="chat-input" placeholder="Type your message...">
                 <button class="chat-send-btn" onclick="sendMessage()">Send</button>
             </div>
@@ -3837,8 +4443,8 @@ body {
             <input type="checkbox" id="terms-bin">
             <label for="terms-bin">I agree with the <a href="/terms" target="_blank">terms and conditions</a></label>
         </div>
-        <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button>
-        <!-- <button type="submit" name="subscription_plan" value="bin_plus_test" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button> -->
+        <!-- <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button> -->
+        <button type="submit" name="subscription_plan" value="bin_plus_test" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button>
     </form>
 </div>
 
@@ -3895,6 +4501,144 @@ body {
         <button type="submit" name="subscription_plan" value="bin_premium_yearly" id="subscribe-premium-year" disabled class="subscribe-btn">Subscribe</button>
     </form>
 </div>
+
+<!-- Security -->
+<div class="security-form">
+    <h2>{% if lang == "Українська" %}Безпека{% else %}Security{% endif %}</h2>
+    
+    <!-- Change Password Section -->
+    <div class="security-section password-section" id="password-section">
+        <div class="password-toggle" onclick="togglePasswordForm()">
+            <h4>{% if lang == "Українська" %}Змінити пароль{% else %}Change Password{% endif %}</h4>
+            <div class="password-toggle-arrow">▼</div>
+        </div>
+        
+        <div class="password-form" id="password-form">
+            <form method="POST" action="{% url 'change_password' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="current-password">{% if lang == "Українська" %}Поточний пароль{% else %}Current Password{% endif %}</label>
+                    <input type="password" id="current-password" name="current_password" required 
+                           placeholder="{% if lang == 'Українська' %}Введіть поточний пароль{% else %}Enter current password{% endif %}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-password">{% if lang == "Українська" %}Новий пароль{% else %}New Password{% endif %}</label>
+                    <input type="password" id="new-password" name="new_password" required 
+                           placeholder="{% if lang == 'Українська' %}Введіть новий пароль{% else %}Enter new password{% endif %}"
+                           minlength="8">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">{% if lang == "Українська" %}Підтвердіть пароль{% else %}Confirm Password{% endif %}</label>
+                    <input type="password" id="confirm-password" name="confirm_password" required 
+                           placeholder="{% if lang == 'Українська' %}Підтвердіть новий пароль{% else %}Confirm new password{% endif %}">
+                </div>
+                
+                <button type="submit" class="security-btn">
+                    {% if lang == "Українська" %}Змінити пароль{% else %}Change Password{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="security-section">
+        <h3>{% if lang == "Українська" %}Двофакторна аутентифікація{% else %}Two-Factor Authentication{% endif %}</h3>
+        <p>{% if lang == "Українська" %}Статус: {% else %}Status: {% endif %}
+            <strong>
+                {% if user.two_factor_enabled %}
+                    {% if lang == "Українська" %}Увімкнено{% else %}Enabled{% endif %}
+                {% else %}
+                    {% if lang == "Українська" %}Вимкнено{% else %}Disabled{% endif %}
+                {% endif %}
+            </strong>
+        </p>
+        
+        <div class="two-factor-buttons">
+            {% if not user.two_factor_enabled %}
+                <form method="POST" action="{% url 'enable_2fa' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="security-btn enable-btn">
+                        {% if lang == "Українська" %}Увімкнути 2FA{% else %}Enable 2FA{% endif %}
+                    </button>
+                </form>
+            {% else %}
+                <form method="POST" action="{% url 'disable_2fa' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="security-btn disable-btn">
+                        {% if lang == "Українська" %}Вимкнути 2FA{% else %}Disable 2FA{% endif %}
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="security-section">
+        <h3>{% if lang == "Українська" %}Активні сесії{% else %}Active Sessions{% endif %}</h3>
+        {% if active_sessions %}
+            <div class="sessions-list">
+                {% for session in active_sessions %}
+                    <div class="session-item">
+                        <div class="session-info">
+                            <strong>IP: {{ session.ip_address }}</strong>
+                            <span>{% if lang == "Українська" %}Остання активність: {% else %}Last activity: {% endif %}{{ session.last_activity|date:"Y-m-d H:i" }}</span>
+                        </div>
+                        {% if not session.is_current %}
+                            <form method="POST" action="{% url 'terminate_session' %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="session_key" value="{{ session.session_key }}">
+                                <button type="submit" class="terminate-btn">
+                                    {% if lang == "Українська" %}Завершити{% else %}Terminate{% endif %}
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="current-session">{% if lang == "Українська" %}Поточна{% else %}Current{% endif %}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>{% if lang == "Українська" %}Немає активних сесій{% else %}No active sessions{% endif %}</p>
+        {% endif %}
+    </div>
+
+    <div class="security-section">
+        <h3>{% if lang == "Українська" %}Історія входів{% else %}Login History{% endif %}</h3>
+        {% if login_history %}
+            <div class="login-history">
+                {% for login in login_history %}
+                    <div class="login-item">
+                        <strong>IP: {{ login.ip_address }}</strong>
+                        <span>{{ login.login_time|date:"Y-m-d H:i" }}</span>
+                        <span class="status {% if login.success %}success{% else %}failed{% endif %}">
+                            {% if login.success %}
+                                {% if lang == "Українська" %}Успішно{% else %}Success{% endif %}
+                            {% else %}
+                                {% if lang == "Українська" %}Невдало{% else %}Failed{% endif %}
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>{% if lang == "Українська" %}Історія входів відсутня{% else %}No login history available{% endif %}</p>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4502,6 +5246,454 @@ body {
 {% endwith %}
 
 <script>
+let currentChatUser = null;
+let chatSocket = null;
+let fileInput = null;
+let selectedFile = null;
+
+function openFileInput() {
+    document.getElementById('chat-file-input').click();
+}
+
+function handleFileSelect(event) {
+    const files = event.target.files;
+    if (files.length > 0) {
+        selectedFile = files[0];
+        showFilePreview(selectedFile);
+    }
+    event.target.value = '';
+}
+
+function showFilePreview(file) {
+    const oldPreview = document.querySelector('.file-preview');
+    if (oldPreview) oldPreview.remove();
+    
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'file-preview';
+    previewDiv.style.cssText = `
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 2001;
+        max-width: 300px;
+        animation: slideUp 0.3s ease;
+    `;
+    
+    let previewHTML = '';
+    
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewHTML = `
+                <div style="margin-bottom: 10px; font-weight: bold;">Изображение: ${file.name}</div>
+                <img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 5px;">
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button onclick="sendFile()" style="flex:1; padding: 8px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Отправить
+                    </button>
+                    <button onclick="cancelFile()" style="flex:1; padding: 8px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Отмена
+                    </button>
+                </div>
+            `;
+            previewDiv.innerHTML = previewHTML;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        previewHTML = `
+            <div style="margin-bottom: 10px; font-weight: bold;">Файл: ${file.name}</div>
+            <div style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                Тип: ${file.type || 'Неизвестно'}<br>
+                Размер: ${(file.size / 1024).toFixed(1)} KB
+            </div>
+            <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <button onclick="sendFile()" style="flex:1; padding: 8px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Отправить
+                </button>
+                <button onclick="cancelFile()" style="flex:1; padding: 8px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Отмена
+                </button>
+            </div>
+        `;
+        previewDiv.innerHTML = previewHTML;
+    }
+    
+    document.body.appendChild(previewDiv);
+}
+
+function createFileInput() {
+    if (!fileInput) {
+        fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.id = 'chat-file-input';
+        fileInput.style.display = 'none';
+        fileInput.multiple = false;
+        fileInput.accept = 'image/*,video/*,.pdf,.doc,.docx,.txt,.zip';
+        
+        fileInput.addEventListener('change', handleFileSelect);
+        document.body.appendChild(fileInput);
+    }
+    return fileInput;
+}
+
+function handleFileSelect(event) {
+    const files = event.target.files;
+    if (files.length > 0) {
+        const file = files[0];
+        
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('Файл слишком большой. Максимальный размер: 10MB');
+            event.target.value = '';
+            return;
+        }
+        
+        const allowedTypes = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+            'application/pdf', 'text/plain',
+            'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/zip', 'application/x-rar-compressed'
+        ];
+        
+        if (!allowedTypes.includes(file.type)) {
+            alert('Недопустимый тип файла. Разрешены: изображения, PDF, текстовые файлы, документы');
+            event.target.value = '';
+            return;
+        }
+        
+        selectedFile = file;
+        showFilePreview(selectedFile);
+    }
+    event.target.value = '';
+}
+
+function sendFile() {
+    if (!selectedFile || !currentChatUser) {
+        cancelFile();
+        return;
+    }
+    
+    const textInput = document.getElementById('chat-input');
+    const text = textInput.value.trim() || '';
+    
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('receiver', currentChatUser);
+    if (text) {
+        formData.append('text', text);
+    }
+    
+    const csrfToken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    if (!csrfToken) {
+        alert('CSRF token not found. Please refresh the page.');
+        cancelFile();
+        return;
+    }
+    
+    fetch('/upload-chat-file/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            displayMessage({
+                text: text || '',
+                file_url: data.file_url,
+                file_name: data.file_name,
+                file_type: data.file_type,
+                file_size: data.file_size,
+                sender: "{{ user.username }}",
+                timestamp: data.timestamp
+            }, true);
+            
+            textInput.value = '';
+            selectedFile = null;
+            cancelFile();
+            
+            if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(JSON.stringify({
+                    'message': text || '[Файл]',
+                    'sender': "{{ user.username }}",
+                    'receiver': currentChatUser,
+                    'file_url': data.file_url,
+                    'file_name': data.file_name,
+                    'file_type': data.file_type
+                }));
+            }
+        } else {
+            alert('Ошибка отправки файла: ' + data.error);
+            cancelFile();
+        }
+    })
+    .catch(error => {
+        console.error('Error sending file:', error);
+        alert('Ошибка отправки файла: ' + error.message);
+        cancelFile();
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function cancelFile() {
+    selectedFile = null;
+    const preview = document.querySelector('.file-preview');
+    if (preview) preview.remove();
+    if (fileInput) fileInput.value = '';
+}
+
+function displayFileMessage(data, isSent) {
+    const messagesContainer = document.getElementById('chat-messages');
+    if (!messagesContainer) return;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+    
+    let fileContent = '';
+    
+    if (data.file_type && data.file_type.startsWith('image/')) {
+        fileContent = `
+            <div style="margin: 5px 0;">
+                <strong>Изображение:</strong>
+            </div>
+            <img src="${data.file_url}" 
+                 style="max-width: 250px; max-height: 250px; border-radius: 5px; cursor: pointer;" 
+                 onclick="openFileModal('${data.file_url}', '${data.file_name || 'image'}')">
+        `;
+    } else {
+        fileContent = `
+            <div style="margin: 5px 0;">
+                <strong>Файл:</strong> ${data.file_name}
+            </div>
+            <div style="background: #f0f0f0; padding: 10px; border-radius: 5px; display: flex; align-items: center; gap: 10px;">
+                <div style="font-size: 24px;">📎</div>
+                <div>
+                    <div style="font-weight: bold;">${data.file_name}</div>
+                    <div style="font-size: 12px; color: #666;">
+                        ${data.file_type || 'Неизвестный формат'} • 
+                        ${(data.file_size / 1024).toFixed(1)} KB
+                    </div>
+                    <a href="${data.file_url}" target="_blank" 
+                       style="display: inline-block; margin-top: 5px; padding: 3px 10px; background: #007bff; color: white; border-radius: 3px; text-decoration: none; font-size: 12px;">
+                        Скачать
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+    
+    messageDiv.innerHTML = `
+        <div class="message-sender">${isSent ? 'Вы' : data.sender || currentChatUser}</div>
+        ${data.text ? `<div style="margin-bottom: 5px;">${data.text}</div>` : ''}
+        ${fileContent}
+        <div class="message-time" style="font-size: 11px; color: #999; margin-top: 4px; text-align: ${isSent ? 'right' : 'left'}">
+            ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </div>
+    `;
+    
+    const spacer = messagesContainer.querySelector('.chat-messages-spacer');
+    if (spacer) {
+        messagesContainer.insertBefore(messageDiv, spacer);
+    } else {
+        messagesContainer.appendChild(messageDiv);
+    }
+    
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function openFileModal(url, filename) {
+    const modal = document.createElement('div');
+    modal.className = 'file-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="position: relative;">
+            <button onclick="closeFileModal()" 
+                    style="position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 30px; cursor: pointer;">×</button>
+            <img src="${url}" 
+                 style="max-width: 90vw; max-height: 90vh; border-radius: 5px;"
+                 alt="${filename}">
+            <div style="position: absolute; bottom: -40px; left: 0; color: white; font-size: 14px;">
+                ${filename}
+                <a href="${url}" download="${filename}" 
+                   style="margin-left: 10px; padding: 3px 10px; background: #007bff; color: white; border-radius: 3px; text-decoration: none;">
+                    Скачать
+                </a>
+            </div>
+        </div>
+    `;
+    
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeFileModal();
+        }
+    });
+    
+    document.body.appendChild(modal);
+}
+
+function closeFileModal() {
+    const modal = document.querySelector('.file-modal');
+    if (modal) modal.remove();
+}
+
+function addAttachmentButton() {
+    const chatInputContainer = document.querySelector('.chat-input-container');
+    if (!chatInputContainer) return;
+    
+    const oldButton = chatInputContainer.querySelector('.attach-btn');
+    if (oldButton) oldButton.remove();
+    
+    const attachButton = document.createElement('button');
+    attachButton.className = 'attach-btn';
+    attachButton.type = 'button';
+    attachButton.innerHTML = '📎';
+    attachButton.title = 'Прикрепить файл';
+    attachButton.style.cssText = `
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 5px 10px;
+        color: #666;
+    `;
+    
+    attachButton.addEventListener('click', function() {
+        const fileInput = createFileInput();
+        fileInput.click();
+    });
+    
+    const chatInput = document.getElementById('chat-input');
+    chatInputContainer.insertBefore(attachButton, chatInput);
+}
+
+function openChat(username) {
+    currentChatUser = username;
+    document.getElementById('chat-username').textContent = username;
+    document.getElementById('chat-toggle').checked = true;
+    
+    addAttachmentButton();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const newPassword = document.getElementById('new-password');
+    const confirmPassword = document.getElementById('confirm-password');
+    
+    function validatePasswords() {
+        if (newPassword.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity('Passwords do not match');
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+    
+    if (newPassword && confirmPassword) {
+        newPassword.addEventListener('input', validatePasswords);
+        confirmPassword.addEventListener('input', validatePasswords);
+    }
+});
+
+function togglePasswordForm() {
+    const passwordSection = document.getElementById('password-section');
+    const passwordForm = document.getElementById('password-form');
+    
+    if (passwordSection.classList.contains('expanded')) {
+        passwordSection.classList.remove('expanded');
+        setTimeout(() => {
+            passwordForm.style.display = 'none';
+        }, 300);
+    } else {
+        passwordForm.style.display = 'block';
+        setTimeout(() => {
+            passwordSection.classList.add('expanded');
+        }, 10);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('click', function(e) {
+        const passwordSection = document.getElementById('password-section');
+        if (passwordSection && passwordSection.classList.contains('expanded') && 
+            !passwordSection.contains(e.target)) {
+            passwordSection.classList.remove('expanded');
+            setTimeout(() => {
+                const passwordForm = document.getElementById('password-form');
+                if (passwordForm) passwordForm.style.display = 'none';
+            }, 300);
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const newPassword = document.getElementById('new-password');
+    const confirmPassword = document.getElementById('confirm-password');
+    
+    function validatePasswords() {
+        if (newPassword.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity('Passwords do not match');
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+    
+    if (newPassword && confirmPassword) {
+        newPassword.addEventListener('input', validatePasswords);
+        confirmPassword.addEventListener('input', validatePasswords);
+    }
+    
+    document.addEventListener('click', function(e) {
+        const passwordSection = document.getElementById('password-section');
+        if (passwordSection && passwordSection.classList.contains('expanded') && 
+            !passwordSection.contains(e.target)) {
+            passwordSection.classList.remove('expanded');
+            setTimeout(() => {
+                const passwordForm = document.getElementById('password-form');
+                if (passwordForm) passwordForm.style.display = 'none';
+            }, 300);
+        }
+    });
+});
+
 // Обработка загрузки фона
 document.addEventListener('DOMContentLoaded', function() {
     const backgroundInput = document.getElementById('backgroundInput');
@@ -4651,7 +5843,6 @@ function updateBackgroundAccessibility() {
 
 document.addEventListener('DOMContentLoaded', updateBackgroundAccessibility); 
 
-// Гаманець - конвертація валют
 function formatNumber(number) {
     return number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$& ');
 }
@@ -4739,57 +5930,125 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Чат
-function processMentions(text) {
+function processMentionsStrict(text) {
     if (!text) return '';
+    
+    if (/<[^>]*>/.test(text)) {
+        return text;
+    }
+    
+    const mentionRegex = /(@[\wа-яА-ЯёЁ_\d]+)/gi;
+    
+    return text.replace(mentionRegex, '<span class="message-mention profile-mention" data-username="$1">$1</span>');
+}
+
+function processMentions(text) {
+    if (!text || typeof text !== 'string') {
+        return '';
+    }
     
     const mentionRegex = /(@[\wа-яА-ЯёЁ]+)/gi;
     
     return text.replace(mentionRegex, '<span class="message-mention profile-mention" data-username="$1">$1</span>');
 }
 
+// ==================================================================================================================================
 function addMentionEventListeners(element) {
     const mentions = element.querySelectorAll('.message-mention, .profile-mention');
     
     mentions.forEach(mention => {
-        mention.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const username = this.getAttribute('data-username').replace('@', '');
-            openUserProfile(username);
-        });
+        const username = mention.getAttribute('data-username');
         
-        mention.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-1px)';
-            this.style.cursor = 'pointer';
-        });
+        if (!isValidMention(username)) {
+            mention.classList.remove('message-mention', 'profile-mention');
+            mention.style.color = '';
+            mention.style.cursor = 'default';
+            mention.style.textDecoration = 'none';
+            mention.style.backgroundColor = '';
+            return;
+        }
         
-        mention.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
+        checkUserExists(username.replace('@', '')).then(exists => {
+            if (!exists) {
+                mention.classList.remove('message-mention', 'profile-mention');
+                mention.style.color = 'inherit';
+                mention.style.fontWeight = 'normal';
+                mention.style.cursor = 'text';
+                mention.style.textDecoration = 'none';
+                mention.style.backgroundColor = 'transparent';
+                mention.style.padding = '0';
+                mention.removeAttribute('data-username');
+                return;
+            }
+            
+            mention.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const cleanUsername = username.replace('@', '');
+                openUserProfile(cleanUsername);
+            });
+            
+            mention.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-1px)';
+                this.style.cursor = 'pointer';
+            });
+            
+            mention.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
         });
     });
 }
 
-function displayMessage(text, sender, isSent) {
+function displayMessage(data, isSent) {
     const messagesContainer = document.getElementById('chat-messages');
-    if (!messagesContainer) {
-        console.error('Chat messages container not found');
-        return;
-    }
+    if (!messagesContainer) return;
     
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
     
     const senderDiv = document.createElement('div');
     senderDiv.className = 'message-sender';
-    senderDiv.textContent = getSenderDisplayName(isSent, sender);
+    senderDiv.textContent = isSent ? 'Вы' : (data.sender || currentChatUser);
     messageDiv.appendChild(senderDiv);
     
-    const textDiv = document.createElement('div');
+    const contentDiv = document.createElement('div');
     
-    const processedText = processMentions(text);
-    textDiv.innerHTML = processedText;
+    if (data.text && data.text.trim()) {
+        const textDiv = document.createElement('div');
+        const processedText = processMentions(data.text);
+        textDiv.innerHTML = processedText;
+        contentDiv.appendChild(textDiv);
+        
+        addMentionEventListeners(textDiv);
+    }
     
-    messageDiv.appendChild(textDiv);
+    if (data.file_url) {
+        const fileDiv = document.createElement('div');
+        fileDiv.className = 'file-attachment';
+        
+        if (data.file_type && data.file_type.startsWith('image/')) {
+            fileDiv.innerHTML = `
+                <div style="margin: 5px 0;">
+                    <img src="${data.file_url}" 
+                         style="max-width: 250px; max-height: 250px; border-radius: 5px; cursor: pointer;" 
+                         onclick="openFileModal('${data.file_url}', '${data.file_name || 'image'}')">
+                </div>
+            `;
+        } else {
+            fileDiv.innerHTML = `
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px; margin: 5px 0;">
+                    <a href="${data.file_url}" download="${data.file_name || 'file'}" 
+                       style="color: #007bff; text-decoration: none;">
+                        📎 ${data.file_name || 'Файл'}
+                    </a>
+                </div>
+            `;
+        }
+        contentDiv.appendChild(fileDiv);
+    }
+    
+    messageDiv.appendChild(contentDiv);
     
     const timeDiv = document.createElement('div');
     timeDiv.className = 'message-time';
@@ -4797,7 +6056,9 @@ function displayMessage(text, sender, isSent) {
     timeDiv.style.color = '#999';
     timeDiv.style.marginTop = '4px';
     timeDiv.style.textAlign = isSent ? 'right' : 'left';
-    timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    const messageDate = data.timestamp ? new Date(data.timestamp) : new Date();
+    timeDiv.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     messageDiv.appendChild(timeDiv);
     
     const spacer = messagesContainer.querySelector('.chat-messages-spacer');
@@ -4808,8 +6069,6 @@ function displayMessage(text, sender, isSent) {
     }
     
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    
-    addMentionEventListeners(messageDiv);
 }
 
 function processProfileDescription() {
@@ -4852,8 +6111,7 @@ function showUserProfileModal(userData) {
         
         const descriptionEl = otherProfileForm.querySelector('.other-profile-description');
         if (descriptionEl) {
-            descriptionEl.innerHTML = userData.description || 'No description';
-            const processedDescription = processMentions(userData.description || 'No description');
+            const processedDescription = processMentionsStrict(userData.description || 'No description');
             descriptionEl.innerHTML = processedDescription;
             addMentionEventListeners(descriptionEl);
         }
@@ -4861,11 +6119,6 @@ function showUserProfileModal(userData) {
         const birthdayEl = otherProfileForm.querySelector('.other-profile-birthday');
         if (birthdayEl) {
             birthdayEl.textContent = userData.birthday;
-        }
-        
-        const subscribeEl = otherProfileForm.querySelector('.other-profile-subscribe');
-        if (subscribeEl) {
-            subscribeEl.textContent = userData.subscribe || 'Basic';
         }
         
         const messageBtn = otherProfileForm.querySelector('.other-profile-message-btn');
@@ -4881,6 +6134,17 @@ function showUserProfileModal(userData) {
         otherProfileToggle.checked = true;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.other-profile-form .message-mention, .other-profile-form .profile-mention')) {
+            e.preventDefault();
+            e.stopPropagation();
+            const username = e.target.getAttribute('data-username').replace('@', '');
+            openUserProfile(username);
+        }
+    });
+});
 
 function loadChatMessages(username) {
     if (username === "{{ user.username }}") {
@@ -4922,15 +6186,44 @@ function loadChatMessages(username) {
                 
                 const senderDiv = document.createElement('div');
                 senderDiv.className = 'message-sender';
-                senderDiv.textContent = getSenderDisplayName(msg.is_sent, msg.sender);
+                senderDiv.textContent = msg.sender;
                 messageDiv.appendChild(senderDiv);
                 
-                const textDiv = document.createElement('div');
+                const contentDiv = document.createElement('div');
                 
-                const processedText = processMentions(msg.text);
-                textDiv.innerHTML = processedText;
+                if (msg.text) {
+                    const textDiv = document.createElement('div');
+                    const processedText = processMentions(msg.text);
+                    textDiv.innerHTML = processedText;
+                    contentDiv.appendChild(textDiv);
+                }
                 
-                messageDiv.appendChild(textDiv);
+                if (msg.file_url) {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'file-attachment';
+                    
+                    if (msg.file_type && msg.file_type.startsWith('image/')) {
+                        fileDiv.innerHTML = `
+                            <div style="margin: 5px 0;">
+                                <img src="${msg.file_url}" 
+                                     style="max-width: 250px; max-height: 250px; border-radius: 5px; cursor: pointer;" 
+                                     onclick="openFileModal('${msg.file_url}', '${msg.file_name || 'image'}')">
+                            </div>
+                        `;
+                    } else {
+                        fileDiv.innerHTML = `
+                            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px; margin: 5px 0;">
+                                <a href="${msg.file_url}" download="${msg.file_name || 'file'}" 
+                                   style="color: #007bff; text-decoration: none;">
+                                    📎 ${msg.file_name || 'Файл'}
+                                </a>
+                            </div>
+                        `;
+                    }
+                    contentDiv.appendChild(fileDiv);
+                }
+                
+                messageDiv.appendChild(contentDiv);
                 
                 const timeDiv = document.createElement('div');
                 timeDiv.className = 'message-time';
@@ -4950,7 +6243,9 @@ function loadChatMessages(username) {
                     messagesContainer.appendChild(messageDiv);
                 }
                 
-                addMentionEventListeners(messageDiv);
+                if (msg.text) {
+                    addMentionEventListeners(messageDiv);
+                }
             });
             
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -5028,13 +6323,11 @@ const mentionStyles = `
     transition: color 0.2s ease;
     padding: 1px 3px;
     border-radius: 3px;
-    background-color: rgba(0, 123, 255, 0.1);
 }
 
 .profile-mention:hover {
     color: #0056b3;
     text-decoration: underline;
-    background-color: rgba(0, 123, 255, 0.15);
 }
 
 .message-mention {
@@ -5045,13 +6338,11 @@ const mentionStyles = `
     transition: color 0.2s ease;
     padding: 1px 3px;
     border-radius: 3px;
-    background-color: rgba(0, 123, 255, 0.1);
 }
 
 .message-mention:hover {
     color: #0056b3;
     text-decoration: underline;
-    background-color: rgba(0, 123, 255, 0.15);
 }
 `;
 
@@ -5100,8 +6391,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(loadRecentContacts, 30000);
 });
 
-let currentChatUser = null;
-let chatSocket = null;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
 const reconnectDelay = 1000;
@@ -5195,7 +6484,6 @@ function loadRecentContacts() {
         });
 }
 
-// Функция для обрезки текста с добавлением "..."
 function truncateText(text, maxLength) {
     if (!text || text.length <= maxLength) {
         return text;
@@ -5243,6 +6531,7 @@ function formatTime(timestamp) {
 function openChat(username) {
     currentChatUser = username;
     document.getElementById('chat-username').textContent = username;
+    
     document.getElementById('chat-toggle').checked = true;
 
     reconnectAttempts = 0;
@@ -5284,6 +6573,9 @@ function openChat(username) {
     
     chatSocket.onclose = function(e) {
         console.log('WebSocket connection closed:', e.code, e.reason);
+        if (document.getElementById('chat-toggle').checked) {
+            setTimeout(() => attemptReconnect(), 2000);
+        }
     };
     
     chatSocket.onerror = function(e) {
@@ -5300,6 +6592,38 @@ function openChat(username) {
     if (recentContactsDiv) {
         recentContactsDiv.style.display = "block";
     }
+    
+    document.addEventListener('keydown', blockEscapeClose);
+}
+
+
+function blockEscapeClose(e) {
+    if (e.key === 'Escape' && document.getElementById('chat-toggle').checked) {
+        e.preventDefault();
+        e.stopPropagation();
+        showTemporaryMessage("Chat cannot be closed", 2000);
+    }
+}
+
+function showTemporaryMessage(message, duration) {
+    const tempMsg = document.createElement('div');
+    tempMsg.textContent = message;
+    tempMsg.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 10000;
+    `;
+    document.body.appendChild(tempMsg);
+    
+    setTimeout(() => {
+        tempMsg.remove();
+    }, duration);
 }
 
 function markMessagesAsRead(username) {
@@ -5326,83 +6650,69 @@ function markMessagesAsRead(username) {
     });
 }
 
-function displayMessage(text, sender, isSent) {
-    const messagesContainer = document.getElementById('chat-messages');
-    if (!messagesContainer) {
-        console.error('Chat messages container not found');
-        return;
-    }
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
-    
-    const senderDiv = document.createElement('div');
-    senderDiv.className = 'message-sender';
-    senderDiv.textContent = getSenderDisplayName(isSent, sender);
-    messageDiv.appendChild(senderDiv);
-    
-    const textDiv = document.createElement('div');
-    
-    const processedText = processMentions(text);
-    textDiv.innerHTML = processedText;
-    
-    messageDiv.appendChild(textDiv);
-    
-    const timeDiv = document.createElement('div');
-    timeDiv.className = 'message-time';
-    timeDiv.style.fontSize = '11px';
-    timeDiv.style.color = '#999';
-    timeDiv.style.marginTop = '4px';
-    timeDiv.style.textAlign = isSent ? 'right' : 'left';
-    timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    messageDiv.appendChild(timeDiv);
-    
-    const spacer = messagesContainer.querySelector('.chat-messages-spacer');
-    if (spacer) {
-        messagesContainer.insertBefore(messageDiv, spacer);
-    } else {
-        messagesContainer.appendChild(messageDiv);
-    }
-    
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    
-    addMentionEventListeners(messageDiv);
-}
-
-function processMentions(text) {
-    if (!text) return '';
-    
-    const mentionRegex = /(@[\wа-яА-ЯёЁ]+)/gi;
-    
-    return text.replace(mentionRegex, '<span class="message-mention" data-username="$1">$1</span>');
-}
-
-function addMentionEventListeners(messageElement) {
-    const mentions = messageElement.querySelectorAll('.message-mention');
-    
-    mentions.forEach(mention => {
-        mention.addEventListener('click', function(e) {
-            e.preventDefault();
-            const username = this.getAttribute('data-username').replace('@', '');
-            openUserProfile(username);
-        });
-        
-        mention.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-1px)';
-        });
-        
-        mention.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-}
-
 function processMentions(text) {
     if (!text) return '';
     
     const mentionRegex = /(@[\wа-яА-ЯёЁ]+)/gi;
     
     return text.replace(mentionRegex, '<span class="message-mention profile-mention" data-username="$1">$1</span>');
+}
+
+function addMentionEventListeners(element) {
+    const mentions = element.querySelectorAll('.message-mention, .profile-mention');
+    
+    mentions.forEach(mention => {
+        const username = mention.getAttribute('data-username');
+        
+        if (!isValidMention(username)) {
+            mention.classList.remove('message-mention', 'profile-mention');
+            mention.style.color = '';
+            mention.style.cursor = 'default';
+            mention.style.textDecoration = 'none';
+            mention.style.backgroundColor = '';
+            return;
+        }
+        
+        checkUserExists(username.replace('@', '')).then(exists => {
+            if (!exists) {
+                mention.classList.remove('message-mention', 'profile-mention');
+                mention.style.color = '';
+                mention.style.cursor = 'default';
+                mention.style.textDecoration = 'none';
+                mention.style.backgroundColor = '';
+                mention.removeAttribute('data-username');
+                return;
+            }
+            
+            mention.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const cleanUsername = username.replace('@', '');
+                openUserProfile(cleanUsername);
+            });
+            
+            mention.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-1px)';
+                this.style.cursor = 'pointer';
+            });
+            
+            mention.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+}
+
+function checkUserExists(username) {
+    return fetch(`/check-user-exists/?username=${encodeURIComponent(username)}`)
+        .then(response => response.json())
+        .then(data => {
+            return data.exists || false;
+        })
+        .catch(error => {
+            console.error('Error checking user existence:', error);
+            return false;
+        });
 }
 
 function isValidMention(username) {
@@ -5442,17 +6752,30 @@ function addMentionEventListeners(element) {
     });
 }
 
+function isValidMention(username) {
+    if (!username || !username.startsWith('@')) return false;
+    
+    const cleanUsername = username.replace('@', '');
+    return /^[\wа-яА-ЯёЁ]+$/.test(cleanUsername);
+}
+
 function processMentionsStrict(text) {
     if (!text) return '';
     
-    const words = text.split(/(\s+)/);
+    if (/<[^>]*>/.test(text)) {
+        return text;
+    }
     
-    return words.map(word => {
-        if (word.startsWith('@') && /^@[\wа-яА-ЯёЁ]+$/.test(word)) {
-            return `<span class="message-mention profile-mention" data-username="${word}">${word}</span>`;
-        }
-        return word;
-    }).join('');
+    const mentionRegex = /(@[\wа-яА-ЯёЁ_\d]+)/gi;
+    
+    return text.replace(mentionRegex, '<span class="message-mention profile-mention" data-username="$1">$1</span>');
+}
+
+function isValidMention(username) {
+    if (!username || !username.startsWith('@')) return false;
+    
+    const cleanUsername = username.replace('@', '');
+    return /^[\wа-яА-ЯёЁ_\d]+$/.test(cleanUsername) && cleanUsername.length > 0;
 }
 
 function displayMessage(text, sender, isSent) {
@@ -5508,6 +6831,58 @@ function processProfileDescription() {
         addMentionEventListeners(element);
     });
 }
+
+function closeProfileModalsOnly() {
+    const profileModals = [
+        'menu-toggle', 'profile-toggle', 'setting-toggle', 'form1-toggle', 
+        'form2-toggle', 'color_theme-toggle', 'wallet-toggle', 'check-subscription-toggle',
+        'subscribe-month-toggle', 'subscribe-year-toggle', 'deposit-toggle', 'add_card-toggle',
+        'bin_mouth-toggle', 'bin_premium_mouth-toggle', 'bin_years-toggle', 'bin_premium_years-toggle',
+        'other-profile-toggle'
+    ];
+    
+    profileModals.forEach(id => {
+        const cb = document.getElementById(id);
+        if (cb) cb.checked = false;
+    });
+}
+
+document.addEventListener('mousedown', (event) => {
+    const forms = [
+        { form: '.side-menu', toggle: '#menu-toggle' },
+        { form: '.wallet-form', toggle: '#wallet-toggle' },
+        { form: '.profile-form', toggle: '#profile-toggle' },
+        { form: '.setting-form', toggle: '#setting-toggle' },
+        { form: '.form1', toggle: '#form1-toggle' },
+        { form: '.form2', toggle: '#form2-toggle' },
+        { form: '.deposit-form', toggle: '#deposit-toggle' },
+        { form: '.add_card-form', toggle: '#add_card-toggle' },
+        { form: '.other-profile-form', toggle: '#other-profile-toggle' },
+        { form: '.security-form', toggle: '#security-toggle' }
+    ];
+
+    let clickedInsideAnyForm = false;
+
+    forms.forEach(({form, toggle}) => {
+        const formElement = document.querySelector(form);
+        const toggleElement = document.getElementById(toggle.replace('#', ''));
+        
+        if (formElement && toggleElement && toggleElement.checked) {
+            if (formElement.contains(event.target) || event.target.closest(form)) {
+                clickedInsideAnyForm = true;
+            }
+        }
+    });
+
+    if (!clickedInsideAnyForm) {
+        forms.forEach(({toggle}) => {
+            const toggleElement = document.getElementById(toggle.replace('#', ''));
+            if (toggleElement && toggleElement.checked) {
+                toggleElement.checked = false;
+            }
+        });
+    }
+});
 
 function loadChatMessages(username) {
     if (username === "{{ user.username }}") {
@@ -5602,7 +6977,10 @@ function displayNotes(notes) {
         messageDiv.className = 'message sent';
         
         const textDiv = document.createElement('div');
-        textDiv.textContent = note.text;
+        
+        const processedText = processMentions(note.text);
+        textDiv.innerHTML = processedText;
+        
         messageDiv.appendChild(textDiv);
         
         const timeDiv = document.createElement('div');
@@ -5622,6 +7000,8 @@ function displayNotes(notes) {
         } else {
             messagesContainer.appendChild(messageDiv);
         }
+        
+        addMentionEventListeners(messageDiv);
     });
     
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -5725,6 +7105,8 @@ function sendMessageToSelfViaAJAX(message) {
         if (data.success) {
             console.log('Note saved:', message);
             saveNoteToStorage(message);
+            
+            loadChatMessages("{{ user.username }}");
         } else {
             console.error('Failed to save note:', data.error);
         }
@@ -5732,6 +7114,7 @@ function sendMessageToSelfViaAJAX(message) {
     .catch(error => {
         console.error('AJAX save note error:', error);
         saveNoteToStorage(message);
+        loadChatMessages("{{ user.username }}");
     });
 }
 
@@ -5782,45 +7165,60 @@ function searchUsers() {
                 const notesDescription = lang === 'Українська' ? 'Ваши заметки' : 'Your notes';
                 
                 resultsHTML += `
-                    <div class="user-search-result" onclick="openChat('${currentUser}')" 
-                         style="padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:8px; width:250px; cursor:pointer; background:white; transition:all 0.2s;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="/static/pictures/notes.jpg" 
-                                 style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-                            <div>
-                                <b style="font-size:14px;">${notesDisplayName}</b>
-                                <div style="color:gray; font-size:12px;">${notesDescription}</div>
+                <div class="recent-contact" onclick="openChat('${currentUser}')">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="/static/pictures/notes.jpg" 
+                             class="contact-avatar" 
+                             alt="${notesDisplayName}">
+                        <div class="contact-info">
+                            <div class="contact-username">${notesDisplayName}</div>
+                            <div class="contact-last-message" title="${notesDescription}">
+                                ${notesDescription}
                             </div>
                         </div>
-                    </div>`;
+                    </div>
+                </div>`;
             }
             
             if (filteredUsers.length > 0) {
                 resultsHTML += filteredUsers
-                    .map(user => `
-                        <div class="user-search-result" onclick="openChat('${user.username}')" 
-                             style="padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:8px; width:250px; cursor:pointer; background:white; transition:all 0.2s;">
+                    .map(user => {
+                        const truncatedDescription = user.your_tag || user.username;
+                        const truncatedDesc = truncateText(truncatedDescription, 25);
+                        
+                        return `
+                        <div class="recent-contact" onclick="openChat('${user.username}')">
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <img src="${user.avatar_url || '/static/pictures/login.png'}" 
-                                     style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-                                <div>
-                                    <b style="font-size:14px;">${user.username}</b>
-                                    <div style="color:gray; font-size:12px;">${user.your_tag || user.username}</div>
+                                     class="contact-avatar" 
+                                     alt="${user.username}">
+                                <div class="contact-info">
+                                    <div class="contact-username">${user.username}</div>
+                                    <div class="contact-last-message" title="${user.your_tag || user.username}">
+                                        ${truncatedDesc}
+                                    </div>
                                 </div>
                             </div>
-                        </div>`)
+                        </div>`;
+                    })
                     .join("");
             }
             
             if (resultsHTML) {
                 resultsDiv.innerHTML = resultsHTML;
             } else {
-                resultsDiv.innerHTML = `<div style="color:#999; padding:10px;">No users found for "${query}"</div>`;
+                const noResultsMsg = lang === 'Українська' 
+                    ? `Користувачів не знайдено за "${query}"`
+                    : `No users found for "${query}"`;
+                resultsDiv.innerHTML = `<div style="color:#999; padding:10px; width:250px;">${noResultsMsg}</div>`;
             }
         })
         .catch(error => {
             console.error('Search error:', error);
-            resultsDiv.innerHTML = `<div style="color:red; padding:10px;">Search error</div>`;
+            const errorMsg = lang === 'Українська' 
+                ? 'Помилка пошуку'
+                : 'Search error';
+            resultsDiv.innerHTML = `<div style="color:red; padding:10px; width:250px;">${errorMsg}</div>`;
         });
 }
 
@@ -5839,9 +7237,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function openUserProfile(username) {
     if (username === "{{ user.username }}") {
+        closeProfileModals();
         document.getElementById('profile-toggle').checked = true;
         return;
     }
+    
+    closeProfileModals();
     
     fetch(`/get-user-profile/?username=${encodeURIComponent(username)}`)
         .then(response => response.json())
@@ -5858,8 +7259,23 @@ function openUserProfile(username) {
         });
 }
 
+function closeAllModals() {
+    const checkboxes = [
+        'menu-toggle', 'profile-toggle', 'setting-toggle', 'form1-toggle', 
+        'form2-toggle', 'color_theme-toggle', 'wallet-toggle', 'check-subscription-toggle',
+        'subscribe-month-toggle', 'subscribe-year-toggle', 'deposit-toggle', 'add_card-toggle',
+        'bin_mouth-toggle', 'bin_premium_mouth-toggle', 'bin_years-toggle', 'bin_premium_years-toggle',
+        'other-profile-toggle'
+    ];
+    
+    checkboxes.forEach(id => {
+        const cb = document.getElementById(id);
+        if (cb) cb.checked = false;
+    });
+}
+
 function showUserProfileModal(userData) {
-    closeProfileModals();
+    closeAllModals();
     
     const otherProfileForm = document.querySelector('.other-profile-form');
     if (otherProfileForm) {
@@ -5887,17 +7303,14 @@ function showUserProfileModal(userData) {
         
         const descriptionEl = otherProfileForm.querySelector('.other-profile-description');
         if (descriptionEl) {
-            descriptionEl.innerHTML = userData.description || 'No description';
+            const processedDescription = processMentionsStrict(userData.description || 'No description');
+            descriptionEl.innerHTML = processedDescription;
+            addMentionEventListeners(descriptionEl);
         }
         
         const birthdayEl = otherProfileForm.querySelector('.other-profile-birthday');
         if (birthdayEl) {
             birthdayEl.textContent = userData.birthday;
-        }
-        
-        const subscribeEl = otherProfileForm.querySelector('.other-profile-subscribe');
-        if (subscribeEl) {
-            subscribeEl.textContent = userData.subscribe || 'Basic';
         }
         
         const messageBtn = otherProfileForm.querySelector('.other-profile-message-btn');
@@ -5907,12 +7320,51 @@ function showUserProfileModal(userData) {
             };
         }
     }
-    
+
     const otherProfileToggle = document.getElementById('other-profile-toggle');
     if (otherProfileToggle) {
         otherProfileToggle.checked = true;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const otherProfileOverlay = document.querySelector('.other-profile-overlay');
+    if (otherProfileOverlay) {
+        otherProfileOverlay.addEventListener('click', function() {
+            const otherProfileToggle = document.getElementById('other-profile-toggle');
+            if (otherProfileToggle) {
+                otherProfileToggle.checked = false;
+            }
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.other-profile-form .message-mention, .other-profile-form .profile-mention')) {
+            e.preventDefault();
+            e.stopPropagation();
+            const username = e.target.getAttribute('data-username').replace('@', '');
+            openUserProfile(username);
+        }
+    });
+    
+    const originalShowUserProfileModal = window.showUserProfileModal;
+    window.showUserProfileModal = function(userData) {
+        if (originalShowUserProfileModal) {
+            originalShowUserProfileModal(userData);
+        }
+        
+        setTimeout(() => {
+            const otherProfileDesc = document.querySelector('.other-profile-description');
+            if (otherProfileDesc) {
+                const processedText = processMentionsStrict(otherProfileDesc.innerHTML);
+                otherProfileDesc.innerHTML = processedText;
+                addMentionEventListeners(otherProfileDesc);
+            }
+        }, 100);
+    };
+});
 
 function closeProfileModals() {
     const profileModals = [
@@ -5928,6 +7380,7 @@ function closeProfileModals() {
         if (cb) cb.checked = false;
     });
 }
+
 
 function closeAllModals() {
     const checkboxes = [
@@ -6170,17 +7623,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const response = await fetch(`/search-users/?q=${encodeURIComponent(query)}`);
             const data = await response.json();
-            
-            if (data.length > 0) {
-                resultsDiv.innerHTML = data
-                    .map(u => `
-                        <div style="padding:6px; border:1px solid #ddd; border-radius:6px; margin-bottom:5px; width:200px;">
-                            <b>${u.username}</b> — <span style="color:gray;">${u.your_tag}</span>
-                        </div>`)
-                    .join("");
-            } else {
-                resultsDiv.innerHTML = `<div style="color:#999;">Никого не найдено по "${query}"</div>`;
-            }
         });
     }
 
@@ -6255,11 +7697,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    const overlays = document.querySelectorAll('.overlay, .profile-overlay, .other-profile-overlay, .setting-overlay, .form1-overlay, .form2-overlay, .color_theme-overlay, .wallet-overlay, .check-subscription-overlay, .subscribe-month-overlay, .subscribe-year-overlay, .bin_mouth-overlay, .bin_premium_mouth-overlay, .bin_years-overlay, .bin_premium_years-overlay, .deposit-overlay, .add_card-overlay');
+    const overlays = document.querySelectorAll('.overlay, .profile-overlay, .other-profile-overlay, .setting-overlay, .form1-overlay, .form2-overlay, .color_theme-overlay, .wallet-overlay, .check-subscription-overlay, .subscribe-month-overlay, .subscribe-year-overlay, .bin_mouth-overlay, .bin_premium_mouth-overlay, .bin_years-overlay, .bin_premium_years-overlay, .deposit-overlay, .add_card-overlay, .security-overlay');
     
     overlays.forEach(overlay => {
         overlay.addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('#menu-toggle, #profile-toggle, #other-profile-toggle, #setting-toggle, #form1-toggle, #form2-toggle, #color_theme-toggle, #wallet-toggle, #check-subscription-toggle, #subscribe-month-toggle, #subscribe-year-toggle, #bin_mouth-toggle, #bin_premium_mouth-toggle, #bin_years-toggle, #bin_premium_years-toggle, #deposit-toggle, #add_card-toggle');
+            const checkboxes = document.querySelectorAll('#menu-toggle, #profile-toggle, #other-profile-toggle, #setting-toggle, #form1-toggle, #form2-toggle, #color_theme-toggle, #wallet-toggle, #check-subscription-toggle, #subscribe-month-toggle, #subscribe-year-toggle, #bin_mouth-toggle, #bin_premium_mouth-toggle, #bin_years-toggle, #bin_premium_years-toggle, #deposit-toggle, #add_card-toggle, #security-toggle');
             
             checkboxes.forEach(cb => {
                 if(cb) cb.checked = false;
@@ -6360,7 +7802,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    const formCheckboxes = ['profile-toggle', 'other-profile-toggle', 'setting-toggle', 'form1-toggle', 'form2-toggle', 'color_theme-toggle', 'check-subscription-toggle', 'subscribe-month-toggle', 'subscribe-year-toggle', 'bin_mouth-toggle', 'bin_premium_mouth-toggle', 'bin_years-toggle', 'bin_premium_years-toggle', 'deposit-toggle', 'add_card-toggle'];
+    const formCheckboxes = [
+        'profile-toggle', 'other-profile-toggle', 'setting-toggle', 'form1-toggle', 
+        'form2-toggle', 'color_theme-toggle', 'check-subscription-toggle', 
+        'subscribe-month-toggle', 'subscribe-year-toggle', 'bin_mouth-toggle', 
+        'bin_premium_mouth-toggle', 'bin_years-toggle', 'bin_premium_years-toggle',
+        'deposit-toggle', 'add_card-toggle', 'security-toggle'
+    ];
     
     formCheckboxes.forEach(id => {
         const cb = document.getElementById(id);

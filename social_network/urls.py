@@ -7,7 +7,6 @@ from django.contrib.auth.views import LogoutView
 from social_network import consumers
 from . import views
 
-# Редирект для неизвестных URL
 def catch_all_redirect(request, path=None):
     if request.user.is_authenticated:
         return redirect('error')
@@ -63,15 +62,17 @@ urlpatterns = [
     path('get-user-by-tag/', views.get_user_by_tag, name='get-user-profile'),
     # файллы в чате
     path('upload-chat-file/', views.upload_chat_file, name='upload_chat_file'),
+    # другое чата
+    path('mark-messages-read/', views.mark_messages_read, name='mark_messages_read'),
+    path('save-note/', views.save_note, name='save_note'),
+    path('get-notes/', views.get_notes, name='get_notes'),
 
     path('get-user-profile/', views.get_user_profile, name='get_user_profile'),
     path('get-user-by-tag/', views.get_user_by_tag, name='get_user_by_tag'),
     path('get-chat-messages/', views.get_chat_messages, name='get_chat_messages'),
-    
-    # Додайте ці рядки до секції "Чат"
-    path('mark-messages-read/', views.mark_messages_read, name='mark_messages_read'),
-    path('save-note/', views.save_note, name='save_note'),
-    path('get-notes/', views.get_notes, name='get_notes'),
+
+    # профиль
+    path('check-user-exists/', views.check_user_exists, name='check_user_exists'),
     
     # security
     path('change-password/', views.change_password, name='change_password'),
@@ -82,7 +83,7 @@ urlpatterns = [
     path('email/', views.email, name='email'),
     path('delete-message/<int:message_id>/', views.delete_message, name='delete-message'),
 
-    # Верификация email
+    # email
 
     # WebSocket для чата
     re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer.as_asgi()),
