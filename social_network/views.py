@@ -32,7 +32,9 @@ from django.core.exceptions import ValidationError
 import random
 import string
 import requests
-
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import os
 User = get_user_model()
 
 def get_user_role(user):
@@ -1078,11 +1080,17 @@ def get_currency_conversion(request):
         })
 
 @login_required
-@csrf_exempt
+# @csrf_exempt
 def upload_chat_file(request):
+    print(f"Upload file request: {request.method}, files: {request.FILES}, POST: {request.POST}")
+    
     if request.method == 'POST' and request.FILES.get('file'):
         file = request.FILES['file']
         receiver_username = request.POST.get('receiver')
+        text = request.POST.get('text', '')
+        
+        print(f"File info: name={file.name}, size={file.size}, type={file.content_type}")
+        print(f"Receiver: {receiver_username}, text: {text}")
         
         if not receiver_username:
             return JsonResponse({'error': 'Receiver is required'}, status=400)
@@ -1095,24 +1103,104 @@ def upload_chat_file(request):
         if file.size > 50 * 1024 * 1024:
             return JsonResponse({'error': 'File too large. Maximum size is 50MB.'}, status=400)
         
-        message = Message.objects.create(
-            sender=request.user,
-            receiver=receiver,
-            file=file,
-            file_name=file.name,
-            file_size=file.size,
-            file_type=file.content_type
-        )
+        import os
+        from django.utils import timezone
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
         
-        return JsonResponse({
-            'success': True,
-            'file_url': message.file.url,
-            'file_name': message.file_name,
-            'file_type': message.file_type,
-            'file_id': message.id
-        })
+        file_extension = os.path.splitext(file.name)[1]
+        timestamp = int(timezone.now().timestamp())
+        safe_filename = f"chat_{request.user.id}_{receiver.id}_{timestamp}{file_extension}"
+        
+        file_content = file.read()
+        saved_path = f'chat_files/{safe_filename}'
+        
+        try:
+            saved_name = default_storage.save(saved_path, ContentFile(file_content))
+            print(f"File saved as: {saved_name}")
+            
+            message = Message.objects.create(
+                sender=request.user,
+                receiver=receiver,
+                text=text,
+                file=saved_name,
+                file_name=file.name,
+                file_size=file.size,
+                file_type=file.content_type,
+                is_file=True
+            )
+            
+            file_url = default_storage.url(saved_name)
+            print(f"File URL: {file_url}")
+            
+            return JsonResponse({
+                'success': True,
+                'file_url': file_url,
+                'file_name': message.file_name,
+                'file_type': message.file_type,
+                'file_size': message.file_size,
+                'text': message.text,
+                'message_id': message.id,
+                'timestamp': message.timestamp.isoformat(),
+                'sender': request.user.username
+            })
+            
+        except Exception as e:
+            print(f"Error saving file: {str(e)}")
+            return JsonResponse({'error': f'Error saving file: {str(e)}'}, status=500)
     
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    return JsonResponse({'error': 'Invalid request or no file provided'}, status=400)
+
+@login_required
+def get_chat_messages(request):
+    other_username = request.GET.get('username')
+    if not other_username:
+        return JsonResponse({'error': 'Username parameter required'}, status=400)
+    
+    try:
+        other_user = User.objects.get(username=other_username)
+        
+        messages = Message.objects.filter(
+            (models.Q(sender=request.user) & models.Q(receiver=other_user)) |
+            (models.Q(sender=other_user) & models.Q(receiver=request.user))
+        ).order_by('timestamp')
+        
+        Message.objects.filter(
+            sender=other_user,
+            receiver=request.user,
+            is_read=False
+        ).update(is_read=True)
+        
+        messages_data = []
+        for msg in messages:
+            message_data = {
+                'id': msg.id,
+                'text': msg.text,
+                'timestamp': msg.timestamp.isoformat(),
+                'is_sent': msg.sender == request.user,
+                'is_read': msg.is_read,
+                'sender': msg.sender.username,
+                'is_file': msg.is_file,
+                'file_url': default_storage.url(msg.file) if msg.file else None,
+                'file_name': msg.file_name,
+                'file_type': msg.file_type,
+                'file_size': msg.file_size
+            }
+            
+            messages_data.append(message_data)
+        
+        return JsonResponse(messages_data, safe=False)
+        
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except Exception as e:
+        print(f"Error loading chat messages: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+def check_user_exists(request):
+    username = request.GET.get('username', '')
+    exists = User.objects.filter(username=username).exists()
+    return JsonResponse({'exists': exists})
 
 @login_required(login_url='login')
 def home(request):
@@ -1222,7 +1310,7 @@ def home(request):
                                 else timezone.now() + timedelta(days=days_count)
                             )
                             user.subscription_purchase_time = timezone.now()
-                            user.subscription_purchase_amount = cost_usd  # Fixed field name
+                            user.subscription_purchase_amount = cost_usd
                             user.subscription_purchase_currency = current_currency
                             user.save()
 
@@ -1330,8 +1418,6 @@ def home(request):
         'years': years,
         'birthday': birthday,
         'expiry_years': range(current_year, current_year + 21),
-        'found_users': found_users,
-        'search_query': search_query,
         'can_refund': can_refund,
         'background_url': background_url,
         'background_exists': background_exists,

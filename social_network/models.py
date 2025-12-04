@@ -228,13 +228,18 @@ class Card(models.Model):
 
     def __str__(self):
         return f"**** **** ****{self.last4} ({self.cardholder or 'no-name'})"
-
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    
+    file = models.FileField(upload_to='chat_files/', null=True, blank=True)
+    file_name = models.CharField(max_length=255, null=True, blank=True)
+    file_size = models.IntegerField(null=True, blank=True)
+    file_type = models.CharField(max_length=100, null=True, blank=True)
+    is_file = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['timestamp']

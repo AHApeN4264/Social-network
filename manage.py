@@ -4,11 +4,11 @@
 # python manage.py runserver 0.0.0.0:8000
 
 # создание ветки
-# git checkout -b add_color-theme_chat_search-users_searsh-@tag-profile
+# git checkout -b add_other-profile_and_edit_more_and_Dockerfile
 
 # git add .
-# git commit -m "add_color-theme_chat_search-users_searsh-@tag-profile"
-# git push add_color-theme_chat_search-users_searsh-@tag-profile
+# git commit -m "add_other-profile_and_edit_more_and_Dockerfile"
+# git push -u origin add_other-profile_and_edit_more_and_Dockerfile
 
 #!/usr/bin/env python
 
