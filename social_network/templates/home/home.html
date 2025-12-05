@@ -2745,7 +2745,7 @@ body {
 }
 
 .chat-container .message.sent {
-    background: #d5ffa5 !important;
+    background: #000000 !important;
     color: rgb(0, 0, 0) !important;
 }
 
@@ -2925,7 +2925,7 @@ body.chat-open-light .chat-container * {
 
 .theme-light .message.sent {
     background: #d5ffa5 !important;
-    color: #000000 !important;
+    color: #ff0000 !important;
 }
 
 .theme-light .message.received {
@@ -2953,15 +2953,6 @@ body.chat-open-light .chat-container * {
     background: #3a3a3a !important;
     color: #ffffff !important;
 }
-
-/* #chat-toggle:checked ~ .chat-container, */
-/* #chat-toggle:checked ~ .chat-container .chat-messages, */
-/* #chat-toggle:checked ~ .chat-container .chat-header, */
-/* #chat-toggle:checked ~ .chat-container .chat-input-container, */
-/* #chat-toggle:checked ~ .chat-container .message { */
-    /* background: inherit !important; */
-    /* color: inherit !important; */
-/* } */
 
 #chat-toggle:checked ~ .chat-container .message.received {
     background: #e9ecef !important;
@@ -3715,7 +3706,7 @@ body.modal-open .chat-container {
 <div class="chat-overlay"></div>
 <div class="security-overlay"></div>
 <!-- <div class="chat-overlay"></div> -->
-{% with lang=user.language|default:"English" %}
+{% with lang=lang %}
     {% if lang == "English"|default:"English" %}
 
     {% if messages %}
@@ -4370,17 +4361,17 @@ body.modal-open .chat-container {
                 <label for="check-subscription-toggle" class="check-subscription-btn">Check subscription status</label>
             </div>
         </div>
+
+        <div style="display:flex; gap:5px; align-items:center;">
+            <input type="text" id="searchInput"
+                style="padding:8px; border-radius:6px; border:1px solid #ccc; margin-top: 16px; margin-left:60px;"
+                placeholder="Search">
+        </div>
+
         
         <div class="main">
             <div class="content">
-                <div style="display:flex; gap:5px; align-items:center;">
-                    <input type="text" id="searchInput"
-                        style="width:12%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-top:-35px; margin-left:10px;"
-                        placeholder="Search"
-                        onkeyup="searchUsers()">
-                </div>      
-
-                <div id="recent-contacts" style="margin-top:20px; margin-left:-50px; width:300px;">
+                <div id="recent-contacts" style="margin-top:-30px; margin-left:-50px; width:300px;">
                     <div id="recent-contacts-list">
                     </div>
                 </div>
@@ -4764,7 +4755,7 @@ body.modal-open .chat-container {
             {% csrf_token %}
             </form>
             <label class="profile-btn" a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    Вихід
+                    Вихід з акаунту
                 </a>
             </label>
         </div>
@@ -6426,7 +6417,7 @@ function loadRecentContacts() {
             const favoriteContact = {
                 username: currentUser,
                 avatar_url: "/static/pictures/notes.jpg",
-                last_message: lang === 'Українська' ? 'Ваши заметки' : 'Your notes',
+                last_message: lang === 'Українська' ? 'Ваші нотатки' : 'Your notes',
                 last_activity: new Date().toISOString(),
                 unread_count: 0
             };
@@ -6441,8 +6432,8 @@ function loadRecentContacts() {
             contactsList.innerHTML = allContacts.map(contact => {
                 let displayName, lastMessage, avatarUrl;
                 if (contact.username === currentUser) {
-                    displayName = lang === 'Українська' ? 'Избранное' : 'Notes';
-                    lastMessage = getLastNoteMessage() || (lang === 'Українська' ? 'Ваши заметки' : 'Your notes');
+                    displayName = lang === 'Українська' ? 'Вибране' : 'Notes';
+                    lastMessage = getLastNoteMessage() || (lang === 'Українська' ? 'Ваші нотатки' : 'Your notes');
                     avatarUrl = "/static/pictures/notes.jpg";
                 } else {
                     displayName = contact.username;
@@ -7012,7 +7003,7 @@ function getSenderDisplayName(isSent, sender) {
     const currentUser = "{{ user.username }}";
     
     if (isSent) {
-        return lang === 'Українська' ? 'Избранное' : 'Notes';
+        return lang === 'Українська' ? 'Відправляється' : 'Іs sent';
     } else {
         return sender;
     }

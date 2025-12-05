@@ -53,10 +53,24 @@ def error(request):
 def change_language(request):
     if request.method == "POST":
         lang = request.POST.get("language", "English")
-        user = request.user
-        user.language = lang
-        user.save()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+        
+        print(f"Changing language to: {lang}")
+
+        request.session['language'] = lang
+        request.session.modified = True
+        
+        if request.user.is_authenticated and hasattr(request.user, "language"):
+            request.user.language = lang
+            request.user.save()
+            print(f"Saved language to user profile: {lang}")
+
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        if is_ajax:
+            return JsonResponse({'success': True, 'language': lang})
+        
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+    return redirect('/')
 
 def change_currency(request):
     if request.method == "POST":
@@ -162,6 +176,12 @@ def add_card(request):
     return JsonResponse({'cards': cards})
 
 def register(request):
+    lang = "English"
+    if request.session.get("language"):
+        lang = request.session["language"]
+    elif request.user.is_authenticated and hasattr(request.user, "language"):
+        lang = request.user.language
+
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         contact = request.POST.get('contact', '').strip()
@@ -196,17 +216,24 @@ def register(request):
             username=username,
             email=email,
             phone_number=phone_number,
-            password=make_password(password)
+            password=make_password(password),
+            language=lang
         )
 
+        request.session['language'] = lang
+        
         auth_login(request, user)
-
         return redirect('home')
 
-    return render(request, 'login/register.html')
-
+    return render(request, 'login/register.html', {"lang": lang})
 
 def login(request):
+    lang = "English"
+    if request.session.get("language"):
+        lang = request.session["language"]
+    elif request.user.is_authenticated and hasattr(request.user, "language"):
+        lang = request.user.language
+
     if request.method == 'POST':
         login_field = request.POST.get('login_field', '').strip()
         password = request.POST.get('password', '').strip()
@@ -226,10 +253,19 @@ def login(request):
             messages.error(request, "Невірний пароль.")
             return render(request, 'login/login.html')
 
-        auth_login(request, user)
+        lang_from_session = request.session.get("language", "English")
+        
+        if hasattr(user, 'language') and user.language != lang_from_session:
+            user.language = lang_from_session
+            user.save()
+        
+        request.session['language'] = lang_from_session
+        
+        backend = 'django.contrib.auth.backends.ModelBackend'
+        auth_login(request, user, backend=backend)
         return redirect('home')
 
-    return render(request, 'login/login.html')
+    return render(request, 'login/login.html', {"lang": lang})
 
 def enter_gmail(request):
     if request.method == 'GET':
@@ -648,7 +684,7 @@ def reset_avatar(request):
         if is_ajax:
             return JsonResponse({
                 'success': True,
-                'avatar_url': '/media/login.png',
+                'avatar_url': '/static/pictures/login.png',
                 'message': 'Аватар скинуто до базового!' if getattr(user, 'language', 'English') == 'Українська' else 'Avatar reset to default!'
             })
         else:
@@ -1204,6 +1240,28 @@ def check_user_exists(request):
 
 @login_required(login_url='login')
 def home(request):
+    lang = "English"
+    
+    # 1. Проверяем язык в сессии (и для авторизованных тоже)
+    if request.session.get("language"):
+        lang = request.session["language"]
+    
+    # 2. Проверяем язык у авторизованного пользователя
+    elif request.user.is_authenticated and hasattr(request.user, "language"):
+        lang = request.user.language
+    
+    # Если пользователь авторизован, сохраняем язык из сессии в его профиль
+    if request.user.is_authenticated and hasattr(request.user, "language"):
+        # Сохраняем язык из сессии в профиль, если он есть
+        if request.session.get("language") and request.user.language != request.session.get("language"):
+            request.user.language = request.session.get("language")
+            request.user.save()
+        
+        # Или сохраняем язык пользователя в сессию, если его там нет
+        elif not request.session.get("language") and hasattr(request.user, "language"):
+            request.session['language'] = request.user.language
+            lang = request.user.language
+
     user = request.user
     role = get_user_role(user)
 
@@ -1423,4 +1481,5 @@ def home(request):
         'background_exists': background_exists,
         'active_sessions': active_sessions,
         'login_history': login_history,
+        'lang': lang,
     })
