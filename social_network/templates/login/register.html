@@ -164,15 +164,51 @@
       background: #008080cc;
     }
 
+    .social-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .social-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      border-color: teal;
+    }
+
+    .social-icon {
+      width: 20px;
+      height: 20px;
+    }
+
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
 {% block body %}
-{% with lang=user.language|default:"English" %}
+{% with lang=lang %}
 <div class="form-container">
   <p class="title">
-    {% if lang == "Українська" %}Реєстрація акаунту{% else %}Register account{% endif %}
+    {% if lang == "Українська" %}
+      Реєстрація акаунту
+    {% else %}
+      Register account
+    {% endif %}
   </p>
 
   {% if messages %}
@@ -201,9 +237,6 @@
   </form>
 
   {% if lang == "Українська" %}
-    <p class="sign-up-label">
-      Вже маєте акаунт? <a href="{% url 'login' %}" class="sign-up-link">Увійти</a>
-    </p>
     <div class="social-buttons">
       <button class="social-btn" title="Google">
         <svg class="social-icon" viewBox="0 0 24 24">
@@ -240,6 +273,9 @@
         </svg>
       </button>
     </div>
+    <p class="sign-up-label">
+      Вже маєте акаунт? <a href="{% url 'login' %}" class="sign-up-link">Увійти</a>
+    </p>
   {% else %}
       <div class="social-buttons">
         <button class="social-btn" title="Google">
