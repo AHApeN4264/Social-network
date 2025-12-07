@@ -1242,22 +1242,17 @@ def check_user_exists(request):
 def home(request):
     lang = "English"
     
-    # 1. Проверяем язык в сессии (и для авторизованных тоже)
     if request.session.get("language"):
         lang = request.session["language"]
     
-    # 2. Проверяем язык у авторизованного пользователя
     elif request.user.is_authenticated and hasattr(request.user, "language"):
         lang = request.user.language
     
-    # Если пользователь авторизован, сохраняем язык из сессии в его профиль
     if request.user.is_authenticated and hasattr(request.user, "language"):
-        # Сохраняем язык из сессии в профиль, если он есть
         if request.session.get("language") and request.user.language != request.session.get("language"):
             request.user.language = request.session.get("language")
             request.user.save()
         
-        # Или сохраняем язык пользователя в сессию, если его там нет
         elif not request.session.get("language") and hasattr(request.user, "language"):
             request.session['language'] = request.user.language
             lang = request.user.language

@@ -126,7 +126,7 @@ class User(AbstractUser):
     two_factor_secret = models.CharField(max_length=32, blank=True, null=True)
 
     def get_active_sessions(self):
-        """Get user's active sessions"""
+        """Get user's activesessions"""
         sessions = []
         try:
             user_sessions = Session.objects.filter(expire_date__gte=timezone.now())
@@ -152,7 +152,6 @@ class User(AbstractUser):
         return sessions
 
     def _get_device_info(self, session):
-        """Получить информацию об устройстве из сессии"""
         user_agent = getattr(session, 'user_agent', 'Unknown device')
         if 'Mobile' in user_agent:
             return 'Mobile'
@@ -162,19 +161,15 @@ class User(AbstractUser):
             return 'Desktop'
 
     def _get_location_info(self, session):
-        """Получить информацию о местоположении"""
         return 'Unknown location'
 
     def _get_current_session_key(self):
-        """Получить ключ текущей сессии"""
         return None
 
     def get_login_history(self):
-        """Получить историю входов пользователя"""
         return LoginHistory.objects.filter(user=self)[:20]
 
     def record_login(self, request, success=True):
-        """Записать попытку входа в историю"""
         device_info = request.META.get('HTTP_USER_AGENT', 'Unknown')[:200]
         ip_address = self._get_client_ip(request)
         
@@ -187,7 +182,6 @@ class User(AbstractUser):
         )
 
     def _get_client_ip(self, request):
-        """Получить IP-адрес клиента"""
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0]
@@ -196,7 +190,6 @@ class User(AbstractUser):
         return ip
 
     def _get_location_from_ip(self, ip_address):
-        """Получить местоположение по IP-адресу"""
         return 'Unknown'
     
 class LoginHistory(models.Model):
