@@ -8,9 +8,7 @@ from social_network import consumers
 from . import views
 
 def catch_all_redirect(request, path=None):
-    if request.user.is_authenticated:
-        return redirect('error')
-    return redirect('login')
+    return redirect('error')
 
 urlpatterns = [
     # Админка
@@ -36,7 +34,7 @@ urlpatterns = [
     path('login', views.login, name='login'),
     path('forgot-password', views.forgot_password, name='forgot-password'),
     path('enter-gmail', views.enter_gmail, name='enter-gmail'),
-    path('logout', LogoutView.as_view(next_page='/login/'), name='logout'),
+    path('logout', LogoutView.as_view(next_page='/login'), name='logout'),
 
     # Условия подписки
     path('terms/', views.terms, name='terms'),
@@ -67,10 +65,6 @@ urlpatterns = [
     path('save-note/', views.save_note, name='save_note'),
     path('get-notes/', views.get_notes, name='get_notes'),
 
-    path('get-user-profile/', views.get_user_profile, name='get_user_profile'),
-    path('get-user-by-tag/', views.get_user_by_tag, name='get_user_by_tag'),
-    path('get-chat-messages/', views.get_chat_messages, name='get_chat_messages'),
-
     # профиль
     path('check-user-exists/', views.check_user_exists, name='check_user_exists'),
     
@@ -80,13 +74,19 @@ urlpatterns = [
     path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
     path('terminate-session/', views.terminate_session, name='terminate_session'),
 
+    # email
     path('email/', views.email, name='email'),
     path('delete-message/<int:message_id>/', views.delete_message, name='delete-message'),
 
-    # email
+    # Bin chat
+    path('get_bin_messages', views.get_bin_messages, name='get_bin_messages'),
+    path('send_message', views.send_message, name='send_message'),
+    path('get-verification-code-bin/', views.get_verification_code_bin, name='get_verification_code_bin'),
 
     # WebSocket для чата
     re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer.as_asgi()),
+
+    path('verification-codes/', views.view_verification_codes, name='verification-codes'),
 
     # Главная страница
     path('', views.home, name='home'),

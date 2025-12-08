@@ -35,20 +35,49 @@ import requests
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import os
+import smtplib
+from email.mime.text import MIMEText
+
 User = get_user_model()
 
 def get_user_role(user):
     if not user.is_authenticated:
         return "User"
-    if user.username.lower() == "ahapen_4264":
-        return "Administrator"
-    elif user.username.lower() == "andrey":
-        return "Moderator"
-    else:
-        return "User"
+    
+    username_lower = user.username.lower()
+    
+    if username_lower == "ahapen_4264":
+        if user.role != 'Administrator':
+            user.role = 'Administrator'
+            user.is_staff = True  
+            user.is_superuser = True
+            user.save()
+        return 'Administrator'
+    
+    elif username_lower == "andrey":
+        if user.role != 'Moderator':
+            user.role = 'Moderator'
+            user.save()
+        return 'Moderator'
+    
+    elif username_lower == "админ":
+        if user.role != 'Administrator':
+            user.role = 'Administrator'
+            user.is_staff = True
+            user.is_superuser = True
+            user.save()
+        return 'Administrator'
+    
+    return user.role if user.role else 'User'
 
 def error(request):
-    return render(request, 'error/error.html')
+    lang = "English"
+    if request.session.get("language"):
+        lang = request.session["language"]
+    elif request.user.is_authenticated and hasattr(request.user, "language"):
+        lang = request.user.language
+
+    return render(request, 'error/error.html', {"lang": lang})
 
 def change_language(request):
     if request.method == "POST":
@@ -222,6 +251,7 @@ def register(request):
 
         request.session['language'] = lang
         
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
         auth_login(request, user)
         return redirect('home')
 
@@ -268,52 +298,166 @@ def login(request):
     return render(request, 'login/login.html', {"lang": lang})
 
 def enter_gmail(request):
+    lang = "English"
+    if request.session.get("language"):
+        lang = request.session["language"]
+    elif request.user.is_authenticated and hasattr(request.user, "language"):
+        lang = request.user.language
+
     if request.method == 'GET':
         request.session.pop('verification_sent', None)
         request.session.pop('reset_email', None)
         request.session.pop('verification_code', None)
         request.session.pop('verification_code_expires', None)
-    
+
     if request.method == 'POST':
         email = request.POST.get('email', '').strip().lower()
+        print(f"\n" + "="*50)
+        print(f"🔍 DEBUG ENTER_GMAIL START")
+        print(f"Email received: {email}")
         
         if not email:
-            messages.error(request, 'Будь ласка, введіть email')
-            return render(request, 'login/enter-gmail.html')
-        
+            messages.error(request, 'Please enter email' if lang != 'Українська' else 'Будь ласка, введіть email')
+            return render(request, 'login/enter-gmail.html', {"lang": lang})
+
         try:
             validate_email(email)
         except ValidationError:
-            messages.error(request, 'Будь ласка, введіть коректний email')
-            return render(request, 'login/enter-gmail.html')
-        
+            messages.error(request, 'Please enter a valid email' if lang != 'Українська' else 'Будь ласка, введіть коректний email')
+            return render(request, 'login/enter-gmail.html', {"lang": lang})
+
         User = get_user_model()
-        
+
         try:
             user = User.objects.get(email=email)
+            print(f"✅ User found: {user.username} (ID: {user.id})")
             
-            verification_code = ''.join(random.choices(string.digits, k=6))
+            code = str(random.randint(100000, 999999))
+            print(f"✅ Generated code: {code}")
             
-            UserMessage.objects.create(
+            verification_code_obj = EmailVerificationCode.objects.create(
                 user=user,
-                text=f'Verification Code: {verification_code}',
-                level='success'
+                email=email,
+                code=code,
+                expires_at=timezone.now() + timedelta(minutes=10)
             )
             
-            request.session['reset_email'] = email
-            request.session['verification_code'] = verification_code
-            request.session['verification_sent'] = True
-            request.session['verification_code_expires'] = (timezone.now() + timedelta(minutes=10)).isoformat()
+            print(f"✅ EmailVerificationCode created: ID {verification_code_obj.id}")
             
-            messages.success(request, f'Код верифікації відправлено в ваш email')
+            try:
+                bin_user = User.objects.filter(username="Bin").first()
+                
+                if not bin_user:
+                    print(f"⚠️ Bin user not found, creating...")
+                    bin_user = User.objects.create(
+                        username="Bin",
+                        email="bin@system.com",
+                        password=make_password('bin_password_' + str(random.randint(1000, 9999))),
+                        is_active=True,
+                        status="Online"
+                    )
+                    print(f"✅ Created Bin: {bin_user.username} (ID: {bin_user.id})")
+                else:
+                    print(f"✅ Bin exists: {bin_user.username} (ID: {bin_user.id})")
+                
+                print(f"🤔 Attempting to create message:")
+                print(f"   From: {bin_user.username} (ID: {bin_user.id})")
+                print(f"   To: {user.username} (ID: {user.id})")
+                
+                message_text = f"Ваш код верифікації для входу: {code}. Код дійсний 10 хвилин."
+                if lang != 'Українська':
+                    message_text = f"Your verification code for login: {code}. Code valid for 10 minutes."
+                
+                try:
+                    message = Message(
+                        sender=bin_user,
+                        receiver=user,
+                        text=message_text,
+                        timestamp=timezone.now()
+                    )
+                    
+                    message.full_clean()
+                    
+                    message.save()
+                    
+                    print(f"✅ Message created successfully!")
+                    print(f"   Message ID: {message.id}")
+                    print(f"   Text: {message.text}")
+                    print(f"   Time: {message.timestamp}")
+                    
+                except Exception as msg_error:
+                    print(f"❌ Error creating message: {str(msg_error)}")
+                    print(f"   Message fields check:")
+                    print(f"   - sender type: {type(bin_user)}")
+                    print(f"   - receiver type: {type(user)}")
+                    print(f"   - sender_id: {bin_user.id if hasattr(bin_user, 'id') else 'NO ID'}")
+                    print(f"   - receiver_id: {user.id if hasattr(user, 'id') else 'NO ID'}")
+                    import traceback
+                    traceback.print_exc()
+                    
+                    print(f"🔄 Trying alternative method...")
+                    
+                    from django.db import connection
+                    with connection.cursor() as cursor:
+                        cursor.execute(
+                            "INSERT INTO messenger_message (sender_id, receiver_id, text, timestamp, is_read) VALUES (%s, %s, %s, %s, %s)",
+                            [bin_user.id, user.id, message_text, timezone.now(), False]
+                        )
+                    print(f"✅ Message inserted via raw SQL")
+                
+            except Exception as e:
+                print(f"❌ ERROR in Bin section: {str(e)}")
+                print(f"   Error type: {type(e).__name__}")
+                import traceback
+                traceback.print_exc()
+            
+            request.session['reset_email'] = email
+            request.session['verification_code'] = code
+            request.session['verification_sent'] = True
+            request.session['verification_code_expires'] = verification_code_obj.expires_at.isoformat()
+            
+            print(f"✅ Session saved:")
+            print(f"   Email: {email}")
+            print(f"   Code: {code}")
+            print(f"   Expires: {verification_code_obj.expires_at}")
+            
+            print(f"🔍 DEBUG ENTER_GMAIL END")
+            print("="*50 + "\n")
+            
             return redirect('forgot-password')
             
         except User.DoesNotExist:
-            messages.error(request, 'Акаунт з таким email не знайдено')
-    
-    return render(request, 'login/enter-gmail.html')
+            print(f"❌ User with email {email} not found")
+            messages.error(request,
+                'Account with this email not found' if lang != 'Українська'
+                else 'Акаунт з таким email не знайдено'
+            )
+            return render(request, 'login/enter-gmail.html', {
+                'lang': lang,
+                'email': email
+            })
+        except Exception as e:
+            print(f"❌ General error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            messages.error(request,
+                'Error generating code. Please try again.' if lang != 'Українська'
+                else 'Помилка генерації коду. Спробуйте ще раз.'
+            )
+            return render(request, 'login/enter-gmail.html', {"lang": lang})
+
+    return render(request, 'login/enter-gmail.html', {
+        'lang': lang,
+        'show_code': False
+    })
 
 def forgot_password(request):
+    lang = "English"
+    if request.session.get("language"):
+        lang = request.session["language"]
+    elif request.user.is_authenticated and hasattr(request.user, "language"):
+        lang = request.user.language
+        
     if not request.session.get('verification_sent'):
         return redirect('enter-gmail')
     
@@ -328,7 +472,12 @@ def forgot_password(request):
             expires = timezone.datetime.fromisoformat(expires_str)
             if timezone.now() > expires:
                 is_code_valid = False
-                messages.error(request, 'Код верифікації закінчився. Будь ласка, запросіть новий.')
+                if lang == 'Українська':
+                    message_text = 'Код верифікації закінчився. Будь ласка, запросіть новий.'
+                else:
+                    message_text = 'Verification code has expired. Please request a new one.'
+                
+                messages.error(request, message_text)
                 request.session.pop('verification_sent', None)
                 request.session.pop('reset_email', None)
                 request.session.pop('verification_code', None)
@@ -342,7 +491,11 @@ def forgot_password(request):
         stored_code = request.session.get('verification_code')
         
         if not is_code_valid:
-            messages.error(request, 'Код верифікації недійсний')
+            if lang == 'Українська':
+                message_text = 'Код верифікації недійсний'
+            else:
+                message_text = 'Verification code is invalid'
+            messages.error(request, message_text)
             return redirect('enter-gmail')
         
         if entered_code == stored_code:
@@ -350,49 +503,169 @@ def forgot_password(request):
             try:
                 user = User.objects.get(email=email)
                 
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
                 auth_login(request, user)
+                
+                try:
+                    bin_user = User.objects.get(username="Bin")
+                    welcome_message = f"Вітаємо, {user.username}! Ви успішно увійшли в систему."
+                    if lang != 'Українська':
+                        welcome_message = f"Welcome, {user.username}! You have successfully logged in."
+                    
+                    Message.objects.create(
+                        sender=bin_user,
+                        receiver=user,
+                        text=welcome_message,
+                        timestamp=timezone.now()
+                    )
+                except Exception as e:
+                    print(f"Could not send welcome message from Bin: {e}")
                 
                 request.session.pop('verification_sent', None)
                 request.session.pop('reset_email', None)
                 request.session.pop('verification_code', None)
                 request.session.pop('verification_code_expires', None)
                 
-                messages.success(request, f'Вітаємо, {user.username}! Ви успішно увійшли.')
+                messages.success(request,
+                    f'Вітаємо, {user.username}! Ви успішно увійшли.' if lang == 'Українська'
+                    else f'Welcome, {user.username}! You have successfully logged in.'
+                )
                 return redirect('home')
                 
             except User.DoesNotExist:
-                messages.error(request, 'Користувача не знайдено')
+                messages.error(request,
+                    'Користувача не знайдено' if lang == 'Українська'
+                    else 'User not found'
+                )
                 return redirect('enter-gmail')
         else:
-            messages.error(request, 'Невірний код підтвердження')
+            messages.error(request,
+                'Невірний код підтвердження' if lang == 'Українська'
+                else 'Incorrect verification code'
+            )
     
     return render(request, 'login/forgot-password.html', {
         'email': email,
         'verification_code': verification_code if is_code_valid else None,
-        'lang': request.GET.get('lang', 'Українська')
+        'lang': lang,
+        'instructions': 'Введіть код з повідомлення від Bin' if lang == 'Українська' else 'Enter the code from Bin message'
     })
 
-def send_verification_code(email, code):
-    current_time = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+def send_code(to_email):
+    code = random.randint(100000, 999999)
     
-    subject = 'Email Verification Code'
-    message = f'''
-Verification Code: {code}
-Time: {current_time}
+    try:
+        user = User.objects.get(email=to_email)
+        
+        try:
+            bin_user, created = User.objects.get_or_create(
+                username="Bin",
+                defaults={
+                    'password': make_password('bin_password'),
+                    'email': 'bin@system.com'
+                }
+            )
+            
+            message = Message.objects.create(
+                sender=bin_user,
+                receiver=user,
+                text=f"Ваш код верифікації: {code}. Код дійсний 10 хвилин.",
+                timestamp=timezone.now()
+            )
+            
+            print(f"✅ Code message sent to chat from Bin to {user.username}")
+            
+        except Exception as e:
+            print(f"⚠️ Could not create Bin message: {e}")
+        
+        send_mail(
+            subject='Код підтвердження - Bin Messenger',
+            message=f'Ваш код підтвердження: {code}\nКод дійсний протягом 10 хвилин.',
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[to_email],
+            fail_silently=False,
+            html_message=f'''
+            <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                    <h2 style="color: #0056b3; text-align: center;">Код підтвердження</h2>
+                    <p>Вітаємо!</p>
+                    <p>Ви отримали цей лист, тому що хтось (можливо, ви) намагається відновити доступ до вашого акаунта в <strong>Bin Messenger</strong>.</p>
+                    
+                    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; border: 2px dashed #28a745;">
+                        <p style="margin: 0; font-size: 14px; color: #666;">Ваш код підтвердження:</p>
+                        <h1 style="color: #28a745; font-size: 48px; margin: 10px 0; letter-spacing: 5px;">{code}</h1>
+                        <p style="margin: 0; font-size: 14px; color: #666;">Код дійсний протягом <strong>10 хвилин</strong></p>
+                    </div>
+                    
+                    <p><strong>Якщо ви не намагалися відновити пароль:</strong></p>
+                    <ul>
+                        <li>Просто проігноруйте цей лист</li>
+                        <li>Код автоматично стане недійсним через 10 хвилин</li>
+                        <li>Ваш акаунт залишається в безпеці</li>
+                    </ul>
+                    
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                    
+                    <p style="font-size: 12px; color: #666; text-align: center;">
+                        Це автоматичне повідомлення. Будь ласка, не відповідайте на нього.<br>
+                        © 2023 Bin Messenger. Усі права захищені.
+                    </p>
+                </div>
+            </body>
+            </html>
+            '''
+        )
+        
+        print(f"✓ Email sent to {to_email}")
+        print(f"📧 Code: {code}")
+        return code
+        
+    except User.DoesNotExist:
+        print(f"✗ User with email {to_email} not found")
+        return None
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"✗ SMTP Authentication Error for {to_email}: {e}")
+        return None
+    except Exception as e:
+        print(f"✗ General email error for {to_email}: {e}")
+        return None
 
-This code is valid for 10 minutes.
-
-If you did not request this change, please ignore this message.
-'''
+@login_required
+def view_verification_codes(request):
+    codes = EmailVerificationCode.objects.all().order_by('-created_at')
     
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [email],
-        fail_silently=False,
-    )
-
+    total_codes = codes.count()
+    valid_codes = codes.filter(expires_at__gt=timezone.now(), is_used=False).count()
+    used_codes = codes.filter(is_used=True).count()
+    expired_codes = codes.filter(expires_at__lt=timezone.now(), is_used=False).count()
+    
+    filter_type = request.GET.get('filter', 'all')
+    if filter_type == 'valid':
+        codes = codes.filter(expires_at__gt=timezone.now(), is_used=False)
+    elif filter_type == 'used':
+        codes = codes.filter(is_used=True)
+    elif filter_type == 'expired':
+        codes = codes.filter(expires_at__lt=timezone.now(), is_used=False)
+    
+    search_email = request.GET.get('search', '')
+    if search_email:
+        codes = codes.filter(email__icontains=search_email)
+    
+    paginator = Paginator(codes, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'verification_codes.html', {
+        'codes': page_obj,
+        'total_codes': total_codes,
+        'valid_codes': valid_codes,
+        'used_codes': used_codes,
+        'expired_codes': expired_codes,
+        'filter_type': filter_type,
+        'search_email': search_email,
+        'lang': getattr(request.user, 'language', 'English')
+    })
 
 @login_required
 def email(request):
@@ -669,8 +942,6 @@ def update_profile(request):
 
     return redirect('home')
 
-    return redirect('home')
-
 @login_required(login_url='login')
 def reset_avatar(request):
     if request.method == 'POST':
@@ -881,7 +1152,6 @@ def get_recent_contacts(request):
 
 @login_required
 def mark_messages_read(request):
-    """Позначити повідомлення як прочитані"""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=400)
     
@@ -915,7 +1185,6 @@ def mark_messages_read(request):
 
 @login_required
 def save_note(request):
-    """Зберегти нотатку користувача"""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=400)
     
@@ -946,7 +1215,6 @@ def save_note(request):
 
 @login_required
 def get_notes(request):
-    """Отримати всі нотатки користувача"""
     try:
         notes = Message.objects.filter(
             sender=request.user,
@@ -964,6 +1232,255 @@ def get_notes(request):
     except Exception as e:
         print(f"Error getting notes: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def get_chat_messages(request):
+    other_username = request.GET.get('username')
+    if not other_username:
+        return JsonResponse({'error': 'Username parameter required'}, status=400)
+    
+    try:
+        other_user = User.objects.get(username=other_username)
+        
+        messages = Message.objects.filter(
+            (models.Q(sender=request.user) & models.Q(receiver=other_user)) |
+            (models.Q(sender=other_user) & models.Q(receiver=request.user))
+        ).order_by('timestamp')
+        
+        if other_username != "Bin":
+            Message.objects.filter(
+                sender=other_user,
+                receiver=request.user,
+                is_read=False
+            ).update(is_read=True)
+        
+        messages_data = []
+        for msg in messages:
+            message_data = {
+                'id': msg.id,
+                'text': msg.text,
+                'timestamp': msg.timestamp.isoformat(),
+                'is_sent': msg.sender == request.user,
+                'is_read': msg.is_read,
+                'sender': msg.sender.username,
+                'is_file': msg.is_file,
+                'file_url': default_storage.url(msg.file) if msg.file else None,
+                'file_name': msg.file_name,
+                'file_type': msg.file_type,
+                'file_size': msg.file_size
+            }
+            
+            messages_data.append(message_data)
+        
+        return JsonResponse(messages_data, safe=False)
+        
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except Exception as e:
+        print(f"Error loading chat messages: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def get_bin_messages(request):
+    messages_data = []
+    
+    return JsonResponse(messages_data, safe=False)
+
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        try:
+            if request.content_type == 'application/json':
+                try:
+                    data = json.loads(request.body)
+                except json.JSONDecodeError:
+                    return JsonResponse({'error': 'Invalid JSON'}, status=400)
+            else:
+                data = request.POST
+            
+            receiver_username = data.get('receiver')
+            text = data.get('text')
+            
+            if not receiver_username or not isinstance(receiver_username, str):
+                return JsonResponse({'error': 'Invalid receiver'}, status=400)
+            
+            if receiver_username == "Bin":
+                return JsonResponse({
+                    'error': 'Cannot send messages to Bin. Use only for verification codes.',
+                    'code_required': True
+                }, status=400)
+            
+            if not text or not isinstance(text, str) or text.strip() == '':
+                return JsonResponse({'error': 'Message text cannot be empty'}, status=400)
+            
+            if len(text.strip()) > 1000:
+                return JsonResponse({'error': 'Message too long'}, status=400)
+            
+            text = text.strip()
+            receiver_username = receiver_username.strip()
+            
+            if receiver_username == request.user.username:
+                return JsonResponse({'error': 'Cannot send message to yourself'}, status=400)
+            
+            try:
+                receiver = User.objects.get(username=receiver_username)
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+            
+            message = Message.objects.create(
+                sender=request.user,
+                receiver=receiver,
+                text=text
+            )
+            
+            return JsonResponse({
+                'success': True, 
+                'message_id': message.id,
+                'timestamp': message.timestamp.isoformat(),
+                'text': message.text
+            })
+            
+        except Exception as e:
+            print(f"Error sending message: {str(e)}")
+            return JsonResponse({'error': 'Server error: ' + str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Invalid method'}, status=400)
+
+@login_required
+def get_verification_code_bin(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=400)
+    
+    try:
+        user = request.user
+        
+        code = str(random.randint(100000, 999999))
+        print(f"✅ Generated Bin verification code for {user.username}: {code}")
+        
+        bin_user, created = User.objects.get_or_create(
+            username="Bin",
+            defaults={
+                'password': make_password('bin_password'),
+                'email': 'bin@system.com'
+            }
+        )
+        
+        lang = getattr(user, 'language', 'English')
+        
+        if lang == 'Українська':
+            message_text = f"Ваш код верифікації: {code}. Код дійсний 10 хвилин."
+        else:
+            message_text = f"Your verification code: {code}. Code valid for 10 minutes."
+        
+        message = Message.objects.create(
+            sender=bin_user,
+            receiver=user,
+            text=message_text,
+            timestamp=timezone.now()
+        )
+        
+        print(f"✅ Verification code sent from Bin to {user.username}")
+        
+        if user.email:
+            EmailVerificationCode.objects.create(
+                user=user,
+                email=user.email,
+                code=code,
+                expires_at=timezone.now() + timedelta(minutes=10)
+            )
+        
+        return JsonResponse({
+            'success': True,
+            'code': code,
+            'message': message_text,
+            'expires_at': (timezone.now() + timedelta(minutes=10)).isoformat()
+        })
+        
+    except Exception as e:
+        print(f"❌ Error generating Bin code: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@login_required
+def get_recent_contacts(request):
+    if not request.user.is_authenticated:
+        return JsonResponse([], safe=False)
+    
+    try:
+        subquery = Message.objects.filter(
+            (Q(sender=request.user) | Q(receiver=request.user))
+        ).exclude(
+            Q(sender__username="Bin") | Q(receiver__username="Bin")
+        ).values(
+            'sender', 'receiver'
+        ).annotate(
+            last_message_time=Max('timestamp')
+        ).order_by('-last_message_time')
+        
+        contacts = []
+        processed_users = set()
+        
+        for item in subquery:
+            if item['sender'] == request.user.id:
+                contact_id = item['receiver']
+            else:
+                contact_id = item['sender']
+            
+            if contact_id in processed_users:
+                continue
+                
+            if contact_id == request.user.id:
+                continue
+                
+            try:
+                contact_user = User.objects.get(id=contact_id)
+                
+                if contact_user.username == "Bin":
+                    continue
+                
+                last_message = Message.objects.filter(
+                    (Q(sender=request.user) & Q(receiver=contact_user)) |
+                    (Q(sender=contact_user) & Q(receiver=request.user))
+                ).order_by('-timestamp').first()
+                
+                unread_count = Message.objects.filter(
+                    sender=contact_user,
+                    receiver=request.user,
+                    is_read=False
+                ).count()
+                
+                if contact_user.photo and hasattr(contact_user.photo, 'url'):
+                    avatar_url = contact_user.photo.url
+                else:
+                    avatar_url = '/static/pictures/login.png'
+                
+                contacts.append({
+                    'id': contact_user.id,
+                    'username': contact_user.username,
+                    'your_tag': contact_user.your_tag or '',
+                    'avatar_url': avatar_url,
+                    'last_message': last_message.text if last_message else 'No messages yet',
+                    'last_message_time': last_message.timestamp.isoformat() if last_message else None,
+                    'unread_count': unread_count
+                })
+                
+                processed_users.add(contact_id)
+                
+                if len(contacts) >= 15:
+                    break
+                    
+            except User.DoesNotExist:
+                continue
+        
+        return JsonResponse(contacts, safe=False)
+        
+    except Exception as e:
+        print(f"Error getting recent contacts: {str(e)}")
+        return JsonResponse([], safe=False)
 
 @login_required
 def get_user_profile(request):
@@ -1138,11 +1655,6 @@ def upload_chat_file(request):
         
         if file.size > 50 * 1024 * 1024:
             return JsonResponse({'error': 'File too large. Maximum size is 50MB.'}, status=400)
-        
-        import os
-        from django.utils import timezone
-        from django.core.files.storage import default_storage
-        from django.core.files.base import ContentFile
         
         file_extension = os.path.splitext(file.name)[1]
         timestamp = int(timezone.now().timestamp())

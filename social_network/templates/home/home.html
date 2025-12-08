@@ -3578,6 +3578,130 @@ body.modal-open .chat-container {
     transform: scale(0.95);
 }
 
+.bin-login-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2000;
+    width: 400px;
+    max-width: 90%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bin-login-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1500;
+}
+
+#bin-login-toggle:checked ~ .bin-login-form {
+    display: flex;
+}
+
+#bin-login-toggle:checked ~ .bin-login-overlay {
+    display: block;
+}
+
+.theme-light .bin-login-form {
+    background: linear-gradient(to right, #ffffff, #e0e0e0);
+    color: #000000;
+}
+
+.theme-dark .bin-login-form {
+    background: linear-gradient(to right, #2c2c2c, #1a1a1a);
+    color: #ffffff;
+}
+
+.theme-pink .bin-login-form {
+    background: linear-gradient(to right, #ffb6c1, #b30086);
+    color: #000000;
+}
+
+.theme-green .bin-login-form {
+    background: linear-gradient(to right, #a8e6a2, #2e7d32);
+    color: #ffffff;
+}
+
+.bin-login-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+.theme-light .bin-login-form input {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    border: 1px solid #999999;
+}
+
+.theme-dark .bin-login-form input {
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    border: 1px solid #555555;
+}
+
+.bin-login-form button {
+    padding: 12px 24px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    transition: background 0.2s;
+}
+
+.bin-login-form button:hover {
+    background: #0056b3;
+}
+
+.bin-login-form .error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
+
+.bin-login-form .success-message {
+    color: #28a745;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
+
+.bin-chat {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bin-chat .message.received {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 1px solid #764ba2;
+}
+
+.bin-chat .message.sent {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    color: white;
+}
+
 #chat-toggle:checked ~ .profile-form,
 #chat-toggle:checked ~ .setting-form,
 #chat-toggle:checked ~ .form1,
@@ -3684,7 +3808,6 @@ body.modal-open .chat-container {
 <input type="checkbox" id="security-toggle">
 <input type="checkbox" id="chat-toggle">
 <input type="checkbox" id="security-toggle">
-
 
 <div class="profile-overlay"></div>
 <div class="other-profile-overlay"></div>
@@ -3795,6 +3918,14 @@ body.modal-open .chat-container {
                         </svg>
                         <span class="birthday-value">{{ user.birthday|default:"Not specified" }}</span>
                     </div>
+                </div>
+
+                <div class="user-info">
+                    {% if role == 'Administrator' %}
+                        <span class="badge bg-danger">👑 Administrator</span>
+                    {% elif role == 'Moderator' %}
+                        <span class="badge bg-warning">🛡️ Moderator</span>
+                    {% endif %}
                 </div>
             </div>
         </div>  
@@ -4434,8 +4565,8 @@ body.modal-open .chat-container {
             <input type="checkbox" id="terms-bin">
             <label for="terms-bin">I agree with the <a href="/terms" target="_blank">terms and conditions</a></label>
         </div>
-        <!-- <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button> -->
-        <button type="submit" name="subscription_plan" value="bin_plus_test" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button>
+        <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button>
+        <!-- <button type="submit" name="subscription_plan" value="bin_plus_test" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button> -->
     </form>
 </div>
 
@@ -5176,7 +5307,6 @@ body.modal-open .chat-container {
             <label for="terms-bin">I agree with the <a href="/terms" target="_blank">terms and conditions</a></label>
         </div>
         <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button>
-        <!-- <button type="submit" name="subscription_plan" value="bin_plus_test" id="subscribe-bin" disabled class="subscribe-btn">Subscribe</button> -->
     </form>
 </div>
 
@@ -5943,7 +6073,6 @@ function processMentions(text) {
     return text.replace(mentionRegex, '<span class="message-mention profile-mention" data-username="$1">$1</span>');
 }
 
-// ==================================================================================================================================
 function addMentionEventListeners(element) {
     const mentions = element.querySelectorAll('.message-mention, .profile-mention');
     
@@ -6138,6 +6267,55 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadChatMessages(username) {
+    if (username === "Bin") {
+        fetch(`/get-bin-messages/`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(messages => {
+                console.log('Loaded Bin messages:', messages);
+                displayBinMessages(messages);
+                
+                if (messages.length === 0) {
+                    const lang = "{{ user.language|default:'English' }}";
+                    const welcomeMessage = lang === 'Українська' 
+                        ? "Привіт! Я Bin. Надішліть будь-яке повідомлення, щоб отримати код верифікації."
+                        : "Hello! I'm Bin. Send any message to get your verification code.";
+                    
+                    setTimeout(() => {
+                        displayMessage({
+                            text: welcomeMessage,
+                            sender: "Bin",
+                            timestamp: new Date().toISOString(),
+                            is_sent: false
+                        }, false);
+                    }, 300);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading Bin messages:', error);
+                const messagesContainer = document.getElementById('chat-messages');
+                if (messagesContainer) {
+                    messagesContainer.innerHTML = '<div class="chat-messages-spacer"></div>';
+                    
+                    const lang = "{{ user.language|default:'English' }}";
+                    const welcomeMessage = lang === 'Українська' 
+                        ? "Привіт! Я Bin. Надішліть будь-яке повідомлення, щоб отримати код верифікації."
+                        : "Hello! I'm Bin. Send any message to get your verification code.";
+                    
+                    setTimeout(() => {
+                        displayMessage({
+                            text: welcomeMessage,
+                            sender: "Bin",
+                            timestamp: new Date().toISOString(),
+                            is_sent: false
+                        }, false);
+                    }, 300);
+                }
+            });
+        return;
+    }
     if (username === "{{ user.username }}") {
         fetch(`/get-notes/`)
             .then(response => {
@@ -6245,6 +6423,27 @@ function loadChatMessages(username) {
             console.error('Error loading chat messages:', error);
         });
 }
+
+function sendFile() {
+    if (!selectedFile || !currentChatUser) {
+        cancelFile();
+        return;
+    }
+    
+    if (currentChatUser === "Bin") {
+        alert("Bin only provides verification codes. Please send a text message to get your code.");
+        cancelFile();
+        return;
+    }
+}
+
+const binContact = {
+    username: "Bin",
+    avatar_url: "/static/pictures/bin_icon.png", 
+    last_message: "Get verification code",
+    last_activity: new Date().toISOString(),
+    unread_count: 0
+};
 
 document.addEventListener('DOMContentLoaded', function() {
     processProfileDescription();
@@ -6422,7 +6621,19 @@ function loadRecentContacts() {
                 unread_count: 0
             };
             
-            const allContacts = [favoriteContact, ...contacts.filter(contact => contact.username !== currentUser)];
+            const binContact = {
+                username: "Bin",
+                avatar_url: "/static/icons/Bin.jpg", 
+                last_message: lang === 'Українська' ? 'Системний бот' : 'System bot',
+                last_activity: new Date().toISOString(),
+                unread_count: 0
+            };
+            
+            const allContacts = [
+                favoriteContact, 
+                binContact,
+                ...contacts.filter(contact => contact.username !== currentUser)
+            ];
             
             if (allContacts.length === 0) {
                 contactsList.innerHTML = '<div style="color:#999; padding:10px; text-align:center;">No recent chats</div>';
@@ -6430,26 +6641,37 @@ function loadRecentContacts() {
             }
             
             contactsList.innerHTML = allContacts.map(contact => {
-                let displayName, lastMessage, avatarUrl;
+                let displayName, lastMessage, avatarUrl, onClickFunction;
+                
                 if (contact.username === currentUser) {
-                    displayName = lang === 'Українська' ? 'Вибране' : 'Notes';
+                    displayName = lang === 'Українська' ? 'Избранное' : 'Notes';
                     lastMessage = getLastNoteMessage() || (lang === 'Українська' ? 'Ваші нотатки' : 'Your notes');
                     avatarUrl = "/static/pictures/notes.jpg";
-                } else {
+                    onClickFunction = `openChat('${contact.username}')`;
+                } 
+                else if (contact.username === "Bin") {
+                    displayName = "Bin";
+                    lastMessage = contact.last_message;
+                    avatarUrl = "/static/pictures/bin_icon.png";
+                    onClickFunction = `openBinLogin()`;
+                }
+                else {
                     displayName = contact.username;
                     lastMessage = contact.last_message || 'No messages yet';
                     avatarUrl = contact.avatar_url || '/static/pictures/login.png';
+                    onClickFunction = `openChat('${contact.username}')`;
                 }
                 
                 const truncatedMessage = truncateText(lastMessage, 25);
                 
                 return `
                 <div class="recent-contact ${contact.unread_count > 0 ? 'unread' : ''}" 
-                     onclick="openChat('${contact.username}')">
+                     onclick="${onClickFunction}">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <img src="${avatarUrl}" 
                              class="contact-avatar" 
-                             alt="${contact.username}">
+                             alt="${contact.username}"
+                             onerror="this.src='/static/pictures/login.png'">
                         <div class="contact-info">
                             <div class="contact-username">${displayName}</div>
                             <div class="contact-last-message" title="${lastMessage}">
@@ -6473,6 +6695,525 @@ function loadRecentContacts() {
         .catch(error => {
             console.error('Error loading recent contacts:', error);
         });
+}
+
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    
+    if (!message || !currentChatUser) return;
+
+    // Если отправляем сообщение в Bin
+    if (currentChatUser === "Bin") {
+        // Получаем код верификации через AJAX
+        getVerificationCodeForBin();
+        input.value = '';
+        return;
+    }
+    
+    // Остальной код для обычных чатов...
+    displayMessage({
+        text: message,
+        sender: "{{ user.username }}",
+        timestamp: new Date().toISOString(),
+        is_sent: true
+    }, true);
+    
+    input.value = '';
+
+    const updateHistory = () => {
+        setTimeout(() => {
+            loadRecentContacts();
+        }, 100);
+    };
+
+    if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+        try {
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'sender': "{{ user.username }}",
+                'receiver': currentChatUser
+            }));
+            console.log('Message sent via WebSocket:', message);
+            updateHistory();
+            
+        } catch (error) {
+            console.error('WebSocket send error:', error);
+            sendMessageViaAJAX(message);
+        }
+    } else {
+        console.error('WebSocket is not connected, falling back to AJAX');
+        sendMessageViaAJAX(message);
+    }
+}
+
+// Новая функция для получения кода верификации
+function getVerificationCodeForBin() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        alert('CSRF token not found. Please refresh the page.');
+        return;
+    }
+    
+    // Сначала показываем сообщение "отправка..."
+    displayMessage({
+        text: document.getElementById('chat-input').value.trim(),
+        sender: "{{ user.username }}",
+        timestamp: new Date().toISOString(),
+        is_sent: true
+    }, true);
+    
+    // Запрашиваем код верификации
+    fetch('/get-verification-code-bin/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Verification code received from Bin:', data.code);
+            
+            // Отображаем код как сообщение от Bin
+            setTimeout(() => {
+                displayMessage({
+                    text: data.message || `Your verification code: ${data.code}`,
+                    sender: "Bin",
+                    timestamp: new Date().toISOString(),
+                    is_sent: false
+                }, false);
+                loadRecentContacts();
+            }, 500);
+        } else {
+            console.error('Failed to get verification code:', data.error);
+            alert('Error getting verification code: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('AJAX get verification code error:', error);
+        alert('Error getting verification code: ' + error.message);
+    });
+}
+
+// Новая функция для получения кода верификации
+function getVerificationCodeForBin() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        alert('CSRF token not found. Please refresh the page.');
+        return;
+    }
+    
+    // Запрашиваем код верификации
+    fetch('/get-verification-code-bin/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            action: 'get_code'
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Verification code received from Bin:', data.code);
+            
+            setTimeout(() => {
+                displayMessage({
+                    text: data.message || `Your verification code: ${data.code}`,
+                    sender: "Bin",
+                    timestamp: new Date().toISOString(),
+                    is_sent: false
+                }, false);
+                loadRecentContacts();
+            }, 500);
+        } else {
+            console.error('Failed to get verification code:', data.error);
+            alert('Error getting verification code: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('AJAX get verification code error:', error);
+        alert('Error getting verification code');
+    });
+}
+
+function openBinLogin() {
+    closeProfileModals();
+    
+    currentChatUser = "Bin";
+    document.getElementById('chat-username').textContent = "Bin";
+    
+    document.getElementById('chat-toggle').checked = true;
+    
+    reconnectAttempts = 0;
+    
+    if (chatSocket) {
+        chatSocket.close();
+        chatSocket = null;
+    }
+    
+    console.log('Opening chat with Bin');
+    
+    loadChatMessages("Bin");
+    
+    setTimeout(() => {
+        displayMessage({
+            text: "Hello! I'm Bin. Send any message to get your verification code.",
+            sender: "Bin",
+            timestamp: new Date().toISOString(),
+            is_sent: false
+        }, false);
+    }, 300);
+    
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchResults').innerHTML = '';
+    
+    const recentContactsDiv = document.getElementById('recent-contacts');
+    if (recentContactsDiv) {
+        recentContactsDiv.style.display = "block";
+    }
+    
+    addAttachmentButton();
+}
+
+function sendMessageToBin(message) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        alert('CSRF token not found. Please refresh the page.');
+        return;
+    }
+    
+    fetch('/get-verification-code-bin/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Verification code received from Bin:', data.code);
+            
+            setTimeout(() => {
+                displayMessage({
+                    text: data.message || `Ваш код верифікації: ${data.code}. Код дійсний 10 хвилин.`,
+                    sender: "Bin",
+                    timestamp: new Date().toISOString(),
+                    is_sent: false
+                }, false);
+                
+                loadRecentContacts();
+                
+                const messagesContainer = document.getElementById('chat-messages');
+                if (messagesContainer) {
+                    setTimeout(() => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 100);
+                }
+            }, 300);
+        } else {
+            console.error('Failed to get verification code:', data.error);
+            alert('Error getting verification code: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('AJAX get verification code error:', error);
+        alert('Error getting verification code: ' + error.message);
+    });
+}
+
+function loadChatMessages(username) {
+    if (username === "Bin") {
+        fetch(`/get-bin-messages/`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(messages => {
+                console.log('Loaded Bin messages:', messages);
+                displayBinMessages(messages);
+            })
+            .catch(error => {
+                console.error('Error loading Bin messages:', error);
+                const messagesContainer = document.getElementById('chat-messages');
+                if (messagesContainer) {
+                    messagesContainer.innerHTML = '<div class="chat-messages-spacer"></div>';
+                }
+            });
+        return;
+    }
+    
+    if (username === "{{ user.username }}") {
+        fetch(`/get-notes/`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(notes => {
+                displayNotes(notes);
+            })
+            .catch(error => {
+                console.error('Error loading notes from server:', error);
+                const localNotes = JSON.parse(localStorage.getItem('user_notes') || '[]');
+                displayNotes(localNotes);
+            });
+        return;
+    }
+    
+    fetch(`/get-chat-messages/?username=${encodeURIComponent(username)}`)
+        .then(response => response.json())
+        .then(messages => {
+            const messagesContainer = document.getElementById('chat-messages');
+            if (!messagesContainer) return;
+            
+            const spacer = messagesContainer.querySelector('.chat-messages-spacer');
+            messagesContainer.innerHTML = '';
+            if (spacer) {
+                messagesContainer.appendChild(spacer);
+            } else {
+                const newSpacer = document.createElement('div');
+                newSpacer.className = 'chat-messages-spacer';
+                messagesContainer.appendChild(newSpacer);
+            }
+            
+            messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.is_sent ? 'sent' : 'received'}`;
+                
+                const senderDiv = document.createElement('div');
+                senderDiv.className = 'message-sender';
+                senderDiv.textContent = msg.sender;
+                messageDiv.appendChild(senderDiv);
+                
+                const contentDiv = document.createElement('div');
+                
+                if (msg.text) {
+                    const textDiv = document.createElement('div');
+                    const processedText = processMentions(msg.text);
+                    textDiv.innerHTML = processedText;
+                    contentDiv.appendChild(textDiv);
+                }
+                
+                if (msg.file_url) {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'file-attachment';
+                    
+                    if (msg.file_type && msg.file_type.startsWith('image/')) {
+                        fileDiv.innerHTML = `
+                            <div style="margin: 5px 0;">
+                                <img src="${msg.file_url}" 
+                                     style="max-width: 250px; max-height: 250px; border-radius: 5px; cursor: pointer;" 
+                                     onclick="openFileModal('${msg.file_url}', '${msg.file_name || 'image'}')">
+                            </div>
+                        `;
+                    } else {
+                        fileDiv.innerHTML = `
+                            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px; margin: 5px 0;">
+                                <a href="${msg.file_url}" download="${msg.file_name || 'file'}" 
+                                   style="color: #007bff; text-decoration: none;">
+                                    📎 ${msg.file_name || 'Файл'}
+                                </a>
+                            </div>
+                        `;
+                    }
+                    contentDiv.appendChild(fileDiv);
+                }
+                
+                messageDiv.appendChild(contentDiv);
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.style.fontSize = '11px';
+                timeDiv.style.color = '#999';
+                timeDiv.style.marginTop = '4px';
+                timeDiv.style.textAlign = msg.is_sent ? 'right' : 'left';
+                
+                const messageDate = new Date(msg.timestamp);
+                timeDiv.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                messageDiv.appendChild(timeDiv);
+                
+                const spacer = messagesContainer.querySelector('.chat-messages-spacer');
+                if (spacer) {
+                    messagesContainer.insertBefore(messageDiv, spacer);
+                } else {
+                    messagesContainer.appendChild(messageDiv);
+                }
+                
+                if (msg.text) {
+                    addMentionEventListeners(messageDiv);
+                }
+            });
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        })
+        .catch(error => {
+            console.error('Error loading chat messages:', error);
+        });
+}
+
+function displayBinMessages(messages) {
+    const messagesContainer = document.getElementById('chat-messages');
+    if (!messagesContainer) return;
+    
+    const spacer = messagesContainer.querySelector('.chat-messages-spacer');
+    messagesContainer.innerHTML = '';
+    if (spacer) {
+        messagesContainer.appendChild(spacer);
+    } else {
+        const newSpacer = document.createElement('div');
+        newSpacer.className = 'chat-messages-spacer';
+        messagesContainer.appendChild(newSpacer);
+    }
+    
+    messages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${msg.is_sent ? 'sent' : 'received'}`;
+        
+        const senderDiv = document.createElement('div');
+        senderDiv.className = 'message-sender';
+        senderDiv.textContent = msg.sender === "Bin" ? "Bin" : msg.sender;
+        messageDiv.appendChild(senderDiv);
+        
+        const textDiv = document.createElement('div');
+        
+        const processedText = processMentions(msg.text);
+        textDiv.innerHTML = processedText;
+        
+        messageDiv.appendChild(textDiv);
+        
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.style.fontSize = '11px';
+        timeDiv.style.color = '#999';
+        timeDiv.style.marginTop = '4px';
+        timeDiv.style.textAlign = msg.is_sent ? 'right' : 'left';
+        
+        const messageDate = new Date(msg.timestamp);
+        timeDiv.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        messageDiv.appendChild(timeDiv);
+        
+        const spacer = messagesContainer.querySelector('.chat-messages-spacer');
+        if (spacer) {
+            messagesContainer.insertBefore(messageDiv, spacer);
+        } else {
+            messagesContainer.appendChild(messageDiv);
+        }
+        
+        addMentionEventListeners(messageDiv);
+    });
+    
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function sendFile() {
+    if (!selectedFile || !currentChatUser) {
+        cancelFile();
+        return;
+    }
+    
+    const textInput = document.getElementById('chat-input');
+    const text = textInput.value.trim() || '';
+    
+    if (currentChatUser === "Bin") {
+        alert("Bin currently only supports text messages");
+        cancelFile();
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('receiver', currentChatUser);
+    if (text) {
+        formData.append('text', text);
+    }
+    
+    const csrfToken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    if (!csrfToken) {
+        alert('CSRF token not found. Please refresh the page.');
+        cancelFile();
+        return;
+    }
+    
+    fetch('/upload-chat-file/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            displayMessage({
+                text: text || '',
+                file_url: data.file_url,
+                file_name: data.file_name,
+                file_type: data.file_type,
+                file_size: data.file_size,
+                sender: "{{ user.username }}",
+                timestamp: data.timestamp
+            }, true);
+            
+            textInput.value = '';
+            selectedFile = null;
+            cancelFile();
+            
+            if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(JSON.stringify({
+                    'message': text || '[Файл]',
+                    'sender': "{{ user.username }}",
+                    'receiver': currentChatUser,
+                    'file_url': data.file_url,
+                    'file_name': data.file_name,
+                    'file_type': data.file_type
+                }));
+            }
+        } else {
+            alert('Ошибка отправки файла: ' + data.error);
+            cancelFile();
+        }
+    })
+    .catch(error => {
+        console.error('Error sending file:', error);
+        alert('Ошибка отправки файла: ' + error.message);
+        cancelFile();
+    });
 }
 
 function truncateText(text, maxLength) {
@@ -6712,37 +7453,6 @@ function isValidMention(username) {
     return username.startsWith('@') && cleanUsername.length > 0;
 }
 
-function addMentionEventListeners(element) {
-    const mentions = element.querySelectorAll('.message-mention, .profile-mention');
-    
-    mentions.forEach(mention => {
-        const username = mention.getAttribute('data-username');
-        
-        if (!isValidMention(username)) {
-            mention.classList.remove('message-mention', 'profile-mention');
-            mention.style.color = '';
-            mention.style.cursor = 'default';
-            return;
-        }
-        
-        mention.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const cleanUsername = username.replace('@', '');
-            openUserProfile(cleanUsername);
-        });
-        
-        mention.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-1px)';
-            this.style.cursor = 'pointer';
-        });
-        
-        mention.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-}
-
 function isValidMention(username) {
     if (!username || !username.startsWith('@')) return false;
     
@@ -6875,80 +7585,6 @@ document.addEventListener('mousedown', (event) => {
     }
 });
 
-function loadChatMessages(username) {
-    if (username === "{{ user.username }}") {
-        fetch(`/get-notes/`)
-            .then(response => {
-                if (!response.ok) throw new Error('Network error');
-                return response.json();
-            })
-            .then(notes => {
-                displayNotes(notes);
-            })
-            .catch(error => {
-                console.error('Error loading notes from server:', error);
-                const localNotes = JSON.parse(localStorage.getItem('user_notes') || '[]');
-                displayNotes(localNotes);
-            });
-        return;
-    }
-    
-    fetch(`/get-chat-messages/?username=${encodeURIComponent(username)}`)
-        .then(response => response.json())
-        .then(messages => {
-            const messagesContainer = document.getElementById('chat-messages');
-            if (!messagesContainer) return;
-            
-            const spacer = messagesContainer.querySelector('.chat-messages-spacer');
-            messagesContainer.innerHTML = '';
-            if (spacer) {
-                messagesContainer.appendChild(spacer);
-            } else {
-                const newSpacer = document.createElement('div');
-                newSpacer.className = 'chat-messages-spacer';
-                messagesContainer.appendChild(newSpacer);
-            }
-            
-            messages.forEach(msg => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${msg.is_sent ? 'sent' : 'received'}`;
-                
-                
-                const textDiv = document.createElement('div');
-                
-                const processedText = processMentions(msg.text);
-                textDiv.innerHTML = processedText;
-                
-                messageDiv.appendChild(textDiv);
-                
-                const timeDiv = document.createElement('div');
-                timeDiv.className = 'message-time';
-                timeDiv.style.fontSize = '11px';
-                timeDiv.style.color = '#999';
-                timeDiv.style.marginTop = '4px';
-                timeDiv.style.textAlign = msg.is_sent ? 'right' : 'left';
-                
-                const messageDate = new Date(msg.timestamp);
-                timeDiv.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                messageDiv.appendChild(timeDiv);
-                
-                const spacer = messagesContainer.querySelector('.chat-messages-spacer');
-                if (spacer) {
-                    messagesContainer.insertBefore(messageDiv, spacer);
-                } else {
-                    messagesContainer.appendChild(messageDiv);
-                }
-                
-                addMentionEventListeners(messageDiv);
-            });
-            
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        })
-        .catch(error => {
-            console.error('Error loading chat messages:', error);
-        });
-}
-
 function displayNotes(notes) {
     const messagesContainer = document.getElementById('chat-messages');
     if (!messagesContainer) return;
@@ -7006,42 +7642,6 @@ function getSenderDisplayName(isSent, sender) {
         return lang === 'Українська' ? 'Відправляється' : 'Іs sent';
     } else {
         return sender;
-    }
-}
-
-function sendMessage() {
-    const input = document.getElementById('chat-input');
-    const message = input.value.trim();
-    
-    if (!message || !currentChatUser) return;
-
-    displayMessage(message, "{{ user.username }}", true);
-    
-    input.value = '';
-
-    const updateHistory = () => {
-        setTimeout(() => {
-            loadRecentContacts();
-        }, 100);
-    };
-
-    if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-        try {
-            chatSocket.send(JSON.stringify({
-                'message': message,
-                'sender': "{{ user.username }}",
-                'receiver': currentChatUser
-            }));
-            console.log('Message sent via WebSocket:', message);
-            updateHistory();
-            
-        } catch (error) {
-            console.error('WebSocket send error:', error);
-            sendMessageViaAJAX(message);
-        }
-    } else {
-        console.error('WebSocket is not connected, falling back to AJAX');
-        sendMessageViaAJAX(message);
     }
 }
 
@@ -7367,22 +7967,6 @@ function closeProfileModals() {
     ];
     
     profileModals.forEach(id => {
-        const cb = document.getElementById(id);
-        if (cb) cb.checked = false;
-    });
-}
-
-
-function closeAllModals() {
-    const checkboxes = [
-        'menu-toggle', 'profile-toggle', 'setting-toggle', 'form1-toggle', 
-        'form2-toggle', 'color_theme-toggle', 'wallet-toggle', 'check-subscription-toggle',
-        'subscribe-month-toggle', 'subscribe-year-toggle', 'deposit-toggle', 'add_card-toggle',
-        'bin_mouth-toggle', 'bin_premium_mouth-toggle', 'bin_years-toggle', 'bin_premium_years-toggle',
-        'chat-toggle', 'other-profile-toggle'
-    ];
-    
-    checkboxes.forEach(id => {
         const cb = document.getElementById(id);
         if (cb) cb.checked = false;
     });

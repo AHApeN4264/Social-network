@@ -12,7 +12,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #000; /* чёрный фон */
+  background-color: #000;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -143,30 +143,41 @@ body {
   }
 }
 </style>
-
-<div class="tv-container">
-  <div class="tv-screen">
-    <div class="static"></div>
-    <div class="error-text">
-        {% with lang=user.language|default:"English" %}
-            {% if lang == "English"|default:"English" %}
-                Not found
-            {% elif lang == "Українська" %}
-                Не знайдено
-            {% endif%}
-        {% endwith %}
+{% with lang=user.language|default:"English" %}
+  <div class="tv-container">
+    <div class="tv-screen">
+      <div class="static"></div>
+      <div class="error-text">
+        {% if lang == "English"|default:"English" %}
+            Not found
+        {% elif lang == "Українська" %}
+            Не знайдено
+        {% endif%}
+      </div>
     </div>
+    <div class="tv-stand"></div>
+      {% if lang == "English"|default:"English" %}
+      {% if user.username%}
+          <button class="menu-btn" onclick="window.location.href='{% url 'home' %}'">
+              Menu
+          </button>
+      {% else %}
+          <button class="menu-btn" onclick="window.location.href='{% url 'login' %}'">
+              Login
+          </button>
+      {% endif%}
+      {% elif lang == "Українська" %}
+        {% if user.username%}
+            <button class="menu-btn" onclick="window.location.href='{% url 'home' %}'">
+                Меню
+            </button>
+        {% else %}
+            <button class="menu-btn" onclick="window.location.href='{% url 'login' %}'">
+                Логин
+            </button>
+        {% endif%}
+      {% endif%}
   </div>
-  <div class="tv-stand"></div>
-    {% if user.username%}
-        <button class="menu-btn" onclick="window.location.href='{% url 'home' %}'">
-            Меню
-        </button>
-    {% else %}
-        <button class="menu-btn" onclick="window.location.href='{% url 'login' %}'">
-            Логин
-        </button>
-    {% endif%}
-</div>
+{% endwith %}
 
 {% endblock %}
