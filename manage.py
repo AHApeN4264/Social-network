@@ -4,11 +4,11 @@
 # python manage.py runserver 0.0.0.0:8000
 
 # создание ветки
-# git checkout -b add_other-profile_and_edit_more_and_Dockerfile
+# git checkout -b bag_fix_and_add_new_functions
 
 # git add .
-# git commit -m "add_other-profile_and_edit_more_and_Dockerfile"
-# git push -u origin add_other-profile_and_edit_more_and_Dockerfile
+# git commit -m "bag_fix_and_add_new_functions"
+# git push -u origin bag_fix_and_add_new_functions
 
 #!/usr/bin/env python
 
