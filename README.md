@@ -1,5 +1,5 @@
 ﻿Русский	
-Это сайт-мессенджер для обмена сообщениями, фотографиями и видео между пользователями, который включает следующие функции:	
+	Это сайт-мессенджер для обмена сообщениями, фотографиями и видео между пользователями, который включает следующие функции:	
     • Чаты и история чатов	
     • Профили пользователей с возможностью просмотра своего профиля и профилей других пользователей	
     • Кошелёк и конвертация валют	
@@ -27,3 +27,4 @@ This is a messenger website for exchanging messages, photos, and videos between 
     • Subscriptions: Bin+ — $4.99 or 199.99 UAH, and Bin Premium — $9.99 or 399.99 UAH
     • Theme customization: the free version includes white and dark themes, while subscriptions starting from Bin+ unlock additional pink and green themes
     • A security section where users can change their password by entering their current password
+
