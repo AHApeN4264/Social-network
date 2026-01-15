@@ -9,6 +9,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 APPEND_SLASH = False
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://chessglob.onrender.com",
+    "https://social-network-2-s2ka.onrender.com",
+]
+
 ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
