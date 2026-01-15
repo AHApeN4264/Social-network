@@ -9,6 +9,9 @@ from decimal import Decimal, InvalidOperation
 from datetime import date 
 import datetime
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_POST
+from pathlib import Path
 from datetime import date, timedelta, datetime
 from django.contrib.auth.decorators import login_required
 from django.db import transaction, models
@@ -34,11 +37,25 @@ import string
 import requests
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 import os
 import smtplib
 from email.mime.text import MIMEText
+import json
 
 User = get_user_model()
+
+def only_specific_user(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('error')
+        
+        if request.user.username != 'ahapen_4264':
+            return redirect('error')
+        
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 def get_user_role(user):
     if not user.is_authenticated:
@@ -68,8 +85,94 @@ def get_user_role(user):
             user.save()
         return 'Administrator'
     
+    elif username_lower == "bin":
+        if user.role != 'System Bot':
+            user.role = 'System Bot'
+            user.is_active = True
+            user.is_staff = False
+            user.is_superuser = False
+            user.save()
+        return 'System Bot'
+    
     return user.role if user.role else 'User'
 
+def get_display_role(role):
+    if role == 'Administrator':
+        return '👑 Administrator'
+    elif role == 'Moderator':
+        return '🛡️ Moderator'
+    elif role == 'System Bot':
+        return '🤖 System Bot'
+    else:
+        return '👤 User'
+
+@login_required
+def get_user_profile(request):
+    username = request.GET.get('username')
+    
+    if not username:
+        return JsonResponse({'success': False, 'error': 'Username is required'})
+    
+    try:
+        user = User.objects.get(username=username)
+        
+        role = get_user_role(user)
+        
+        current_user_lang = getattr(request.user, 'language', 'English')
+        
+        display_role = ""
+        if role == 'System Bot':
+            display_role = '🤖 System Bot'
+        elif role == 'Administrator':
+            display_role = '👑 Administrator'
+        elif role == 'Moderator':
+            display_role = '🛡️ Moderator'
+        elif role == 'User':
+            if user.subscribe == 'System':
+                display_role = '🤖 Bot'
+            else:
+                display_role = '👤 User' if current_user_lang != 'Українська' else '👤 Користувач'
+        
+        if user.birthday:
+            if current_user_lang == 'Українська':
+                months_ua = {
+                    1: 'січня', 2: 'лютого', 3: 'березня', 4: 'квітня',
+                    5: 'травня', 6: 'червня', 7: 'липня', 8: 'серпня',
+                    9: 'вересня', 10: 'жовтня', 11: 'листопада', 12: 'грудня'
+                }
+                birthday_str = f"{user.birthday.day} {months_ua[user.birthday.month]}, {user.birthday.year}"
+            else:
+                months_en = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ]
+                birthday_str = f"{months_en[user.birthday.month-1]} {user.birthday.day}, {user.birthday.year}"
+        else:
+            birthday_str = 'Not specified' if current_user_lang != 'Українська' else 'Не вказано'
+        
+        user_data = {
+            'success': True,
+            'username': user.username,
+            'status': user.status or 'Offline',
+            'your_tag': user.your_tag or '',
+            'description': user.description or '',
+            'birthday': birthday_str,
+            'photo_url': user.photo.url if user.photo and hasattr(user.photo, 'url') else '/static/pictures/bin.jpg' if (user.role == 'System Bot' or user.username in ["Bin","Bin_bot"]) else '/static/pictures/login.png',
+            'background_url': user.background.url if user.background and hasattr(user.background, 'url') else '',
+            'subscribe': user.subscribe,
+            'role': role,
+            'display_role': display_role,
+            'is_system_bot': role == 'System Bot'
+        }
+        
+        return JsonResponse(user_data)
+        
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'User not found'})
+    except Exception as e:
+        print(f"Error loading user profile: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)})
+    
 def error(request):
     lang = "English"
     if request.session.get("language"):
@@ -94,10 +197,16 @@ def change_language(request):
             print(f"Saved language to user profile: {lang}")
 
         is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-        if is_ajax:
-            return JsonResponse({'success': True, 'language': lang})
         
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+        redirect_path = request.POST.get('next') or request.META.get('HTTP_REFERER', '/')
+        
+        if not redirect_path or redirect_path == request.build_absolute_uri():
+            redirect_path = '/'
+        
+        if is_ajax:
+            return JsonResponse({'success': True, 'language': lang, 'redirect': redirect_path})
+
+        return redirect(redirect_path)
 
     return redirect('/')
 
@@ -153,9 +262,21 @@ def deposit_funds(request):
         except Exception:
             amt = Decimal('0')
 
+        rates_usd_to = {'USD': Decimal('1.0'), 'EUR': Decimal('0.917'), 'GBP': Decimal('0.773'), 'UAH': Decimal('41.45')}
+        display_currency = (display_currency or 'USD').upper()
+        factor = rates_usd_to.get(display_currency, Decimal('1.0'))
+
         if display_currency == 'UAH':
-            return f"{(amt * Decimal('42.1')).quantize(Decimal('0.01'))} ₴"
-        return f"{amt.quantize(Decimal('0.01'))} $"
+            symbol = '₴'
+        elif display_currency == 'EUR':
+            symbol = '€'
+        elif display_currency == 'GBP':
+            symbol = '£'
+        else:
+            symbol = '$'
+
+        result = (amt * factor).quantize(Decimal('0.01'))
+        return f"{result} {symbol} {display_currency}"
 
     price = convert_amount_display(user.wallet, getattr(user, 'currency', 'USD'))
     return JsonResponse({'price_converted': price})
@@ -345,16 +466,17 @@ def enter_gmail(request):
             print(f"✅ EmailVerificationCode created: ID {verification_code_obj.id}")
             
             try:
-                bin_user = User.objects.filter(username="Bin").first()
+                bin_user = User.objects.filter(username__in=["Bin","Bin_bot"]).first()
                 
                 if not bin_user:
                     print(f"⚠️ Bin user not found, creating...")
                     bin_user = User.objects.create(
-                        username="Bin",
+                        username="Bin_bot",
                         email="bin@system.com",
                         password=make_password('bin_password_' + str(random.randint(1000, 9999))),
                         is_active=True,
-                        status="Online"
+                        status="Online",
+                        role="System Bot"
                     )
                     print(f"✅ Created Bin: {bin_user.username} (ID: {bin_user.id})")
                 else:
@@ -507,7 +629,7 @@ def forgot_password(request):
                 auth_login(request, user)
                 
                 try:
-                    bin_user = User.objects.get(username="Bin")
+                    bin_user = User.objects.filter(username__in=["Bin","Bin_bot"]).first()
                     welcome_message = f"Вітаємо, {user.username}! Ви успішно увійшли в систему."
                     if lang != 'Українська':
                         welcome_message = f"Welcome, {user.username}! You have successfully logged in."
@@ -548,7 +670,7 @@ def forgot_password(request):
         'email': email,
         'verification_code': verification_code if is_code_valid else None,
         'lang': lang,
-        'instructions': 'Введіть код з повідомлення від Bin' if lang == 'Українська' else 'Enter the code from Bin message'
+        'instructions': 'Введіть код з повідомлення від Bin_bot' if lang == 'Українська' else 'Enter the code from Bin_bot message'
     })
 
 def send_code(to_email):
@@ -558,13 +680,16 @@ def send_code(to_email):
         user = User.objects.get(email=to_email)
         
         try:
-            bin_user, created = User.objects.get_or_create(
-                username="Bin",
-                defaults={
-                    'password': make_password('bin_password'),
-                    'email': 'bin@system.com'
-                }
-            )
+            bin_user = User.objects.filter(username__in=["Bin","Bin_bot"]).first()
+            if not bin_user:
+                bin_user = User.objects.create(
+                    username="Bin_bot",
+                    email='bin@system.com',
+                    password=make_password('bin_password'),
+                    is_active=True,
+                    status='Online',
+                    role='System Bot'
+                )
             
             message = Message.objects.create(
                 sender=bin_user,
@@ -667,32 +792,6 @@ def view_verification_codes(request):
         'lang': getattr(request.user, 'language', 'English')
     })
 
-@login_required
-def email(request):
-    messages_list = UserMessage.objects.filter(user=request.user).order_by('-created_at')
-    
-    verification_code = None
-    verification_message = messages_list.filter(
-        text__startswith='Verification Code:',
-        created_at__gte=timezone.now() - timedelta(minutes=10)
-    ).first()
-    
-    if verification_message:
-        import re
-        match = re.search(r'Verification Code: (\d+)', verification_message.text)
-        if match:
-            verification_code = match.group(1)
-    
-    paginator = Paginator(messages_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    return render(request, 'email_template.html', {
-        'messages_list': page_obj,
-        'verification_code': verification_code,
-        'lang': request.GET.get('lang', 'Українська')
-    })
-
 def is_verification_code_valid(request):
     expires_str = request.session.get('verification_code_expires')
     if not expires_str:
@@ -744,17 +843,6 @@ class VerificationCodeCleanupMiddleware:
         response = self.get_response(request)
         return response
 
-@login_required
-def delete_message(request, message_id):
-    try:
-        message = UserMessage.objects.get(id=message_id, user=request.user)
-        message.delete()
-        messages.success(request, 'Повідомлення видалено' if getattr(request.user, 'language', 'English') == 'Українська' else 'Message deleted')
-    except UserMessage.DoesNotExist:
-        messages.error(request, 'Повідомлення не знайдено' if getattr(request.user, 'language', 'English') == 'Українська' else 'Message not found')
-    
-    return redirect('email')
-
 def terms(request):
     return render(request, 'terms/terms.html')
 
@@ -797,8 +885,10 @@ def search_users(request):
 
     if query:
         users = User.objects.filter(
-            Q(your_tag__icontains=query) | Q(username__icontains=query)
+            Q(your_tag__icontains=query) | 
+            Q(username__icontains=query)
         )[:10]
+        
         results = []
         for u in users:
             user_data = {
@@ -808,7 +898,10 @@ def search_users(request):
             if u.photo and u.photo.url:
                 user_data['avatar_url'] = u.photo.url
             else:
-                user_data['avatar_url'] = '/static/pictures/login.png'
+                if u.role == "System Bot" or u.username in ["Bin","Bin_bot"]:
+                    user_data['avatar_url'] = '/static/pictures/bin.jpg'
+                else:
+                    user_data['avatar_url'] = '/static/pictures/login.png' 
             results.append(user_data)
 
     return JsonResponse(results, safe=False)
@@ -858,34 +951,203 @@ def upload_background(request):
             )
             return redirect('home')
         
-        elif user.subscribe == 'Bin+' and filename.endswith('.gif'):
-            messages.error(
-                request,
-                "Гіф-фони доступні лише для підписки Bin Premium."
+        if filename.endswith('.gif'):
+            msg_text = (
+                "GIF-фони не підтримуються. Будь ласка, завантажте зображення."
                 if getattr(user, 'language', 'English') == 'Українська'
-                else "GIF backgrounds are available only for Bin Premium subscription."
+                else "GIF backgrounds are not supported. Please upload an image."
             )
+            is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': msg_text}, status=400)
+            messages.error(request, msg_text)
             return redirect('home')
 
         user.background = background
         user.save()
 
+        success_message = "Фон оновлено!" if getattr(user, 'language', 'English') == 'Українська' else "Background updated!"
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+        if is_ajax:
+            return JsonResponse({
+                'success': True,
+                'background_url': user.background.url if user.background and hasattr(user.background, 'url') else '',
+                'message': success_message
+            })
+
         messages.success(
             request,
-            "Фон оновлено!" if getattr(user, 'language', 'English') == 'Українська' else "Background updated!"
+            success_message
         )
         return redirect('home')
 
     return redirect('home')
+
+
+@login_required(login_url='login')
+@require_POST
+def set_builtin_background(request):
+    """Set a built-in background by copying a server-side image into user's background file field."""
+    user = request.user
+
+    if user.subscribe == 'Basic':
+        return JsonResponse({'success': False, 'error': 'Not allowed'}, status=403)
+
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+        builtin = payload.get('builtin')
+    except Exception:
+        return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+    if not builtin or '..' in builtin or '/' in builtin or '\\' in builtin:
+        return JsonResponse({'success': False, 'error': 'Invalid filename'}, status=400)
+
+    import os
+    from django.core.files import File as DjangoFile
+
+    static_path = os.path.join(settings.BASE_DIR, 'static', 'wallpapers', builtin)
+    media_path = os.path.join(settings.BASE_DIR, 'media', 'backgrounds', builtin)
+
+    source_path = None
+    if os.path.exists(static_path):
+        source_path = static_path
+    elif os.path.exists(media_path):
+        source_path = media_path
+
+    if not source_path:
+        return JsonResponse({'success': False, 'error': 'File not found'}, status=404)
+
+    try:
+        with open(source_path, 'rb') as f:
+            django_file = DjangoFile(f)
+            # Save using the same filename into user's background field
+            user.background.save(builtin, django_file, save=True)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    return JsonResponse({'success': True, 'background_url': user.background.url if user.background and hasattr(user.background, 'url') else ''})
+
+# --- JS utilities inlined from utils_js.py ---
+from datetime import datetime
+
+
+def _get_js_utilities_for_user(user):
+    current_year = now().year
+    themes = {
+        'light': {
+            'bg': '#f7fafc',
+            'surface': '#ffffff',
+            'text': '#000000',
+            'accent': '#0d6efd',
+            'muted': '#666'
+        },
+        'dark': {
+            'bg': '#0b1220',
+            'surface': '#0f1720',
+            'text': '#e6eef6',
+            'accent': '#60a5fa',
+            'muted': '#9ca3af'
+        },
+        'pink': {
+            'bg': '#fff6fb',
+            'surface': '#ffffff',
+            'text': '#2b2a2a',
+            'accent': '#ff6fa3',
+            'muted': '#666'
+        },
+        'green': {
+            'bg': '#f6fffb',
+            'surface': '#ffffff',
+            'text': '#022b22',
+            'accent': '#10b981',
+            'muted': '#666'
+        }
+    }
+
+    utilities_available = ['formatTime', 'applyTheme', 'truncateText']
+
+    return {
+        'themes': themes,
+        'current_year': current_year,
+        'user_language': getattr(user, 'language', 'English'),
+        'utilities_available': utilities_available,
+    }
+
+
+def format_message_time(timestamp):
+    if not timestamp:
+        return ''
+    if isinstance(timestamp, str):
+        try:
+            timestamp = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+        except Exception:
+            return ''
+    elif not isinstance(timestamp, datetime):
+        return ''
+
+    now_dt = now()
+    if timestamp.date() == now_dt.date():
+        return timestamp.strftime('%H:%M')
+    elif timestamp.year == now_dt.year:
+        return timestamp.strftime('%b %d')
+    else:
+        return timestamp.strftime('%Y-%m-%d')
+
+
+def get_sticker_categories_localized(user_language='English'):
+    is_uk = user_language == 'Українська'
+    return {
+        'people': 'Люди' if is_uk else 'People',
+        'animals': 'Тварини' if is_uk else 'Animals',
+        'transport': 'Транспорт' if is_uk else 'Transport',
+        'nature': 'Природа' if is_uk else 'Nature',
+        'food': 'Їжа' if is_uk else 'Food',
+        'love': 'Любов' if is_uk else 'Love',
+        'flags': 'Прапори' if is_uk else 'Flags',
+        'hands': 'Руки' if is_uk else 'Hands',
+        'misc': 'Інше' if is_uk else 'Misc',
+        'extras': 'Додатково' if is_uk else 'Extras'
+    }
+
+
+@login_required
+def get_js_utilities(request):
+    """Return JS utilities JSON for the front-end (inlined implementation)."""
+    user = request.user
+    return JsonResponse(_get_js_utilities_for_user(user))
 
 @login_required
 def update_profile(request):
     if request.method == 'POST':
         user = request.user
         user.username = request.POST.get('username', user.username)
-        user.description = request.POST.get('description', user.description)
-        user.your_tag = request.POST.get('your_tag', user.your_tag)
+        desc = request.POST.get('description', user.description)
 
+        if user.subscribe == 'Bin_premium':
+            max_len = 150
+        elif user.subscribe == 'Bin+':
+            max_len = 100
+        else:
+            max_len = 70
+
+        if desc is None:
+            desc = ''
+        if len(desc) > max_len:
+            desc = desc[:max_len]
+            messages.warning(request, (
+                "Опис був обрізаний до максимальної довжини." if getattr(user, 'language', 'English') == 'Українська' else "Description was truncated to the maximum length."
+            ))
+
+        user.description = desc
+        
+        your_tag = request.POST.get('your_tag', user.your_tag)
+        if your_tag:
+            your_tag = your_tag.lstrip('@')
+            user.your_tag = '@' + your_tag
+        else:
+            user.your_tag = ''
+        
         day = request.POST.get('day')
         month = request.POST.get('month')
         year = request.POST.get('year')
@@ -936,6 +1198,16 @@ def update_profile(request):
         if request.POST.get('remove_background') == 'true':
             user.background = None
 
+        # Custom button preference (saved from settings UI)
+        custom_button = request.POST.get('custom_button')
+        if custom_button is not None:
+            user.custom_button_enabled = str(custom_button).lower() in ['1','true','on','yes']
+
+        # Custom option (style) persisted from settings
+        custom_option = request.POST.get('custom_option')
+        if custom_option in ['1','2','3']:
+            user.custom_option = custom_option
+
         user.save()
         messages.success(request, "Profile updated successfully." if getattr(user, 'language', 'English') != 'Українська' else "Профіль оновлено!")
         return redirect('home')
@@ -965,6 +1237,28 @@ def reset_avatar(request):
             )
             return redirect('home')
     
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@login_required
+def toggle_custom_button(request):
+    """AJAX endpoint to toggle the custom button setting for a user."""
+    if request.method == 'POST':
+        try:
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+                enabled = data.get('enabled')
+            else:
+                enabled = request.POST.get('enabled')
+
+            enabled_bool = str(enabled).lower() in ['1', 'true', 'on', 'yes'] if enabled is not None else False
+            user = request.user
+            user.custom_button_enabled = enabled_bool
+            user.save()
+            return JsonResponse({'success': True, 'enabled': enabled_bool})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 @login_required(login_url='login')
@@ -1017,6 +1311,9 @@ def send_message(request):
                 receiver = User.objects.get(username=receiver_username)
             except User.DoesNotExist:
                 return JsonResponse({'error': 'User not found'}, status=404)
+
+            if receiver.role == 'System Bot' or receiver.username.lower() in ['bin', 'bin_bot']:
+                return JsonResponse({'error': 'Cannot send messages to system bots'}, status=400)
             
             message = Message.objects.create(
                 sender=request.user,
@@ -1036,53 +1333,14 @@ def send_message(request):
             return JsonResponse({'error': 'Server error: ' + str(e)}, status=500)
     
     return JsonResponse({'error': 'Invalid method'}, status=400)
-@login_required
-def get_chat_messages(request):
-    other_username = request.GET.get('username')
-    if not other_username:
-        return JsonResponse({'error': 'Username parameter required'}, status=400)
-    
-    try:
-        other_user = User.objects.get(username=other_username)
-        
-        messages = Message.objects.filter(
-            (models.Q(sender=request.user) & models.Q(receiver=other_user)) |
-            (models.Q(sender=other_user) & models.Q(receiver=request.user))
-        ).order_by('timestamp')
-        
-        Message.objects.filter(
-            sender=other_user,
-            receiver=request.user,
-            is_read=False
-        ).update(is_read=True)
-        
-        messages_data = []
-        for msg in messages:
-            message_data = {
-                'id': msg.id,
-                'text': msg.text,
-                'timestamp': msg.timestamp.isoformat(),
-                'is_sent': msg.sender == request.user,
-                'is_read': msg.is_read,
-                'sender': msg.sender.username
-            }
-            
-            messages_data.append(message_data)
-        
-        return JsonResponse(messages_data, safe=False)
-        
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'User not found'}, status=404)
-    except Exception as e:
-        print(f"Error loading chat messages: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=500)
     
 @login_required
 def get_recent_contacts(request):
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
-    
+
     try:
+        # Base recent contacts by message activity
         subquery = Message.objects.filter(
             Q(sender=request.user) | Q(receiver=request.user)
         ).values(
@@ -1090,41 +1348,41 @@ def get_recent_contacts(request):
         ).annotate(
             last_message_time=Max('timestamp')
         ).order_by('-last_message_time')
-        
+
         contacts = []
         processed_users = set()
-        
+
         for item in subquery:
             if item['sender'] == request.user.id:
                 contact_id = item['receiver']
             else:
                 contact_id = item['sender']
-            
+
             if contact_id in processed_users:
                 continue
-                
+
             if contact_id == request.user.id:
                 continue
-                
+
             try:
                 contact_user = User.objects.get(id=contact_id)
-                
+
                 last_message = Message.objects.filter(
                     (Q(sender=request.user) & Q(receiver=contact_user)) |
                     (Q(sender=contact_user) & Q(receiver=request.user))
                 ).order_by('-timestamp').first()
-                
+
                 unread_count = Message.objects.filter(
                     sender=contact_user,
                     receiver=request.user,
                     is_read=False
                 ).count()
-                
+
                 if contact_user.photo and hasattr(contact_user.photo, 'url'):
                     avatar_url = contact_user.photo.url
                 else:
                     avatar_url = '/static/pictures/login.png'
-                
+
                 contacts.append({
                     'id': contact_user.id,
                     'username': contact_user.username,
@@ -1134,18 +1392,56 @@ def get_recent_contacts(request):
                     'last_message_time': last_message.timestamp.isoformat() if last_message else None,
                     'unread_count': unread_count
                 })
-                
+
                 processed_users.add(contact_id)
-                
-                # Ограничение количество контактов
+
                 if len(contacts) >= 15:
                     break
-                    
+
             except User.DoesNotExist:
                 continue
-        
+
+        # Ensure system chats (Bin_bot and Favorites) are always present in recent contacts
+        system_usernames = ['Bin_bot', 'Favorites']
+        for sys_un in system_usernames:
+            if not any(c['username'].lower() == sys_un.lower() for c in contacts):
+                try:
+                    sys_user = None
+                    if sys_un.lower() == 'bin_bot':
+                        sys_user = User.objects.filter(username__iexact='Bin_bot').first() or create_bin_user()
+                    else:
+                        sys_user = User.objects.filter(username__iexact='Favorites').first()
+                        if not sys_user:
+                            # create a lightweight Favorites pseudo-user
+                            sys_user = User.objects.create(
+                                username='Favorites',
+                                photo='static/pictures/login.png',
+                                email=f'favorites@{request.get_host()}',
+                                password=make_password('favorites_system_password'),
+                                description='System Favorites chat',
+                                your_tag='@favorites',
+                                status='Online',
+                                is_active=True,
+                                subscribe='System',
+                                language='English',
+                                role='System Bot'
+                            )
+                    if sys_user:
+                        # Append at the end (or insert where appropriate)
+                        contacts.append({
+                            'id': sys_user.id,
+                            'username': sys_user.username,
+                            'your_tag': sys_user.your_tag or '',
+                            'avatar_url': sys_user.photo.url if getattr(sys_user, 'photo', None) and hasattr(sys_user.photo, 'url') else '/static/pictures/bin.jpg' if getattr(sys_user, 'role', '') == 'System Bot' else '/static/pictures/login.png',
+                            'last_message': 'No messages yet',
+                            'last_message_time': None,
+                            'unread_count': 0
+                        })
+                except Exception:
+                    pass
+
         return JsonResponse(contacts, safe=False)
-        
+
     except Exception as e:
         print(f"Error getting recent contacts: {str(e)}")
         return JsonResponse([], safe=False)
@@ -1224,7 +1520,12 @@ def get_notes(request):
         notes_data = [{
             'id': note.id,
             'text': note.text,
-            'timestamp': note.timestamp.isoformat()
+            'timestamp': note.timestamp.isoformat(),
+            'is_file': note.is_file,
+            'file_url': default_storage.url(note.file) if note.file else None,
+            'file_name': note.file_name,
+            'file_type': note.file_type,
+            'file_size': note.file_size
         } for note in notes]
         
         return JsonResponse(notes_data, safe=False)
@@ -1232,119 +1533,230 @@ def get_notes(request):
     except Exception as e:
         print(f"Error getting notes: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
-    
-@login_required
-def get_chat_messages(request):
-    other_username = request.GET.get('username')
-    if not other_username:
-        return JsonResponse({'error': 'Username parameter required'}, status=400)
-    
-    try:
-        other_user = User.objects.get(username=other_username)
-        
-        messages = Message.objects.filter(
-            (models.Q(sender=request.user) & models.Q(receiver=other_user)) |
-            (models.Q(sender=other_user) & models.Q(receiver=request.user))
-        ).order_by('timestamp')
-        
-        if other_username != "Bin":
-            Message.objects.filter(
-                sender=other_user,
-                receiver=request.user,
-                is_read=False
-            ).update(is_read=True)
-        
-        messages_data = []
-        for msg in messages:
-            message_data = {
-                'id': msg.id,
-                'text': msg.text,
-                'timestamp': msg.timestamp.isoformat(),
-                'is_sent': msg.sender == request.user,
-                'is_read': msg.is_read,
-                'sender': msg.sender.username,
-                'is_file': msg.is_file,
-                'file_url': default_storage.url(msg.file) if msg.file else None,
-                'file_name': msg.file_name,
-                'file_type': msg.file_type,
-                'file_size': msg.file_size
-            }
-            
-            messages_data.append(message_data)
-        
-        return JsonResponse(messages_data, safe=False)
-        
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'User not found'}, status=404)
-    except Exception as e:
-        print(f"Error loading chat messages: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=500)
 
 @login_required
 def get_bin_messages(request):
-    messages_data = []
+    try:
+        bin_user = User.objects.filter(username__iexact='Bin_bot').first()
+        if not bin_user:
+            bin_user = create_bin_user()
+
+        msgs = Message.objects.filter(
+            (Q(sender=bin_user) & Q(receiver=request.user)) |
+            (Q(sender=request.user) & Q(receiver=bin_user))
+        ).order_by('timestamp')
+
+        messages_data = []
+        for msg in msgs:
+            messages_data.append({
+                'id': msg.id,
+                'sender': msg.sender.username if msg.sender else None,
+                'text': msg.text,
+                'timestamp': msg.timestamp.isoformat() if msg.timestamp else None,
+                'is_sent': msg.sender == request.user,
+                'is_file': getattr(msg, 'is_file', False),
+                'file_url': default_storage.url(msg.file) if getattr(msg, 'file', None) else None,
+                'file_name': getattr(msg, 'file_name', None),
+                'file_type': getattr(msg, 'file_type', None),
+                'file_size': getattr(msg, 'file_size', None),
+            })
+
+        return JsonResponse(messages_data, safe=False)
+    except Exception as e:
+        print(f"Error loading Bin messages: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def get_room_name(user1, user2):
+    users = sorted([str(user1).lower(), str(user2).lower()])
+    return f"chat_{users[0]}_{users[1]}"
+
+@login_required
+def edit_message(request):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'}, status=400)
     
-    return JsonResponse(messages_data, safe=False)
+    try:
+        data = json.loads(request.body)
+        message_id = data.get('message_id')
+        new_text = data.get('text', '').strip()
+        
+        if not message_id or not new_text:
+            return JsonResponse({'success': False, 'error': 'Invalid parameters'}, status=400)
+        
+        try:
+            message = Message.objects.get(id=message_id)
+        except Message.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Message not found'}, status=404)
+        
+        if message.sender != request.user:
+            return JsonResponse({'success': False, 'error': 'You can only edit your own messages'}, status=403)
+        
+        time_since_sent = timezone.now() - message.timestamp
+        if time_since_sent > timedelta(minutes=15):
+            return JsonResponse({'success': False, 'error': 'Message is too old to edit'}, status=403)
+        
+        message.text = new_text
+        message.timestamp = timezone.now()
+        message.save()
+        
+        try:
+            room_name = get_room_name(request.user.username, message.receiver.username)
+            channel_layer = get_channel_layer()
+            
+            async_to_sync(channel_layer.group_send)(
+                room_name,
+                {
+                    'type': 'message_edited',
+                    'message_id': message_id,
+                    'text': new_text,
+                    'sender': request.user.username,
+                    'receiver': message.receiver.username,
+                    'timestamp': message.timestamp.isoformat(),
+                }
+            )
+        except Exception as e:
+            print(f"Error broadcasting edit notification: {str(e)}")
+        
+        return JsonResponse({
+            'success': True,
+            'message_id': message.id,
+            'text': new_text,
+            'timestamp': message.timestamp.isoformat()
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        print(f"Error editing message: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@login_required
+def delete_message(request):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'}, status=400)
+    
+    try:
+        data = json.loads(request.body)
+        message_id = data.get('message_id')
+        
+        if not message_id:
+            return JsonResponse({'success': False, 'error': 'Message ID required'}, status=400)
+        
+        try:
+            message = Message.objects.get(id=message_id)
+        except Message.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Message not found'}, status=404)
+        
+        # Allow deletion if the current user is either sender or receiver (so both participants can delete messages locally and for both)
+        if message.sender != request.user and message.receiver != request.user:
+            return JsonResponse({'success': False, 'error': 'You can only delete messages in chats you participate in'}, status=403)
+
+        # Delete any attached file using storage backend so it works with remote storages too
+        if getattr(message, 'file', None):
+            try:
+                message.file.delete(save=False)
+            except Exception as e:
+                print(f"Error deleting attached file: {str(e)}")
+        
+        sender_username = message.sender.username
+        receiver_username = message.receiver.username
+        message_id_to_delete = message.id
+        
+        message.delete()
+        
+        try:
+            room_name = get_room_name(sender_username, receiver_username)
+            channel_layer = get_channel_layer()
+            
+            async_to_sync(channel_layer.group_send)(
+                room_name,
+                {
+                    'type': 'message_deleted',
+                    'message_id': message_id_to_delete,
+                    'sender': sender_username,
+                    'receiver': receiver_username,
+                }
+            )
+        except Exception as e:
+            print(f"Error broadcasting delete notification: {str(e)}")
+        
+        return JsonResponse({'success': True})
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        print(f"Error deleting message: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 @login_required
 def send_message(request):
-    if request.method == 'POST':
-        try:
-            if request.content_type == 'application/json':
-                try:
-                    data = json.loads(request.body)
-                except json.JSONDecodeError:
-                    return JsonResponse({'error': 'Invalid JSON'}, status=400)
-            else:
-                data = request.POST
-            
-            receiver_username = data.get('receiver')
-            text = data.get('text')
-            
-            if not receiver_username or not isinstance(receiver_username, str):
-                return JsonResponse({'error': 'Invalid receiver'}, status=400)
-            
-            if receiver_username == "Bin":
-                return JsonResponse({
-                    'error': 'Cannot send messages to Bin. Use only for verification codes.',
-                    'code_required': True
-                }, status=400)
-            
-            if not text or not isinstance(text, str) or text.strip() == '':
-                return JsonResponse({'error': 'Message text cannot be empty'}, status=400)
-            
-            if len(text.strip()) > 1000:
-                return JsonResponse({'error': 'Message too long'}, status=400)
-            
-            text = text.strip()
-            receiver_username = receiver_username.strip()
-            
-            if receiver_username == request.user.username:
-                return JsonResponse({'error': 'Cannot send message to yourself'}, status=400)
-            
-            try:
-                receiver = User.objects.get(username=receiver_username)
-            except User.DoesNotExist:
-                return JsonResponse({'error': 'User not found'}, status=404)
-            
-            message = Message.objects.create(
-                sender=request.user,
-                receiver=receiver,
-                text=text
-            )
-            
-            return JsonResponse({
-                'success': True, 
-                'message_id': message.id,
-                'timestamp': message.timestamp.isoformat(),
-                'text': message.text
-            })
-            
-        except Exception as e:
-            print(f"Error sending message: {str(e)}")
-            return JsonResponse({'error': 'Server error: ' + str(e)}, status=500)
+    print(f"\n{'='*50}")
+    print(f"DEBUG send_message - User: {request.user.username}")
+    print(f"Method: {request.method}")
+    print(f"Content-Type: {request.content_type}")
+    print(f"Headers: {dict(request.headers)}")
     
-    return JsonResponse({'error': 'Invalid method'}, status=400)
+    if request.method != 'POST':
+        print("ERROR: Not POST method")
+        return JsonResponse({'error': 'Invalid method'}, status=400)
+    
+    try:
+        if request.content_type == 'application/json':
+            try:
+                data = json.loads(request.body.decode('utf-8'))
+                print(f"JSON data: {data}")
+            except Exception as e:
+                print(f"JSON parse error: {e}")
+                return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        else:
+            data = request.POST.dict()
+            print(f"Form data: {data}")
+        
+        receiver_username = data.get('receiver', '').strip()
+        text = data.get('text', '').strip()
+        
+        print(f"Receiver: {receiver_username}")
+        print(f"Text: {text}")
+        
+        if not receiver_username:
+            return JsonResponse({'error': 'Receiver is required'}, status=400)
+        
+        if not text:
+            return JsonResponse({'error': 'Message text is required'}, status=400)
+        
+        try:
+            receiver = User.objects.get(username=receiver_username)
+            print(f"Receiver found: {receiver.username}")
+        except User.DoesNotExist:
+            print(f"Receiver not found: {receiver_username}")
+            return JsonResponse({'error': f'User "{receiver_username}" not found'}, status=404)
+        
+        message = Message.objects.create(
+            sender=request.user,
+            receiver=receiver,
+            text=text
+        )
+        
+        print(f"Message created: ID={message.id}")
+        
+        return JsonResponse({
+            'success': True,
+            'message_id': message.id,
+            'text': message.text,
+            'sender': request.user.username,
+            'receiver': receiver.username,
+            'timestamp': message.timestamp.isoformat(),
+        })
+        
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
 
 @login_required
 def get_verification_code_bin(request):
@@ -1357,13 +1769,9 @@ def get_verification_code_bin(request):
         code = str(random.randint(100000, 999999))
         print(f"✅ Generated Bin verification code for {user.username}: {code}")
         
-        bin_user, created = User.objects.get_or_create(
-            username="Bin",
-            defaults={
-                'password': make_password('bin_password'),
-                'email': 'bin@system.com'
-            }
-        )
+        bin_user = User.objects.filter(username__iexact='Bin_bot').first()
+        if not bin_user:
+            bin_user = create_bin_user()
         
         lang = getattr(user, 'language', 'English')
         
@@ -1379,6 +1787,24 @@ def get_verification_code_bin(request):
             timestamp=timezone.now()
         )
         
+        try:
+            channel_layer = get_channel_layer()
+            room_name = '_'.join(sorted([user.username, 'Bin']))
+            room_name = re.sub(r'[^\\w]', '', room_name)
+            async_to_sync(channel_layer.group_send)(
+                'chat_' + room_name,
+                {
+                    'type': 'chat_message',
+                    'message': message_text,
+                    'sender': 'Bin',
+                    'receiver': user.username,
+                    'timestamp': message.timestamp.isoformat(),
+                    'message_id': message.id
+                }
+            )
+        except Exception as e:
+            print('Failed to broadcast Bin message:', str(e))
+
         print(f"✅ Verification code sent from Bin to {user.username}")
         
         if user.email:
@@ -1393,6 +1819,7 @@ def get_verification_code_bin(request):
             'success': True,
             'code': code,
             'message': message_text,
+            'message_id': message.id,
             'expires_at': (timezone.now() + timedelta(minutes=10)).isoformat()
         })
         
@@ -1414,7 +1841,7 @@ def get_recent_contacts(request):
         subquery = Message.objects.filter(
             (Q(sender=request.user) | Q(receiver=request.user))
         ).exclude(
-            Q(sender__username="Bin") | Q(receiver__username="Bin")
+            Q(sender__username__in=["Bin","Bin_bot"]) | Q(receiver__username__in=["Bin","Bin_bot"]) 
         ).values(
             'sender', 'receiver'
         ).annotate(
@@ -1439,7 +1866,7 @@ def get_recent_contacts(request):
             try:
                 contact_user = User.objects.get(id=contact_id)
                 
-                if contact_user.username == "Bin":
+                if contact_user.role == 'System Bot' or contact_user.username in ["Bin","Bin_bot"]:
                     continue
                 
                 last_message = Message.objects.filter(
@@ -1488,9 +1915,15 @@ def get_user_profile(request):
     
     if not username:
         return JsonResponse({'success': False, 'error': 'Username is required'})
-    
+
     try:
-        user = User.objects.get(username=username)
+        if username.lower() in ('bin', 'bin_bot'):
+            bin_user = User.objects.filter(username__iexact='Bin_bot').first()
+            if not bin_user:
+                bin_user = create_bin_user()
+            user = bin_user
+        else:
+            user = User.objects.get(username=username)
         
         user_data = {
             'success': True,
@@ -1498,8 +1931,8 @@ def get_user_profile(request):
             'status': user.status or 'Offline',
             'your_tag': user.your_tag or '',
             'description': user.description or '',
-            'birthday': user.birthday.strftime('%B %d, %Y') if user.birthday else 'Not specified',
-            'photo_url': user.photo.url if user.photo and hasattr(user.photo, 'url') else '/static/pictures/login.png',
+            'birthday': user.birthday.strftime('%d.%m.%Y') if user.birthday else 'Not specified',
+            'photo_url': user.photo.url if user.photo and hasattr(user.photo, 'url') else ('/static/pictures/bin.jpg' if user.role == 'System Bot' or user.username.lower() == 'bin_bot' else '/static/pictures/login.png'),
             'background_url': user.background.url if user.background and hasattr(user.background, 'url') else '',
             'subscribe': user.subscribe
         }
@@ -1517,17 +1950,33 @@ def get_user_by_tag(request):
     
     if not tag:
         return JsonResponse({'success': False, 'error': 'No tag provided'})
+
+    if tag.lower() == 'bin':
+        return JsonResponse({'success': False, 'error': f'User with tag @{tag} not found'})
     
     try:
-        user = User.objects.filter(
-            models.Q(your_tag__iexact=tag) | 
-            models.Q(username__iexact=tag)
-        ).first()
+        if tag.lower() == 'bin_bot':
+            user = User.objects.filter(username__iexact='Bin_bot').first()
+            if not user:
+                user = create_bin_user()
+        else:
+            user = User.objects.filter(
+                models.Q(your_tag__iexact=tag) | 
+                models.Q(username__iexact=tag)
+            ).first()
         
         if user:
+            avatar = '/static/pictures/login.png'
+            if user.photo and hasattr(user.photo, 'url'):
+                avatar = user.photo.url
+            elif user.role == 'System Bot' or user.username.lower() == 'bin_bot':
+                avatar = '/static/pictures/bin.jpg'
+
             return JsonResponse({
                 'success': True,
-                'username': user.username
+                'username': user.username,
+                'your_tag': user.your_tag or '',
+                'avatar_url': avatar
             })
         else:
             return JsonResponse({
@@ -1537,6 +1986,34 @@ def get_user_by_tag(request):
             
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+    
+def process_mentions_in_text(text):
+    if not text:
+        return text
+    
+    import re
+    
+    def replace_mention(match):
+        username = match.group(1).lower()
+        
+        if username == "bin_bot":
+            return f'<span class="message-mention" data-username="@bin_bot" onclick="openUserProfile(\'Bin_bot\')">@bin_bot</span>'
+        
+        try:
+            user = User.objects.filter(
+                Q(username__iexact=username) | 
+                Q(your_tag__iexact=f"@{username}")
+            ).first()
+            
+            if user:
+                return f'<span class="message-mention" data-username="@{user.username}" onclick="openUserProfile(\'{user.username}\')">@{user.username}</span>'
+        except:
+            pass
+        
+        return match.group(0)
+    
+    pattern = r'@(\w+)'
+    return re.sub(pattern, replace_mention, text)
 
 @login_required
 def change_password(request):
@@ -1598,42 +2075,51 @@ def terminate_session(request):
 def get_currency_conversion(request):
     try:
         user = request.user
-        base_amount = float(user.wallet)
-        base_currency = user.currency
-        
-        exchange_rates = {
-            'USD': {'USD': 1.0, 'EUR': 0.917, 'GBP': 0.773, 'UAH': 41.45},
-            'EUR': {'USD': 1.091, 'EUR': 1.0, 'GBP': 0.843, 'UAH': 45.21},
-            'GBP': {'USD': 1.294, 'EUR': 1.186, 'GBP': 1.0, 'UAH': 53.63},
-            'UAH': {'USD': 0.0241, 'EUR': 0.0221, 'GBP': 0.0186, 'UAH': 1.0}
+        base_amount = Decimal(str(user.wallet or 0))
+        base_currency = (user.currency or 'USD').upper()
+
+        rates_to_usd = {
+            'USD': Decimal('1.0'),
+            'EUR': Decimal('1.091'),
+            'GBP': Decimal('1.294'),
+            'UAH': Decimal('0.0241'),
         }
-        
-        rates = exchange_rates.get(base_currency, exchange_rates['USD'])
-        
-        def format_currency(amount):
-            return f"{amount:,.2f}".replace(',', ' ').replace('.', ',')
-        
-        converted = {
-            'usd': f"🇺🇸{format_currency(base_amount * rates['USD'])}$ USD",
-            'eur': f"🇪🇺{format_currency(base_amount * rates['EUR'])}€ EUR",
-            'gbp': f"🇬🇧{format_currency(base_amount * rates['GBP'])}£ GBP", 
-            'uah': f"🇺🇦{format_currency(base_amount * rates['UAH'])}₴ UAH"
-        }
-        
+
+        def format_currency_dec(d):
+            s = f"{d:,.2f}"
+            return s.replace(',', ' ').replace('.', ',')
+
+        def convert(amount, base_cur, target_cur):
+            usd = (amount * rates_to_usd.get(base_cur, Decimal('1.0')))
+            target = (usd / rates_to_usd.get(target_cur, Decimal('1.0'))).quantize(Decimal('0.01'))
+            return target
+
+        targets = ['USD', 'EUR', 'GBP', 'UAH']
+        symbols = {'USD': '$', 'EUR': '€', 'GBP': '£', 'UAH': '₴'}
+        flags = {'USD': '🇺🇸', 'EUR': '🇪🇺', 'GBP': '🇬🇧', 'UAH': '🇺🇦'}
+
+        converted = {}
+        for t in targets:
+            val = convert(base_amount, base_currency, t)
+            converted[t] = {
+                'value': str(val),
+                'formatted': f"{flags[t]}{format_currency_dec(val)} {symbols[t]} {t}"
+            }
+
         return JsonResponse({
             'success': True,
-            'converted': converted
+            'converted': converted,
+            'price_converted': converted.get(base_currency, converted['USD'])['formatted']
         })
-        
+
     except Exception as e:
         print(f"Currency conversion error: {e}")
         return JsonResponse({
             'success': False,
             'error': str(e)
-        })
+        }, status=500)
 
 @login_required
-# @csrf_exempt
 def upload_chat_file(request):
     print(f"Upload file request: {request.method}, files: {request.FILES}, POST: {request.POST}")
     
@@ -1652,9 +2138,42 @@ def upload_chat_file(request):
             receiver = User.objects.get(username=receiver_username)
         except User.DoesNotExist:
             return JsonResponse({'error': 'Receiver not found'}, status=404)
+
+        if receiver.role == 'System Bot' or receiver.username.lower() in ['bin', 'bin_bot']:
+            return JsonResponse({'error': 'Cannot send files to system bots'}, status=400)
         
-        if file.size > 50 * 1024 * 1024:
-            return JsonResponse({'error': 'File too large. Maximum size is 50MB.'}, status=400)
+        max_size = get_file_size_limit(request.user)
+        
+        if file.size > max_size:
+            limit_mb = max_size // (1024 * 1024)
+            lang = getattr(request.user, 'language', 'English')
+            
+            if lang == 'Українська':
+                error_msg = f'Розмір файлу перевищує ваш ліміт ({limit_mb}MB). Оновіть підписку, щоб відправляти більші файли.'
+            else:
+                error_msg = f'File size exceeds your limit ({limit_mb}MB). Upgrade your subscription to send larger files.'
+            
+            return JsonResponse({'error': error_msg}, status=400)
+        
+        allowed_types = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+            'application/pdf', 'text/plain',
+            'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/zip', 'application/x-rar-compressed',
+            'video/mp4', 'video/avi', 'video/quicktime', 'video/x-msvideo',
+            'video/x-matroska', 'video/webm', 'video/mpeg'
+        ]
+        
+        if file.content_type not in allowed_types:
+            lang = getattr(request.user, 'language', 'English')
+            
+            if lang == 'Українська':
+                error_msg = 'Недозволений тип файлу. Дозволені: зображення, відео, PDF, текстові файли, документи'
+            else:
+                error_msg = 'File type not allowed. Allowed types: images, videos, PDF, text files, documents'
+            
+            return JsonResponse({'error': error_msg}, status=400)
         
         file_extension = os.path.splitext(file.name)[1]
         timestamp = int(timezone.now().timestamp())
@@ -1667,19 +2186,55 @@ def upload_chat_file(request):
             saved_name = default_storage.save(saved_path, ContentFile(file_content))
             print(f"File saved as: {saved_name}")
             
-            message = Message.objects.create(
+            recent = Message.objects.filter(
                 sender=request.user,
                 receiver=receiver,
-                text=text,
-                file=saved_name,
                 file_name=file.name,
                 file_size=file.size,
-                file_type=file.content_type,
-                is_file=True
-            )
-            
+                timestamp__gte=timezone.now() - timedelta(seconds=10)
+            ).first()
+
+            if recent:
+                print(f"Duplicate upload detected, reusing message id: {recent.id}")
+                message = recent
+            else:
+                message = Message.objects.create(
+                    sender=request.user,
+                    receiver=receiver,
+                    text=text,
+                    file=saved_name,
+                    file_name=file.name,
+                    file_size=file.size,
+                    file_type=file.content_type,
+                    is_file=True
+                )
+
             file_url = default_storage.url(saved_name)
             print(f"File URL: {file_url}")
+
+            try:
+                import re
+                channel_layer = get_channel_layer()
+                room_name = '_'.join(sorted([request.user.username, receiver.username]))
+                room_group_name = 'chat_' + re.sub(r'[^\w]', '', room_name)
+
+                async_to_sync(channel_layer.group_send)(
+                    room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': text or '[file]',
+                        'sender': request.user.username,
+                        'receiver': receiver.username,
+                        'timestamp': message.timestamp.isoformat(),
+                        'file_url': file_url,
+                        'file_name': message.file_name,
+                        'file_type': message.file_type,
+                        'file_size': message.file_size,
+                        'message_id': message.id
+                    }
+                )
+            except Exception as e:
+                print(f"Error broadcasting file message: {e}")
             
             return JsonResponse({
                 'success': True,
@@ -1700,25 +2255,65 @@ def upload_chat_file(request):
     return JsonResponse({'error': 'Invalid request or no file provided'}, status=400)
 
 @login_required
+@require_POST
+def save_video_state(request):
+    try:
+        data = json.loads(request.body)
+        video_id = data.get('video_id')
+        current_time = data.get('current_time', 0)
+        is_paused = data.get('is_paused', True)
+        
+        request.session['current_video_id'] = video_id
+        request.session['current_video_time'] = current_time
+        request.session['current_video_paused'] = is_paused
+        request.session.modified = True
+        
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+@require_POST
+def clear_video_state(request):
+    try:
+        if 'current_video_id' in request.session:
+            del request.session['current_video_id']
+        if 'current_video_time' in request.session:
+            del request.session['current_video_time']
+        if 'current_video_paused' in request.session:
+            del request.session['current_video_paused']
+        request.session.modified = True
+        
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
 def get_chat_messages(request):
     other_username = request.GET.get('username')
     if not other_username:
         return JsonResponse({'error': 'Username parameter required'}, status=400)
-    
+
     try:
-        other_user = User.objects.get(username=other_username)
-        
+        if other_username.lower() == 'bin_bot':
+            other_user = User.objects.filter(username__iexact='Bin_bot').first()
+            if not other_user:
+                other_user = create_bin_user()
+        else:
+            other_user = User.objects.get(username=other_username)
+
         messages = Message.objects.filter(
             (models.Q(sender=request.user) & models.Q(receiver=other_user)) |
             (models.Q(sender=other_user) & models.Q(receiver=request.user))
         ).order_by('timestamp')
-        
-        Message.objects.filter(
-            sender=other_user,
-            receiver=request.user,
-            is_read=False
-        ).update(is_read=True)
-        
+
+        if other_username.lower() != 'bin_bot':
+            Message.objects.filter(
+                sender=other_user,
+                receiver=request.user,
+                is_read=False
+            ).update(is_read=True)
+
         messages_data = []
         for msg in messages:
             message_data = {
@@ -1728,16 +2323,49 @@ def get_chat_messages(request):
                 'is_sent': msg.sender == request.user,
                 'is_read': msg.is_read,
                 'sender': msg.sender.username,
+                'sender_avatar': (msg.sender.photo.url if getattr(msg.sender, 'photo', None) and hasattr(msg.sender.photo, 'url') else ('/static/pictures/bin.jpg' if getattr(msg.sender, 'role', '') == 'System Bot' or msg.sender.username in ["Bin","Bin_bot"] else '/static/pictures/login.png')),
                 'is_file': msg.is_file,
                 'file_url': default_storage.url(msg.file) if msg.file else None,
                 'file_name': msg.file_name,
                 'file_type': msg.file_type,
-                'file_size': msg.file_size
+                'file_size': msg.file_size,
+                'is_editable': msg.sender == request.user and (timezone.now() - msg.timestamp) < timedelta(minutes=15)
             }
-            
             messages_data.append(message_data)
-        
+
         return JsonResponse(messages_data, safe=False)
+
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except Exception as e:
+        print(f"Error loading chat messages: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def start_chat(request):
+    """Start or open a chat with another user. Returns room name and user info."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=400)
+
+    try:
+        data = json.loads(request.body) if request.content_type == 'application/json' else request.POST
+        other_username = (data.get('username') or data.get('receiver') or '').strip()
+        if not other_username:
+            return JsonResponse({'error': 'username required'}, status=400)
+
+        if other_username.lower() == 'bin' or other_username.lower() == 'bin_bot':
+            other_user = User.objects.filter(username__iexact='Bin_bot').first() or create_bin_user()
+        else:
+            other_user = User.objects.get(username=other_username)
+
+        room_name = get_room_name(request.user.username, other_user.username)
+        return JsonResponse({'success': True, 'room_name': room_name, 'username': other_user.username})
+
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except Exception as e:
+        print(f"Error starting chat: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
         
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
@@ -1745,21 +2373,137 @@ def get_chat_messages(request):
         print(f"Error loading chat messages: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
+@require_POST
+@csrf_exempt
+def save_custom_option(request):
+    if request.user.is_authenticated:
+        try:
+            data = json.loads(request.body)
+            custom_option = data.get('custom_option')
+            if custom_option in ['1', '2', '3', '4']:
+                request.user.custom_option = custom_option
+                request.user.save()
+                return JsonResponse({'success': True})
+            return JsonResponse({'success': False, 'error': 'Invalid option'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'})
+    return JsonResponse({'success': False, 'error': 'Not authenticated'})
+
+@require_POST
+@csrf_exempt
+def toggle_custom_button(request):
+    if request.user.is_authenticated:
+        try:
+            data = json.loads(request.body)
+            enabled = data.get('enabled', False)
+            request.user.custom_button_enabled = enabled
+            request.user.save()
+            return JsonResponse({'success': True})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'})
+    return JsonResponse({'success': False, 'error': 'Not authenticated'})
+
+@login_required
+def save_button_text_color(request):
+    if request.method == 'POST':
+        try:
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+            else:
+                data = request.POST
+            text_color = data.get('button_text_color', '').strip().lower()
+            if text_color not in ['white', 'black']:
+                return JsonResponse({'success': False, 'error': 'Invalid color value'})
+            request.user.color_text_button = text_color
+            request.user.save()
+            
+            return JsonResponse({'success': True})
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
 def check_user_exists(request):
     username = request.GET.get('username', '')
     exists = User.objects.filter(username=username).exists()
     return JsonResponse({'exists': exists})
 
+def create_bin_user():
+    try:
+        bin_user = User.objects.filter(username__in=["Bin", "Bin_bot"]).first()
+
+        if bin_user:
+            bin_user.description = "Official Bin Messenger bot. I provide verification codes and assistance."
+            bin_user.your_tag = "@Bin_bot"
+            bin_user.status = "Online"
+            bin_user.is_active = True
+            bin_user.subscribe = "System"
+            bin_user.role = "System Bot"
+            bin_user.birthday = date(2025, 12, 20)
+
+            if not bin_user.photo or getattr(bin_user.photo, 'name', '') in ['', 'login.png']:
+                bin_user.photo = bin_user.photo
+
+            bin_user.save()
+            return bin_user
+
+        else:
+            bin_user = User.objects.create(
+                username="Bin_bot",
+                photo='static/pictures/bin.jpg',
+                email="bot@bin-messenger.com",
+                password=make_password(
+                    'bin_system_password_' + str(random.randint(1000, 9999))
+                ),
+                description="Official Bin Messenger bot. I provide verification codes and assistance.",
+                your_tag="@Bin_bot",
+                status="Online",
+                is_active=True,
+                subscribe="System",
+                language="English",
+                role="System Bot",
+                birthday=date(2025, 12, 20),
+                wallet=Decimal('0.00')
+            )
+            return bin_user
+
+    except Exception as e:
+        print(f"Error creating Bin user: {e}")
+        return None
+
+def get_file_size_limit(user):
+    if user.subscribe == 'Bin_premium':
+        return 50 * 1024 * 1024
+    elif user.subscribe == 'Bin+':
+        return 20 * 1024 * 1024
+    else:
+        return 10 * 1024 * 1024
+
+@login_required
+def get_file_upload_limit(request):
+    user = request.user
+    limit_bytes = get_file_size_limit(user)
+    limit_mb = limit_bytes // (1024 * 1024)
+    
+    return JsonResponse({
+        'limit_bytes': limit_bytes,
+        'limit_mb': limit_mb,
+        'subscription': user.subscribe,
+        'max_file_size': f"{limit_mb}MB"
+    })
+
 @login_required(login_url='login')
 def home(request):
     lang = "English"
-    
+
     if request.session.get("language"):
         lang = request.session["language"]
-    
     elif request.user.is_authenticated and hasattr(request.user, "language"):
         lang = request.user.language
-    
+
     if request.user.is_authenticated and hasattr(request.user, "language"):
         if request.session.get("language") and request.user.language != request.session.get("language"):
             request.user.language = request.session.get("language")
@@ -1771,6 +2515,8 @@ def home(request):
 
     user = request.user
     role = get_user_role(user)
+
+    create_bin_user()
 
     search_query = request.GET.get('search', '').strip()
     found_users = []
@@ -1803,10 +2549,9 @@ def home(request):
             username = match.group(1)
             try:
                 target = User.objects.get(username=username)
-                url = reverse('home') + f"?profile={target.username}"
-                return f'<a href="{url}" style="color:#0056b3;">@{username}</a>'
+                return f'<a href="javascript:void(0)" onclick="openUserProfile(\'{target.username}\'); return false;" class="profile-mention" data-username="@{target.username}">@{username}</a>'
             except User.DoesNotExist:
-                return f'<span style="color:#0056b3;">@{username}</span>'
+                return f'<span class="profile-mention">@{username}</span>'
 
         formatted = re.sub(r'@(\w+)', repl, text)
         return mark_safe(formatted)
@@ -1973,7 +2718,24 @@ def home(request):
         time_diff = timezone.now() - user.subscription_purchase_time
         can_refund = time_diff <= timedelta(hours=24)
 
-    return render(request, 'home/home.html', {
+    file_size_limit_mb = get_file_size_limit(request.user) // (1024 * 1024)
+
+    sticker_category_labels = {
+        'people': 'Люди' if getattr(user, 'language', 'English') == 'Українська' else 'People',
+        'animals': 'Тварини' if getattr(user, 'language', 'English') == 'Українська' else 'Animals',
+        'transport': 'Транспорт' if getattr(user, 'language', 'English') == 'Українська' else 'Transport',
+        'nature': 'Природа' if getattr(user, 'language', 'English') == 'Українська' else 'Nature',
+        'food': 'Їжа' if getattr(user, 'language', 'English') == 'Українська' else 'Food',
+        'love': 'Любов' if getattr(user, 'language', 'English') == 'Українська' else 'Love',
+        'flags': 'Прапори' if getattr(user, 'language', 'English') == 'Українська' else 'Flags',
+        'misc': 'Інше' if getattr(user, 'language', 'English') == 'Українська' else 'Misc',
+        'extras': 'Додатково' if getattr(user, 'language', 'English') == 'Українська' else 'Extras'
+    }
+
+    sticker_category_labels_json = json.dumps(sticker_category_labels, ensure_ascii=False)
+
+    template = 'home/home_uk.html' if lang == 'Українська' else 'home/home_en.html'
+    return render(request, template, {
         'user': user,
         'description_html': description_html,
         'price_converted': price_converted,
@@ -1989,4 +2751,6 @@ def home(request):
         'active_sessions': active_sessions,
         'login_history': login_history,
         'lang': lang,
+        'sticker_category_labels_json': sticker_category_labels_json,
+        'file_size_limit_mb': file_size_limit_mb,
     })

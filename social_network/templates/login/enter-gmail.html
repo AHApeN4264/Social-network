@@ -228,7 +228,7 @@
         const emailInput = document.querySelector('input[name="email"]');
         emailInput.focus();
         
-        // Автоматически добавляем @gmail.com если пользователь ввел только имя
+
         emailInput.addEventListener('blur', function() {
             const value = this.value.trim();
             if (value && !value.includes('@') && value.indexOf(' ') === -1) {
@@ -236,7 +236,7 @@
             }
         });
         
-        // Подтверждение по Enter
+
         emailInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && this.value.trim()) {
                 e.preventDefault();

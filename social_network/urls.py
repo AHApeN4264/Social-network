@@ -6,14 +6,17 @@ from django.shortcuts import redirect
 from django.contrib.auth.views import LogoutView
 from social_network import consumers
 from . import views
+from .views import only_specific_user
 
 def catch_all_redirect(request, path=None):
     return redirect('error')
 
+# Админка для админа
+admin_site = only_specific_user(admin.site.urls)
+
 urlpatterns = [
     # Админка
-    path('admin/', admin.site.urls),
-
+    path('admin/', admin_site),
     # Страница ошибки
     path('error', views.error, name='error'),
 
@@ -28,6 +31,12 @@ urlpatterns = [
     path('add-card/', views.add_card, name='add-card'),
     path('deposit-funds/', views.deposit_funds, name='deposit-funds'),
     path('get_currency-conversion/', views.get_currency_conversion, name='get_currency-conversion'),
+
+    # Theme
+    path('save-custom-option/', views.save_custom_option, name='save_custom_option'),
+    path('toggle-custom-button/', views.toggle_custom_button, name='toggle_custom_button'),
+    path('save-button-text-color/', views.save_button_text_color, name='save_button_text_color'),
+    # path('save-time-format/', views.save_time_format, name='save_time_format'),
     
     # Аутентификация
     path('register', views.register, name='register'),
@@ -37,7 +46,7 @@ urlpatterns = [
     path('logout', LogoutView.as_view(next_page='/login'), name='logout'),
 
     # Условия подписки
-    path('terms/', views.terms, name='terms'),
+    path('terms', views.terms, name='terms'),
 
     # Поиск на главном экране
     path('search-users/', views.search_users, name='search_users'),
@@ -57,8 +66,8 @@ urlpatterns = [
     # просмотр профиля другого пользователя
     path('get-user-profile/', views.get_user_profile, name='get_user_profile'),
     # поиск по тегу
-    path('get-user-by-tag/', views.get_user_by_tag, name='get-user-profile'),
-    # файллы в чате
+    path('get-user-by-tag/', views.get_user_by_tag, name='get-user-by-tag'),
+    # файлы в чате
     path('upload-chat-file/', views.upload_chat_file, name='upload_chat_file'),
     # другое чата
     path('mark-messages-read/', views.mark_messages_read, name='mark_messages_read'),
@@ -74,14 +83,16 @@ urlpatterns = [
     path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
     path('terminate-session/', views.terminate_session, name='terminate_session'),
 
-    # email
-    path('email/', views.email, name='email'),
-    path('delete-message/<int:message_id>/', views.delete_message, name='delete-message'),
-
     # Bin chat
     path('get_bin_messages', views.get_bin_messages, name='get_bin_messages'),
-    path('send_message', views.send_message, name='send_message'),
+    path('get-bin-messages/', views.get_bin_messages, name='get-bin-messages'),
+    path('send-bin-message/', views.send_message, name='send_bin_message'),
     path('get-verification-code-bin/', views.get_verification_code_bin, name='get_verification_code_bin'),
+    path('create_bin_user/', views.create_bin_user, name='create_bin_user'),
+
+    # Message management
+    path('edit-message/', views.edit_message, name='edit_message'),
+    path('delete-message/', views.delete_message, name='delete_message'),
 
     # WebSocket для чата
     re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer.as_asgi()),

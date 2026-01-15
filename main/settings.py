@@ -33,7 +33,6 @@ INSTALLED_APPS = [
 SITE_ID = 1
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -43,6 +42,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
+
+try:
+    import importlib
+    importlib.import_module('whitenoise')
+except Exception:
+    print('Warning: whitenoise not installed; WhiteNoise middleware will be disabled.')
+else:
+    MIDDLEWARE.insert(0, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'main.urls'
 
@@ -120,5 +127,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 SECRET_KEY = config("SECRET_KEY")
-EMAIL_HOST_USER='bin.web.messenger@gmail.com'
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")

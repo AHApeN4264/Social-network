@@ -1,14 +1,14 @@
 # python manage.py runserver
-
+# & .\.venv\Scripts\python.exe manage.py runserver 192.168.1.53:5000
 # Для запуска с телефона
 # python manage.py runserver 0.0.0.0:8000
 
 # создание ветки
-# git checkout -b bag_fix_and_add_new_functions
+# git checkout -b Add_Bot_Bin_Currency_conversion_Security_Stikers_Uploads_photos/videos_Account_recovery_Copy/edit/delete_messages_Scroll_Hour_format_Support_Edit_Color_theme_Chat_Terms_Subscription_Profile
 
 # git add .
-# git commit -m "bag_fix_and_add_new_functions"
-# git push -u origin bag_fix_and_add_new_functions
+# git commit -m "Add_Bot_Bin_Currency_conversion_Security_Stikers_Uploads_photos/videos_Account_recovery_Copy/edit/delete_messages_Scroll_Hour_format_Support_Edit_Color_theme_Chat_Terms_Subscription_Profile"
+# git push -u origin Add_Bot_Bin_Currency_conversion_Security_Stikers_Uploads_photos/videos_Account_recovery_Copy/edit/delete_messages_Scroll_Hour_format_Support_Edit_Color_theme_Chat_Terms_Subscription_Profile
 
 #!/usr/bin/env python
 
