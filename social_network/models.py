@@ -21,7 +21,7 @@ class User(AbstractUser):
     )
 
     background = models.ImageField(
-        upload_to='users/backgrounds/',
+        upload_to='backgrounds/',
         null=True,
         blank=True,
         default=None
@@ -63,17 +63,17 @@ class User(AbstractUser):
         help_text="Email or phone number"
     )
     email = models.EmailField(unique=True, null=True, blank=True)
-    phone_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    your_tag = models.CharField(max_length=30, unique=True, null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if not self.your_tag:
-            self.your_tag = self.username
-        super().save(*args, **kwargs)
-
-    @property
-    def display_tag(self):
-        return f"@{self.your_tag}" if self.your_tag else f"@{self.username}"
+    phone_number = models.CharField(max_length=20, unique=True, null=True, blank=True) 
+    your_tag = models.CharField(max_length=30, unique=True, null=True, blank=True) 
+ 
+    def save(self, *args, **kwargs): 
+        if not self.your_tag: 
+            self.your_tag = self.username 
+        super().save(*args, **kwargs) 
+ 
+    @property 
+    def display_tag(self): 
+        return f"@{self.your_tag}" if self.your_tag else f"@{self.username}" 
 
     subscribe = models.CharField(
         max_length=20,
@@ -117,16 +117,27 @@ class User(AbstractUser):
             ('User', 'User'),
             ('Moderator', 'Moderator'),
             ('Administrator', 'Administrator'),
+            ('System Bot', 'System Bot'),
         ],
         default='User',
     )
 
-    # Security
     two_factor_enabled = models.BooleanField(default=False)
     two_factor_secret = models.CharField(max_length=32, blank=True, null=True)
-
+    custom_button_enabled = models.BooleanField(default=False)
+    custom_option = models.CharField(max_length=1, default='1', choices=[
+        ('1', 'Light-Dark'),
+        ('2', 'Rainbow'),
+        ('3', 'Bright'),
+        ('4', 'Dark')
+    ])
+    color_text_button = models.CharField(
+        max_length=10, 
+        default='black', 
+        choices=[('black', 'Black'), ('white', 'White')]
+    )
+    
     def get_active_sessions(self):
-        """Get user's activesessions"""
         sessions = []
         try:
             user_sessions = Session.objects.filter(expire_date__gte=timezone.now())
