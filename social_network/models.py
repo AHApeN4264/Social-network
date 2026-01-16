@@ -64,7 +64,7 @@ class User(AbstractUser):
     )
     email = models.EmailField(unique=True, null=True, blank=True)
     phone_number = models.CharField(max_length=20, unique=True, null=True, blank=True) 
-    your_tag = models.CharField(max_length=30, unique=True, null=True, blank=True) 
+    your_tag = models.CharField(max_length=100, unique=True, null=True, blank=True) 
  
     def save(self, *args, **kwargs): 
         if not self.your_tag: 
