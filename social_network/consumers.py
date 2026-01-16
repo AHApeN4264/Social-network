@@ -10,7 +10,6 @@ User = get_user_model()
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    
     async def connect(self):
         try:
             self.room_name = self.scope['url_route']['kwargs']['room_name']

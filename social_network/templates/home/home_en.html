@@ -4,7 +4,7 @@
 {% block title %}
 <title>Main</title>
 <link rel="icon" href="{% static 'icons/Bin.jpg' %}" type="image/png">
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'css/home.css' %}"> -->
 <!-- <link rel="stylesheet" href="{% static 'js/home.js' %}"> -->
 
 <style>
@@ -4074,8 +4074,7 @@ body.modal-open .chat-container {
 .main-btn {
     display: block;
     width: 100%;
-    background: linear-gradient(135deg, #ffffff);
-    color: #000;
+    color: inherit;
     border-radius: 6px;
     padding: 8px 10px;
     border: 1px solid rgba(0,0,0,0.06);
@@ -4160,10 +4159,48 @@ body.modal-open .chat-container {
 }
 
 .main-btn-style-0 {
-    background: linear-gradient(135deg, #ffffff 100%);
-    color: #000;
-    border: 1px solid rgba(0,0,0,0.06);
-} 
+    background: linear-gradient(135deg, #ffffff, #ffffff) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 10px 15px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    margin: 5px 0 !important;
+    font-size: 17px !important;
+    font-weight: 500 !important;
+    box-sizing: border-box !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+}
+
+.main-btn-style-0,
+.main-btn.main-btn-style-0 {
+    background: linear-gradient(135deg, #ffffff, #ffffff) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 10px 15px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    margin: 5px 0 !important;
+    font-size: 17px !important;
+    font-weight: 500 !important;
+    box-sizing: border-box !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+}
+
+.theme-dark .main-btn-style-0,
+.theme-dark .main-btn.main-btn-style-0 {
+    background: linear-gradient(135deg, #ffffff, #ffffff) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+}
 
 .main-btn-style-1 {
     background: linear-gradient(90deg, 
@@ -4819,12 +4856,6 @@ body.form-open .chat-container {
     line-height: 1.3;
     letter-spacing: 0.3px;
     margin-bottom: 5px;
-    transition: all 0.5s ease;
-}
-
-.color_theme-form .main-btn.main-btn-style-1:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 #chat-toggle:checked ~ .profile-form,
@@ -11825,57 +11856,64 @@ document.addEventListener('click', function(e) {
 });
 
 // Checkbox in Color theme ======================================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const themeSelect = document.getElementById('themeSelect');
-    const applyThemeBtn = document.getElementById('applyThemeBtn');
+document.addEventListener('DOMContentLoaded', function () {
     const customThemeToggle = document.getElementById('customThemeToggle');
-    const customThemeLabel = document.getElementById('customThemeLabel');
-    const hiddenInput = document.getElementById('custom_button_input');
-    
-    const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
     const additionalContainer = document.getElementById('additional-checkboxes-container');
     const customOptionInput = document.getElementById('custom_option_input');
+    const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
 
-    function applySelectedStyle(value) {
-        const allButtons = document.querySelectorAll('.main-btn, .deposit-btn, .add_card-btn, .other-profile-message-btn');
+    const BUTTON_SELECTORS = [
+        '.main-btn',
+        '.deposit-btn',
+        '.add_card-btn',
+        '.other-profile-message-btn',
+        '.subscribe-btn',
+        '.profile-btn',
+        '.setting-btn',
+        'label.main-btn-style-0',
+        'label.main-btn-style-1',
+        'label.main-btn-style-2',
+        'label.main-btn-style-3',
+        'label.main-btn-style-4',
+        '.main-btn.main-btn-style-0',
+        '.main-btn.main-btn-style-1',
+        '.main-btn.main-btn-style-2',
+        '.main-btn.main-btn-style-3',
+        '.main-btn.main-btn-style-4'
+    ].join(',');
+
+    function applyButtonStyle() {
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+
+        const isEnabled = customThemeToggle?.checked ?? false;
+        const styleValue = isEnabled
+            ? (customOptionInput?.value || document.querySelector('input[name="customOption"]:checked')?.value || '1')
+            : '0';
+
         allButtons.forEach(btn => {
-            btn.classList.add('changing');
-            setTimeout(() => {
-                btn.classList.remove('main-btn-style-0', 'main-btn-style-1', 'main-btn-style-2', 'main-btn-style-3', 'main-btn-style-4');
+            btn.className = btn.className
+                .replace(/main-btn-style-\d+/g, '')
+                .replace(/\bmain-btn\b/g, '')
+                .trim();
 
-                if (value === '0') {
-                    btn.classList.remove('main-btn');
-                    btn.classList.add('main-btn-style-0');
-                } else {
-                    btn.classList.add('main-btn', 'main-btn-style-' + value);
-                }
-
-                setTimeout(() => btn.classList.remove('changing'), 50);
-            }, 10);
+            if (styleValue === '0') {
+                btn.classList.add('main-btn-style-0');
+            } else {
+                btn.classList.add('main-btn', `main-btn-style-${styleValue}`);
+            }
         });
     }
 
     function updateAdditionalVisibility() {
-        if (!additionalContainer) return;
-
-        if (customThemeToggle && customThemeToggle.checked) {
-            additionalContainer.style.display = 'block';
-
-            const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-            const selectedValue = selectedRadio ? selectedRadio.value : '1';
-            applySelectedStyle(selectedValue);
-        } else {
-            additionalContainer.style.display = 'none';
-
-            applySelectedStyle('0');
-            if (customOptionInput) customOptionInput.value = '0';
+        if (additionalContainer) {
+            additionalContainer.style.display = customThemeToggle.checked ? 'block' : 'none';
         }
     }
 
     function saveCustomOption(value) {
         const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
         if (!csrf) return;
-        
+
         fetch('/save-custom-option/', {
             method: 'POST',
             headers: {
@@ -11883,213 +11921,54 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': csrf,
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({custom_option: value})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                console.error('Error saving custom option:', data.error);
-            }
-        })
-        .catch(err => console.error('Save custom option error:', err));
+            body: JSON.stringify({ custom_option: value })
+        }).catch(() => {});
     }
 
-    customOptionRadios.forEach(r => r.addEventListener('change', function() {
-        const selectedValue = this.value;
-        
-        if (customThemeToggle && customThemeToggle.checked) {
-            applySelectedStyle(selectedValue);
-            if (customOptionInput) customOptionInput.value = selectedValue;
-            saveCustomOption(selectedValue);
-        }
-    }));
-
     if (customThemeToggle) {
-        customThemeToggle.addEventListener('change', function() {
-            const isChecked = this.checked;
-            
-            if (customThemeLabel) customThemeLabel.textContent = isChecked ? 'Custom enabled' : 'Enable Custom button';
-            
-            if (hiddenInput) hiddenInput.value = isChecked ? '1' : '0';
-            
+        customThemeToggle.addEventListener('change', function () {
             updateAdditionalVisibility();
-            
-            if (!isChecked) {
-                applySelectedStyle('0');
-                if (customOptionInput) customOptionInput.value = '0';
-                saveCustomOption('0');
-            } else {
-                const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-                const selectedValue = selectedRadio ? selectedRadio.value : '1';
-                applySelectedStyle(selectedValue);
-                if (customOptionInput) customOptionInput.value = selectedValue;
-                saveCustomOption(selectedValue);
+            applyButtonStyle();
+
+            const isChecked = this.checked;
+            const selectedValue = isChecked
+                ? (document.querySelector('input[name="customOption"]:checked')?.value || '1')
+                : '0';
+
+            if (customOptionInput) customOptionInput.value = selectedValue;
+
+            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (csrf) {
+                fetch('/toggle-custom-button/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ enabled: isChecked })
+                }).catch(() => {});
             }
-            
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || null;
-            if (!csrf) return;
-            
-            fetch('/toggle-custom-button/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrf,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({enabled: isChecked})
-            }).catch(err => console.error('Persist error', err));
         });
 
-        const isInitiallyChecked = customThemeToggle.checked;
-        
-        if (customThemeLabel) customThemeLabel.textContent = isInitiallyChecked ? 'Custom enabled' : 'Enable Custom button';
-        if (hiddenInput) hiddenInput.value = isInitiallyChecked ? '1' : '0';
-        
-        if (!isInitiallyChecked) {
-            applySelectedStyle('0');
-            if (customOptionInput) customOptionInput.value = '0';
-        } else {
-            const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-            const initialValue = selectedRadio ? selectedRadio.value : (customOptionInput ? customOptionInput.value : '1');
-            applySelectedStyle(initialValue);
-            if (customOptionInput) customOptionInput.value = initialValue;
-        }
-        
+        customOptionRadios.forEach(radio => {
+            radio.addEventListener('change', function () {
+                if (customThemeToggle.checked) {
+                    applyButtonStyle();
+                    if (customOptionInput) customOptionInput.value = this.value;
+                    saveCustomOption(this.value);
+                }
+            });
+        });
+
         updateAdditionalVisibility();
-    }
-    
-    if (colorThemeToggle) {
-        colorThemeToggle.addEventListener('change', updateMenuDisabled);
-        updateMenuDisabled();
+        applyButtonStyle();
     }
 
-    function applyCustomButtonUI(enabled) {
-        const selected = (customOptionInput && customOptionInput.value) ? customOptionInput.value : '1';
-        
-        const allMainBtns = document.querySelectorAll('.main-btn');
-        const otherMsgBtn = document.querySelector('.other-profile-message-btn');   
+    const observer = new MutationObserver(applyButtonStyle);
+    observer.observe(document.body, { childList: true, subtree: true });
 
-        const applyStyle = (el) => {
-            if (!el) return;
-            if (enabled) {
-                el.classList.add('main-btn');
-                el.classList.remove('main-btn-style-0', 'main-btn-style-1', 'main-btn-style-2', 'main-btn-style-3', 'main-btn-style-4');
-                el.classList.add('main-btn-style-' + (selected || '1'));
-            } else {
-                el.classList.remove('main-btn');
-                el.classList.remove('main-btn-style-1','main-btn-style-2','main-btn-style-3','main-btn-style-4');
-            }
-        };  
-
-        allMainBtns.forEach(applyStyle);
-        if (otherMsgBtn) applyStyle(otherMsgBtn);
-    }
-
-    function applyButtonTextColor(value) {
-        const buttons = document.querySelectorAll('.main-btn, .deposit-btn, .add_card-btn, .other-profile-message-btn');
-        buttons.forEach(btn => {
-            if (!btn) return;
-            btn.style.color = (value === 'black') ? '#000' : '#fff';
-            
-            if (value === 'white') {
-                btn.style.textShadow = '0 1px 2px rgba(0,0,0,0.3)';
-            } else {
-                btn.style.textShadow = 'none';
-            }
-        });
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Custom button enabled:', {% if user.custom_button_enabled %}true{% else %}false{% endif %});
-        console.log('Custom option:', "{{ user.custom_option|default:'1' }}");
-        
-        const depositBtn = document.querySelector('.deposit-btn');
-        const addCardBtn = document.querySelector('.add_card-btn');
-        console.log('Deposit button classes:', depositBtn?.className);
-        console.log('Add card button classes:', addCardBtn?.className);
-        
-        setTimeout(() => {
-            applyCustomButtonUI({% if user.custom_button_enabled %}true{% else %}false{% endif %});
-            applyButtonTextColor("{{ user.color_text_button|default:'white' }}");
-        }, 200);
-    });
-
-    const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
-    textColorRadios.forEach(r => r.addEventListener('change', function() {
-        const value = this.value;
-        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-        if (!csrf) return;
-        fetch('/save-button-text-color/', {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json', 'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest' },
-            body: JSON.stringify({ button_text_color: value })
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                applyButtonTextColor(value);
-            } else {
-                console.error('Could not save button text color', data.error);
-            }
-        }).catch(e => console.error('Save color error', e));
-    }));
-
-    try {
-        const initialColor = "{{ user.color_text_button|default:'white' }}";
-        applyButtonTextColor(initialColor);
-        applyCustomButtonUI(!!({% if user.custom_button_enabled %}true{% else %}false{% endif %}));
-    } catch(e) {}
-
-    if (customThemeToggle) {
-        customThemeToggle.addEventListener('change', function() {
-            applyCustomButtonUI(this.checked);
-        });
-    }
-    
-    if (themeSelect && applyThemeBtn) {
-        const userSubscribe = "{{ user.subscribe }}";  
-        const body = document.body;
-
-        const savedTheme = localStorage.getItem('selectedTheme');
-        if (savedTheme) {
-            body.classList.add(`theme-${savedTheme}`);
-            themeSelect.value = savedTheme;
-        }
-
-        if (userSubscribe === "Basic") {
-            themeSelect.querySelector('option[value="pink"]').disabled = true;
-            themeSelect.querySelector('option[value="green"]').disabled = true;
-        }
-
-        applyThemeBtn.addEventListener('click', () => {
-            const selected = themeSelect.value;
-
-            if ((selected === "pink" || selected === "green") && userSubscribe === "Basic") {
-                alert("❌ This theme is available only for subscribers!");
-                return;
-            }
-
-            body.classList.remove('theme-light', 'theme-dark', 'theme-pink', 'theme-green');
-
-            body.classList.add(`theme-${selected}`);
-
-            localStorage.setItem('selectedTheme', selected);
-        });
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const chatContainer = document.querySelector('.chat-container');
-    const colorThemeToggle = document.getElementById('color_theme-toggle');
-    
-    if (chatContainer && colorThemeToggle) {
-        chatContainer.addEventListener('click', function(e) {
-            if (colorThemeToggle.checked) {
-                colorThemeToggle.checked = false;
-                
-                updateFormOpenState();
-                
-                e.stopPropagation();
-            }
-        });
-    }
+    setTimeout(applyButtonStyle, 300);
 });
 
 // chat-settings
