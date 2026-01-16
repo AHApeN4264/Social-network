@@ -76,7 +76,7 @@ class User(AbstractUser):
         return f"@{self.your_tag}" if self.your_tag else f"@{self.username}" 
 
     subscribe = models.CharField(
-        max_length=20,
+        max_length=50,
         choices=[
             ('Basic', 'Basic'),
             ('Bin+', 'Bin+'),
@@ -86,7 +86,7 @@ class User(AbstractUser):
     )
 
     subscribe_period = models.CharField(
-        max_length=10,
+        max_length=50,
         choices=[
             ('monthly', 'Monthly'),
             ('yearly', 'Yearly'),
