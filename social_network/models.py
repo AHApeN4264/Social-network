@@ -12,7 +12,7 @@ import random
 # python manage.py migrate
 
 class User(AbstractUser):
-    username = models.CharField(max_length=18, unique=True)
+    username = models.CharField(max_length=150, unique=True)
     photo = models.ImageField(
         upload_to='users/',
         null=True,
@@ -64,7 +64,7 @@ class User(AbstractUser):
     )
     email = models.EmailField(unique=True, null=True, blank=True)
     phone_number = models.CharField(max_length=20, unique=True, null=True, blank=True) 
-    your_tag = models.CharField(max_length=100, unique=True, null=True, blank=True) 
+    your_tag = models.CharField(max_length=150, unique=True, null=True, blank=True) 
  
     def save(self, *args, **kwargs): 
         if not self.your_tag: 
@@ -112,7 +112,7 @@ class User(AbstractUser):
     )
 
     role = models.CharField(
-        max_length=20,
+        max_length=50,
         choices=[
             ('User', 'User'),
             ('Moderator', 'Moderator'),
