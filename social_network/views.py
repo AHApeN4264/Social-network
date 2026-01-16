@@ -367,8 +367,9 @@ def register(request):
             email=email,
             phone_number=phone_number,
             password=make_password(password),
-            language=lang
-        )
+            language=lang,
+            your_tag=f"@{username}"
+        )       
 
         request.session['language'] = lang
         

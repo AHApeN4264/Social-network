@@ -16,10 +16,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name = f'chat_{self.room_name}'
 
             if not self.scope["user"].is_authenticated:
-                await self.close()
+                await self.close(code=4001)
                 return
-
-            logger.info(f"Connecting to room: {self.room_name}")
 
             await self.channel_layer.group_add(
                 self.room_group_name,
@@ -27,24 +25,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
             await self.accept()
-            logger.info(f"WebSocket connected successfully to: {self.room_name}")
 
         except Exception as e:
-            logger.error(f"Connection error: {e}")
             await self.close()
 
     async def disconnect(self, close_code):
         try:
-            if hasattr(self, 'room_group_name') and self.room_group_name:
+            if hasattr(self, 'room_group_name'):
                 await self.channel_layer.group_discard(
                     self.room_group_name,
                     self.channel_name
                 )
-                logger.info(f"WebSocket disconnected from: {getattr(self, 'room_name', None)}")
-        except Exception as e:
-            logger.error(f"Disconnection error: {e}")
+        except Exception:
+            pass
 
-    async def receive(self, text_data):
+    async def receive(self, text_data=None, bytes_data=None):
+        if text_data is None:
+            return
+
         try:
             data = json.loads(text_data)
             message = data.get('message', '').strip()
@@ -52,54 +50,55 @@ class ChatConsumer(AsyncWebsocketConsumer):
             receiver_username = data.get('receiver')
 
             if not message or not sender_username or not receiver_username:
-                logger.error("Missing required fields in message")
                 return
-
-            logger.info(f"Message received: {sender_username} -> {receiver_username}: {message}")
 
             saved_message = await self.save_message(sender_username, receiver_username, message)
 
             if saved_message:
-                logger.info(f"Message saved to DB with ID: {saved_message.id}")
-
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
-                        'type': 'chat_message',
+                        'type': 'chat.message',
                         'message': message,
                         'sender': sender_username,
                         'receiver': receiver_username,
                         'timestamp': saved_message.timestamp.isoformat(),
-                        'message_id': saved_message.id
+                        'message_id': saved_message.id,
                     }
                 )
-            else:
-                logger.error("Failed to save message to database")
 
         except json.JSONDecodeError:
-            logger.error("Invalid JSON in WebSocket message")
-        except Exception as e:
-            logger.error(f"Error in receive: {e}")
+            pass
+        except Exception:
+            pass
 
     async def chat_message(self, event):
-        try:
-            payload = {
-                'message': event['message'],
-                'sender': event['sender'],
-                'receiver': event['receiver'],
-                'timestamp': event.get('timestamp'),
-                'message_id': event.get('message_id')
-            }
+        payload = {
+            'type': 'chat.message',
+            'message': event['message'],
+            'sender': event['sender'],
+            'receiver': event['receiver'],
+            'timestamp': event['timestamp'],
+            'message_id': event.get('message_id'),
+        }
 
-            for k in ['file_url', 'file_name', 'file_type', 'file_size']:
-                if k in event:
-                    payload[k] = event[k]
+        await self.send(text_data=json.dumps(payload))
 
-            await self.send(text_data=json.dumps(payload))
-            logger.info(f"Broadcasted message: {payload}")
+    async def message_edited(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'message_edited',
+            'message_id': event.get('message_id'),
+            'text': event.get('text'),
+            'timestamp': event.get('timestamp'),
+            'sender': event.get('sender'),
+        }))
 
-        except Exception as e:
-            logger.error(f"Error in chat_message: {e}")
+    async def message_deleted(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'message_deleted',
+            'message_id': event.get('message_id'),
+            'sender': event.get('sender'),
+        }))
 
     @database_sync_to_async
     def save_message(self, sender_username, receiver_username, text):
@@ -107,39 +106,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             sender = User.objects.get(username=sender_username)
             receiver = User.objects.get(username=receiver_username)
 
-            message = Message.objects.create(
+            msg = Message.objects.create(
                 sender=sender,
                 receiver=receiver,
-                text=text
+                text=text,
             )
-            return message
+            return msg
         except User.DoesNotExist:
-            logger.error(f"User not found: {sender_username} or {receiver_username}")
             return None
-        except Exception as e:
-            logger.error(f"Error saving message: {e}")
+        except Exception:
             return None
-
-    async def message_edited(self, event):
-        try:
-            await self.send(text_data=json.dumps({
-                'type': 'message_edited',
-                'message_id': event.get('message_id'),
-                'text': event.get('text'),
-                'timestamp': event.get('timestamp'),
-                'sender': event.get('sender'),
-                'receiver': event.get('receiver')
-            }))
-        except Exception as e:
-            logger.error(f"Error in message_edited handler: {e}")
-
-    async def message_deleted(self, event):
-        try:
-            await self.send(text_data=json.dumps({
-                'type': 'message_deleted',
-                'message_id': event.get('message_id'),
-                'sender': event.get('sender'),
-                'receiver': event.get('receiver')
-            }))
-        except Exception as e:
-            logger.error(f"Error in message_deleted handler: {e}")
