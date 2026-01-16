@@ -86,12 +86,17 @@ DATABASES = {
 }
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
-        conn_max_age=60,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'social_network_jt6o',
+        'USER': 'social_network_jt6o_user',
+        'PASSWORD': 'your_password',
+        'HOST': 'dpg-d5l44ch4tr6s73ctp3m0-a',
+        'PORT': 5432,
+        'CONN_MAX_AGE': 60,
+    }
 }
+
 
 CHANNEL_LAYERS = {
     'default': {
