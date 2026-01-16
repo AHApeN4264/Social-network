@@ -5087,9 +5087,9 @@ body.form-open .chat-container {
              style="{% if user.background and user.background.url %}background-image: url('{{ user.background.url }}'); display: block;{% elif user.your_tag == '@Bin_bot' %}{% else %}display: none;{% endif %}"></div>
         
             <div class="profile-preview-header">
-                <img class="profile-preview-avatar other-profile-avatar" 
-                     src="{% static 'pictures/login.png' %}" 
-                     alt="Avatar">
+            <img class="profile-preview-avatar other-profile-avatar" 
+                 src="/static/pictures/login.png" 
+                 alt="Avatar">
                 <div class="profile-preview-info">
                     <h3 class="username-text other-profile-username">{{ user.username }}</h3>
                     <div class="profile-preview-status">
