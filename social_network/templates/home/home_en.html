@@ -57,7 +57,6 @@ body.theme-green {
 }
 
 .side-menu,
-.profile-form,
 .profile-preview-card,
 .setting-form,
 .form1,
@@ -211,12 +210,10 @@ input, textarea, select {
 
 .profile-form {
     position: fixed;
-    top: 249px;
-    right: 755px;
-    transform: none;
-    background: var(--surface);
-    /* padding: 20px; */
-    border-radius: 8px;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
     display: none;
     z-index: 2000;
     width: 400px;
@@ -224,11 +221,152 @@ input, textarea, select {
     box-sizing: border-box;
     flex-direction: column;
     gap: 20px;
-    transition: background 0.3s, color 0.3s;
-} 
+}
 
-#profile-toggle:checked ~ .profile-form {
+.profile-header {
     display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-header .info h2 {
+    margin: 0 0 5px 0;
+    font-size: 22px;
+    color: #333;
+}
+
+.profile-header .info p {
+    margin: 5px 0 0 0;
+    color: #777;
+    font-size: 15px;
+}
+
+.profile-preview-card {
+    position: relative;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: var(--surface);
+    overflow: hidden;
+}
+
+.profile-preview-background {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+    opacity: 1;
+    transition: background-image 0.3s ease;
+}
+
+.profile-preview-card * {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.profile-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-preview-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+}
+
+.profile-preview-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 22px;
+    color: var(--text);
+    word-wrap: break-word;
+}
+
+.profile-preview-status {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.profile-preview-tag {
+    font-size: 13px;
+    color: #007bff;
+    font-weight: 600;
+    background: #e3f2fd;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.profile-preview-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 20px 0;
+}
+
+.profile-preview-section {
+    margin-bottom: 15px;
+}
+
+.profile-preview-label {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.profile-preview-value {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.profile-preview-birthday {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-size: 15px;
+}
+
+.system-bot-label {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+/* Стили для темы */
+.theme-light .profile-preview-card {
+    background: linear-gradient(to right, #ffffff, #e0e0e0);
+    color: #000000;
+}
+
+.theme-dark .profile-preview-card {
+    background: linear-gradient(to right, #2c2c2c, #1a1a1a);
+    color: #ffffff;
+}
+
+.theme-pink .profile-preview-card {
+    background: linear-gradient(to right, #ffb6c1, #b30086);
+    color: #000000;
+}
+
+.theme-green .profile-preview-card {
+    background: linear-gradient(to right, #a8e6a2, #2e7d32);
+    color: #ffffff;
 }
 
 .theme-light {
@@ -361,10 +499,6 @@ input, textarea, select {
     background: linear-gradient(135deg, #1a1a1a, #2c2c2c) !important;
     border: 1px solid #555555 !important;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
-}
-
-.theme-dark .main-btn-style-0:hover {
-    background: linear-gradient(135deg, #2c2c2c, #3a3a3a) !important;
 }
 
 .theme-dark .currency-item {
@@ -5026,7 +5160,11 @@ body.form-open .chat-container {
 <label class="hamburger" for="menu-toggle"><span></span><span></span><span></span></label>
 <label for="menu-toggle" class="overlay"></label>
 <div class="side-menu">
-    <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
+    {% if user.photo and user.photo.url %}
+        <img class="avatar" src="{{ user.photo.url }}" alt="Avatar" onerror="this.src='{% static 'pictures/login.png' %}'">
+    {% else %}
+        <img class="avatar" src="{% static 'pictures/login.png' %}" alt="Avatar">
+    {% endif %}
     <div class="username">{{ user.username }}</div>
     {% if user.subscribe == "Bin+" %}
         <div style="color:#0056b3" class="username-line">Bin+</div>
@@ -5079,16 +5217,31 @@ body.form-open .chat-container {
                 <br>
                 <label for="form1-toggle" class="edit-icon">Edit profile</label>
             </div>
-        </div>    
-
-        <hr class="profile-preview-divider">        
+        </div>
+        
+        <hr class="profile-preview-divider">
+        
+        <div class="profile-preview-section">
+            <div class="profile-preview-value">
+                {% if user.role == 'Administrator' %}
+                    <span style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        👑 Administrator
+                    </span>
+                {% elif user.role == 'Moderator' %}
+                    <span style="background: linear-gradient(135deg, #ffc107, #e0a800); color: #212529; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        🛡️ Moderator
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        
         <div class="profile-preview-section">
             <div class="profile-preview-label">Description</div>
             <div class="profile-preview-value" id="my-profile-description">
-                {{ user.description }}
+                {{ user.description|default:"No description" }}
             </div>
-        </div>     
-
+        </div>
+        
         <div class="profile-preview-section">
             <div class="profile-preview-label">Birthday</div>
             <div class="profile-preview-birthday">
@@ -5101,72 +5254,65 @@ body.form-open .chat-container {
                 <span class="birthday-value">{{ user.birthday|default:"Not specified" }}</span>
             </div>
         </div>
-
-        <div class="user-info">
-            {% if role == 'Administrator' %}
-                <span class="badge bg-danger">👑 Administrator</span>
-            {% elif role == 'Moderator' %}
-                <span class="badge bg-warning">🛡️ Moderator</span>
-            {% endif %}
-        </div>
+        
     </div>
-</div>  
+</div>
 
 <div class="other-profile-form">
     <div class="profile-preview-card">
         <div class="profile-preview-background" id="other-profile-background"
-             style="{% if user.background and user.background.url %}background-image: url('{{ user.background.url }}'); display: block;{% elif user.your_tag == '@Bin_bot' %}{% else %}display: none;{% endif %}"></div>
+             style="display: none;"></div>
         
-            <div class="profile-preview-header">
-            <img class="profile-preview-avatar other-profile-avatar" 
+        <div class="profile-preview-header">
+            <img class="profile-preview-avatar" 
                  src="/static/pictures/login.png" 
                  alt="Avatar">
-                <div class="profile-preview-info">
-                    <h3 class="username-text other-profile-username">{{ user.username }}</h3>
-                    <div class="profile-preview-status">
-                        <span class="status-value offline other-profile-status">
-                            ● Offline
-                        </span>
-                    </div>
-                    <div class="profile-preview-tag tag-copy other-profile-tag" onclick="copyOtherUserTag()">
-                        @{{ user.your_tag|default:user.username }}
-                    </div>
-                    {% if user.your_tag|default:''|lower == "@hello" or user.your_tag|default:''|lower == "@bin_bot" or user.role == "System Bot" or user.username|default:''|lower == 'bin' %}
-                        <div class="system-bot-label">System Bot</div>
-                    {% endif %}
+            <div class="profile-preview-info">
+                <h3 class="username-text other-profile-username">{{ user.username }}</h3>
+                <div class="profile-preview-status">
+                    <span class="status-value offline other-profile-status">
+                        ● Offline
+                    </span>
                 </div>
-            </div>            
-            <hr class="profile-preview-divider">          
-                  
-            <div class="profile-preview-section">
-                <div class="profile-preview-label" id="role-label"></div>
-                <div class="profile-preview-value" id="other-profile-role"></div>
+                <div class="profile-preview-tag tag-copy other-profile-tag" onclick="copyOtherUserTag()">
+                    @{{ user.your_tag|default:user.username }}
+                </div>
             </div>
-            <div class="profile-preview-section">
-                <div class="profile-preview-label">Description</div>
-                <div class="profile-preview-value other-profile-description">
-                    No description
-                </div>
-            </div>       
-
-            <div class="profile-preview-section">
-                <div class="profile-preview-label">Birthday</div>
-                <div class="profile-preview-birthday">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    <span class="birthday-value other-profile-birthday">Not specified</span>
-                </div>
-
-            <button class="other-profile-message-btn {% if user.custom_button_enabled %}main-btn main-btn-style-{{ user.custom_option|default:'1' }}{% endif %}" style="padding:10px 20px; border:none; border-radius:6px; cursor:pointer; flex:1;">
+        </div>
+        
+        <hr class="profile-preview-divider">
+        
+        <!-- <div class="profile-preview-section"> -->
+            <!-- <div class="profile-preview-label">Role</div> -->
+            <!-- <div class="profile-preview-value" id="other-profile-role"> -->
+                <!-- User -->
+            <!-- </div> -->
+        <!-- </div> -->
+        
+        <div class="profile-preview-section">
+            <div class="profile-preview-label">Description</div>
+            <div class="profile-preview-value other-profile-description">
+                No description
+            </div>
+        </div>
+        
+        <div class="profile-preview-section">
+            <div class="profile-preview-label">Birthday</div>
+            <div class="profile-preview-birthday">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span class="birthday-value other-profile-birthday">Not specified</span>
+            </div>
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="other-profile-message-btn profile-btn" onclick="openChatWithOtherUser()">
                 Message
             </button>
-            </div>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
         </div>
     </div>
 </div>
@@ -5174,7 +5320,7 @@ body.form-open .chat-container {
 <div class="color_theme-form">
     <h2>Color theme settings</h2>
     <select id="themeSelect">
-        <option value="" disabled>=== Busic ===</option>
+        <option value="" disabled>=== Basic ===</option>
         <option value="light">Light</option>
         <option value="dark">Dark</option>
         <option value="" disabled>=== Subscribe ===</option>
@@ -5183,17 +5329,17 @@ body.form-open .chat-container {
     </select>
     <button id="applyThemeBtn">Apply</button>   
 
-<div class="icon-checkbox-container">
-    <input type="checkbox" id="customThemeToggle" class="icon-checkbox" {% if user.custom_button_enabled %}checked{% endif %}>
-    <label for="customThemeToggle">
-        <span class="check-icon">
-            <svg viewBox="0 0 20 20" style="display: none;">
-                <polyline points="4 10 8 14 16 6"></polyline>
-            </svg>
-        </span>
-        <span id="customThemeLabel">{% if user.custom_button_enabled %}Custom enabled{% else %}Enable Custom button{% endif %}</span>
-    </label>
-</div>
+    <div class="icon-checkbox-container">
+        <input type="checkbox" id="customThemeToggle" class="icon-checkbox" {% if user.custom_button_enabled %}checked{% endif %}>
+        <label for="customThemeToggle">
+            <span class="check-icon">
+                <svg viewBox="0 0 20 20" style="display: none;">
+                    <polyline points="4 10 8 14 16 6"></polyline>
+                </svg>
+            </span>
+            <span id="customThemeLabel">{% if user.custom_button_enabled %}Custom enabled{% else %}Enable Custom button{% endif %}</span>
+        </label>
+    </div>
 
     <div id="additional-checkboxes-container" style="{% if not user.custom_button_enabled %}display: none;{% endif %} margin-top: 15px; padding: 10px; border-radius: 6px;">
         <h4 style="margin-top: 0; margin-bottom: 10px;">Custom Options</h4>         
@@ -5258,7 +5404,7 @@ body.form-open .chat-container {
     </div>
 
     <div id="text-color-container" style="margin-top: 15px; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-        <h4 style="margin-top: 0; margin-bottom: 10px;">Button Text Color</h4>                          
+        <h4 style="margin-top: 0; margin-bottom: 10px;">Button Text Color</h4>                              
 
         <div style="display: flex; flex-direction: column; gap: 15px; align-items: flex-start;">
             <div class="icon-checkbox3-container" style="margin: 0;">
@@ -5273,7 +5419,7 @@ body.form-open .chat-container {
                     </span>
                     <span>White Text</span>
                 </label>
-            </div>                                                  
+            </div>                                                      
 
             <div class="icon-checkbox3-container" style="margin: 0;">
                 <input type="radio" name="textColorOption" id="textColorBlack" class="icon-checkbox3" 
@@ -5292,7 +5438,7 @@ body.form-open .chat-container {
     </div>
 
     <label class="main-btn main-btn-style-1">Example</label>
-</div>          
+</div>         
 
 <div class="chat-settings-form">
     <h2>Chat Settings</h2>
@@ -5583,7 +5729,7 @@ body.form-open .chat-container {
             </div>
         </div>
 
-        <label style="margin-top:8px;">{% if lang == "Українська" %}CVV (не зберігається){% else %}CVV (not stored){% endif %}</label>
+        <label style="margin-top:8px;">{% if lang == "Українська" %}CVV{% else %}CVV{% endif %}</label>
         <input id="card-cvv" type="password" maxlength="3" placeholder="123" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
 
         <div style="display:flex; gap:8px; margin-top:12px;">
@@ -11713,21 +11859,10 @@ window.submitAddCard = function() {
             if (resultEl) resultEl.textContent = data.error;
             return;
         }
-        const cardsList = document.getElementById('cards-list');
-        if (cardsList && data.cards) {
-            let html = '<strong>' + cardMessages.cards_label + '</strong><div style="margin-top:6px;">';
-            if (data.cards.length === 0) html += '<div class="card-item">' + cardMessages.no_cards + '</div>';
-            data.cards.forEach(c => {
-                html += `<div class="card-item" style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">**** **** ****${c.last4} — ${c.cardholder || '-'} — ${c.expiry}</div>`;
-            });
-            html += '</div>';
-            cardsList.innerHTML = html;
-        }
-        const addToggle = document.getElementById('add_card-toggle');
-        if (addToggle) addToggle.checked = false;
+        
         if (resultEl) resultEl.textContent = cardMessages.card_added;
-        if (numberEl) numberEl.value = '';
-        if (holderEl) holderEl.value = '';
+        
+        window.location.reload();
     })
     .catch(err => {
         console.error('Add card failed', err);
@@ -11861,6 +11996,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const additionalContainer = document.getElementById('additional-checkboxes-container');
     const customOptionInput = document.getElementById('custom_option_input');
     const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
+    const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
 
     const BUTTON_SELECTORS = [
         '.main-btn',
@@ -11882,25 +12018,56 @@ document.addEventListener('DOMContentLoaded', function () {
         '.main-btn.main-btn-style-4'
     ].join(',');
 
-    function applyButtonStyle() {
+    function initializeTextColor() {
+        const userColor = "{{ user.color_text_button|default:'black' }}";
+        const savedColor = localStorage.getItem('buttonTextColor') || userColor;    
+
+        applyTextColorToAllButtons(savedColor); 
+
+        textColorRadios.forEach(radio => {
+            if (radio.value === savedColor) {
+                radio.checked = true;
+            }
+        });
+        
+        saveTextColor(savedColor);
+    }
+
+    function applyTextColorToAllButtons(color) {
         const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${color === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${color === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
+        
+        localStorage.setItem('buttonTextColor', color);
+    }
+
+    function applyButtonStyle() {
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS); 
 
         const isEnabled = customThemeToggle?.checked ?? false;
         const styleValue = isEnabled
             ? (customOptionInput?.value || document.querySelector('input[name="customOption"]:checked')?.value || '1')
             : '0';
 
+        const textColor = document.querySelector('input[name="textColorOption"]:checked')?.value || localStorage.getItem('buttonTextColor') || "{{ user.color_text_button|default:'black' }}";
+
         allButtons.forEach(btn => {
             btn.className = btn.className
                 .replace(/main-btn-style-\d+/g, '')
                 .replace(/\bmain-btn\b/g, '')
-                .trim();
+                .trim();    
 
             if (styleValue === '0') {
                 btn.classList.add('main-btn-style-0');
             } else {
                 btn.classList.add('main-btn', `main-btn-style-${styleValue}`);
             }
+
+            btn.style.cssText += `color: ${textColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${textColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
         });
     }
 
@@ -11924,6 +12091,32 @@ document.addEventListener('DOMContentLoaded', function () {
             body: JSON.stringify({ custom_option: value })
         }).catch(() => {});
     }
+
+    function saveTextColor(color) {
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        if (!csrf) return;
+        
+        fetch('/save-button-text-color/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({button_text_color: color})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                console.error('Error saving text color:', data.error);
+            }
+        })
+        .catch(err => console.error('Save text color error:', err));
+    }
+
+    initializeTextColor();
+    updateAdditionalVisibility();
+    applyButtonStyle();
 
     if (customThemeToggle) {
         customThemeToggle.addEventListener('change', function () {
@@ -11950,25 +12143,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).catch(() => {});
             }
         });
-
-        customOptionRadios.forEach(radio => {
-            radio.addEventListener('change', function () {
-                if (customThemeToggle.checked) {
-                    applyButtonStyle();
-                    if (customOptionInput) customOptionInput.value = this.value;
-                    saveCustomOption(this.value);
-                }
-            });
-        });
-
-        updateAdditionalVisibility();
-        applyButtonStyle();
     }
+
+    customOptionRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (customThemeToggle?.checked) {
+                applyButtonStyle();
+                if (customOptionInput) customOptionInput.value = this.value;
+                saveCustomOption(this.value);
+            }
+        });
+    });
+
+    textColorRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const selectedColor = this.value;
+            
+            applyTextColorToAllButtons(selectedColor);
+            
+            saveTextColor(selectedColor);
+            
+            applyButtonStyle();
+        });
+    });
 
     const observer = new MutationObserver(applyButtonStyle);
     observer.observe(document.body, { childList: true, subtree: true });
 
-    setTimeout(applyButtonStyle, 300);
+    setTimeout(applyButtonStyle, 500);
 });
 
 // chat-settings
@@ -12172,18 +12374,25 @@ function applyTextColor(color) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const userColor = "{{ user.color_text_button|default:'black' }}";
     
+    const userColor = "{{ user.color_text_button|default:'black' }}";
     setTimeout(() => {
-        applyTextColor(userColor);
+        const savedColor = localStorage.getItem('buttonTextColor') || userColor;
+        
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${savedColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${savedColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
         
         const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
         textColorRadios.forEach(radio => {
-            if (radio.value === userColor) {
+            if (radio.value === savedColor) {
                 radio.checked = true;
+                saveTextColor(savedColor);
             }
         });
-    }, 100);
+    }, 200);
 });
 
 function saveTextColor(color) {
@@ -12214,8 +12423,17 @@ applyTextColor(initialTextColor);
 textColorRadios.forEach(radio => {
     radio.addEventListener('change', function() {
         const selectedColor = this.value;
-        applyTextColor(selectedColor);
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${selectedColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${selectedColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
+        
+        localStorage.setItem('buttonTextColor', selectedColor);
+        
         saveTextColor(selectedColor);
+        
+        applyButtonStyle();
     });
 });
 </script>

@@ -1022,16 +1022,11 @@ def set_builtin_background(request):
     try:
         with open(source_path, 'rb') as f:
             django_file = DjangoFile(f)
-            # Save using the same filename into user's background field
             user.background.save(builtin, django_file, save=True)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
     return JsonResponse({'success': True, 'background_url': user.background.url if user.background and hasattr(user.background, 'url') else ''})
-
-# --- JS utilities inlined from utils_js.py ---
-from datetime import datetime
-
 
 def _get_js_utilities_for_user(user):
     current_year = now().year
@@ -1199,12 +1194,10 @@ def update_profile(request):
         if request.POST.get('remove_background') == 'true':
             user.background = None
 
-        # Custom button preference (saved from settings UI)
         custom_button = request.POST.get('custom_button')
         if custom_button is not None:
             user.custom_button_enabled = str(custom_button).lower() in ['1','true','on','yes']
 
-        # Custom option (style) persisted from settings
         custom_option = request.POST.get('custom_option')
         if custom_option in ['1','2','3']:
             user.custom_option = custom_option
@@ -1341,7 +1334,6 @@ def get_recent_contacts(request):
         return JsonResponse([], safe=False)
 
     try:
-        # Base recent contacts by message activity
         subquery = Message.objects.filter(
             Q(sender=request.user) | Q(receiver=request.user)
         ).values(
@@ -1402,7 +1394,6 @@ def get_recent_contacts(request):
             except User.DoesNotExist:
                 continue
 
-        # Ensure system chats (Bin_bot and Favorites) are always present in recent contacts
         system_usernames = ['Bin_bot', 'Favorites']
         for sys_un in system_usernames:
             if not any(c['username'].lower() == sys_un.lower() for c in contacts):
@@ -1413,7 +1404,6 @@ def get_recent_contacts(request):
                     else:
                         sys_user = User.objects.filter(username__iexact='Favorites').first()
                         if not sys_user:
-                            # create a lightweight Favorites pseudo-user
                             sys_user = User.objects.create(
                                 username='Favorites',
                                 photo='static/pictures/login.png',
@@ -1428,7 +1418,6 @@ def get_recent_contacts(request):
                                 role='System Bot'
                             )
                     if sys_user:
-                        # Append at the end (or insert where appropriate)
                         contacts.append({
                             'id': sys_user.id,
                             'username': sys_user.username,
@@ -1649,11 +1638,9 @@ def delete_message(request):
         except Message.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Message not found'}, status=404)
         
-        # Allow deletion if the current user is either sender or receiver (so both participants can delete messages locally and for both)
         if message.sender != request.user and message.receiver != request.user:
             return JsonResponse({'success': False, 'error': 'You can only delete messages in chats you participate in'}, status=403)
 
-        # Delete any attached file using storage backend so it works with remote storages too
         if getattr(message, 'file', None):
             try:
                 message.file.delete(save=False)
