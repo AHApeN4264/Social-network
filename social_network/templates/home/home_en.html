@@ -348,7 +348,6 @@ input, textarea, select {
     font-weight: 600;
 }
 
-/* Стили для темы */
 .theme-light .profile-preview-card {
     background: linear-gradient(to right, #ffffff, #e0e0e0);
     color: #000000;
@@ -370,7 +369,6 @@ input, textarea, select {
 }
 
 .theme-light {
-  /* background-color: #ffffff; */
   color: #000000;
 }
 
@@ -405,6 +403,10 @@ input, textarea, select {
 .theme-light .deposit-btn {
     background: linear-gradient(135deg, #008080) !important;
     color: #ffffff !important;
+}
+
+.theme-light .kebab-btn {
+    color: #000000 !important;
 }
 
 .theme-light .profile-form label,
@@ -503,6 +505,10 @@ input, textarea, select {
 
 .theme-dark .currency-item {
     background: #1e1e1e;
+}
+
+.theme-dark .kebab-btn {
+    color: #ffffff !important;
 }
 
 .theme-dark .plan {
@@ -4329,8 +4335,7 @@ body.modal-open .chat-container {
     text-decoration: none !important;
 }
 
-.theme-dark .main-btn-style-0,
-.theme-dark .main-btn.main-btn-style-0 {
+body.theme-dark .main-btn.main-btn-style-0 {
     background: linear-gradient(135deg, #ffffff, #ffffff) !important;
     color: #000000 !important;
     border: 1px solid rgba(0,0,0,0.06) !important;
@@ -4974,24 +4979,6 @@ body.form-open .chat-container {
     filter: brightness(1);
 }
 
-.color_theme-form .main-btn.main-btn-style-1 {
-    display: block;
-    width: 100%;
-    background: linear-gradient(90deg, #a7a7a7 0%, #ffffff 50%, #a7a7a7 100%);
-    color: #000000;
-    border-radius: 6px;
-    padding: 8px 10px;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-sizing: border-box;
-    text-align: center;
-    cursor: pointer;
-    font-size: 17px;
-    font-weight: 500;
-    line-height: 1.3;
-    letter-spacing: 0.3px;
-    margin-bottom: 5px;
-}
-
 #chat-toggle:checked ~ .profile-form,
 #chat-toggle:checked ~ .setting-form,
 #chat-toggle:checked ~ .form1,
@@ -5170,6 +5157,8 @@ body.form-open .chat-container {
         <div style="color:#0056b3" class="username-line">Bin+</div>
     {% elif user.subscribe == "Bin_premium" %}
         <div style="color:#b3009b" class="username-line">Bin premium</div>
+    {% else %}
+        <div class="username-line"></div>
     {% endif %}
     <label for="profile-toggle" class="main-btn main-btn-style-1">My profile</label>
     <label for="wallet-toggle" class="main-btn main-btn-style-1">Wallet</label>
@@ -5199,12 +5188,14 @@ body.form-open .chat-container {
         <div class="profile-preview-background" id="main-profile-background"
              style="{% if user.background and user.background.url %}background-image: url('{{ user.background.url }}'); display: block;{% else %}display: none;{% endif %}"></div>
         
-        <div class="profile-preview-header">
-            <img class="profile-preview-avatar avatar" 
-                 src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                 alt="Avatar">
-            <div class="profile-preview-info">
-                <h3 class="username-text">{{ user.username }}</h3>
+            <div class="profile-preview-header">
+                {% if user.photo and user.photo.url %}
+                    <img id="avatarInput-img" class="profile-preview-avatar" src="{{ user.photo.url }}" alt="Avatar" onerror="this.src='{% static 'pictures/login.png' %}'">
+                {% else %}
+                    <img id="avatarInput-img" class="profile-preview-avatar" src="{% static 'pictures/login.png' %}" alt="Avatar">
+                {% endif %}
+                <div class="profile-preview-info">
+                    <h3 class="username-text">{{ user.username }}</h3>
                 <div class="profile-preview-status">
                     <span class="status-value {% if user.status == 'Online' %}online{% else %}offline{% endif %}">
                         ● {{ user.status|default:"Offline" }}
@@ -5254,7 +5245,6 @@ body.form-open .chat-container {
                 <span class="birthday-value">{{ user.birthday|default:"Not specified" }}</span>
             </div>
         </div>
-        
     </div>
 </div>
 
@@ -5310,7 +5300,7 @@ body.form-open .chat-container {
         </div>
         
         <div style="display:flex; gap:10px; margin-top:20px;">
-            <button class="other-profile-message-btn profile-btn" onclick="openChatWithOtherUser()">
+            <button class="other-profile-message-btn main-btn-style-1" onclick="openChatWithOtherUser()">
                 Message
             </button>
         </div>
@@ -5519,10 +5509,13 @@ body.form-open .chat-container {
                 {% csrf_token %}        
 
                 <div class="avatar-upload-section">
-                    <img id="avatarInput-img" class="avatar" 
-                         src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                         alt="Avatar">
-                    <br>                        
+                    {% if user.photo and user.photo.url %}
+                        <img id="edit-avatar-preview" class="avatar" src="{{ user.photo.url }}" alt="Avatar" onerror="this.src='{% static 'pictures/login.png' %}'">
+                    {% else %}
+                        <img id="edit-avatar-preview" class="avatar" src="{% static 'pictures/login.png' %}" alt="Avatar">
+                    {% endif %}
+                    <br>
+                    <br>                                        
 
                     <label for="avatarInput" style="display: inline-block; padding: 8px 16px; background: #007bff; color: white; border-radius: 6px; cursor: pointer;">
                         Choose New Avatar
@@ -5530,7 +5523,7 @@ body.form-open .chat-container {
                     </label>
                     <button type="button" class="btn-delete-avatar" onclick="confirmAvatarReset()">
                         Delete Avatar
-                    </button>           
+                    </button>   
                                 
                     <!-- <label for="backgroundInput" style="display: inline-block; padding: 8px 16px; background: #28a745; color: white; border-radius: 6px; cursor: pointer; margin-top: 10px; {% if user.subscribe == 'Basic' %}opacity: 0.6; cursor: not-allowed;{% endif %}" title="{% if user.subscribe == 'Basic' %}Backgrounds available for Bin+ and Bin Premium{% elif user.subscribe == 'Bin+' %}Images only (GIF for Bin Premium){% else %}All image formats including GIF{% endif %}"> -->
                         <!-- Choose New Background -->
@@ -5539,7 +5532,7 @@ body.form-open .chat-container {
                     <!-- <button type="button" class="btn-delete-background" onclick="confirmBackgroundReset()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px;" {% if not user.background or not user.background.url %}disabled{% endif %}> -->
                         <!-- Remove Background -->
                     <!-- </button>         -->
-                </div>    
+                </div>  
 
                 <div class="form-group">
                     <label for="username-input"><strong>Username:</strong></label>
@@ -5857,18 +5850,18 @@ body.form-open .chat-container {
                             <strong>You can write up to 150 characters in the description</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
+                    <!-- <li> -->
+                        <!-- <span class="icon" style="margin-right: 10px; flex-shrink: 0;"> -->
+                            <!-- <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> -->
+                                  <!-- <path d="M0 0h24v24H0z" fill="none"></path> -->
+                                 <!-- <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path> -->
+                            <!-- </svg> -->
+                        <!-- </span> -->
+                        <!-- <span> -->
                             <!-- <strong>Can place a background in your profile</strong> -->
-                             <strong></strong>
-                        </span>
-                    </li>
+                             <!-- <strong></strong> -->
+                        <!-- </span> -->
+                    <!-- </li> -->
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -5880,18 +5873,19 @@ body.form-open .chat-container {
                             <strong>Upload a file up to 50 MB</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>.</strong>
-                        </span>
-                    </li>
-                </ul>
+                    <!-- <li> -->
+                        <!-- <span class="icon" style="margin-right: 10px; flex-shrink: 0;"> -->
+                            <!-- <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> -->
+                                  <!-- <path d="M0 0h24v24H0z" fill="none"></path> -->
+                                 <!-- <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path> -->
+                            <!-- </svg> -->
+                        <!-- </span> -->
+                        <!-- <span> -->
+                            <!-- <strong>.</strong> -->
+                        <!-- </span> -->
+                    <!-- </li> -->
+                <!-- </ul> -->
+                <br><br><br><br><br>
                 <div class="action">
                     <label for="bin_premium_mouth-toggle" class="button">Choose plan</label>
                 </div>
@@ -6007,18 +6001,18 @@ body.form-open .chat-container {
                             <strong>You can write up to 150 characters in the description</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
+                    <!-- <li> -->
+                        <!-- <span class="icon" style="margin-right: 10px; flex-shrink: 0;"> -->
+                            <!-- <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> -->
+                                  <!-- <path d="M0 0h24v24H0z" fill="none"></path> -->
+                                 <!-- <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path> -->
+                            <!-- </svg> -->
+                        <!-- </span> -->
+                        <!-- <span> -->
                             <!-- <strong>Can place a background in your profile</strong> -->
-                             <strong></strong>
-                        </span>
-                    </li>
+                             <!-- <strong></strong> -->
+                        <!-- </span> -->
+                    <!-- </li> -->
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -6030,17 +6024,18 @@ body.form-open .chat-container {
                             <strong>Upload a file up to 50 MB</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>.</strong>
-                        </span>
-                    </li>
+                    <!-- <li> -->
+                        <!-- <span class="icon" style="margin-right: 10px; flex-shrink: 0;"> -->
+                            <!-- <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> -->
+                                  <!-- <path d="M0 0h24v24H0z" fill="none"></path> -->
+                                 <!-- <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path> -->
+                            <!-- </svg> -->
+                        <!-- </span> -->
+                        <!-- <span> -->
+                            <!-- <strong>.</strong> -->
+                        <!-- </span> -->
+                    <!-- </li> -->
+                     <br><br><br><br>
                 </ul>
                 <div class="action">
                     <label for="bin_premium_years-toggle" class="button">Choose plan</label>
@@ -11562,6 +11557,187 @@ function setupSubscription(checkboxId, buttonId) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarInput = document.getElementById('avatarInput');
+    const usernameInput = document.getElementById('username-input');
+    const descriptionInput = document.querySelector('.description-input');
+    const tagInput = document.getElementById('tag-input');
+    const birthdayDay = document.getElementById('birthday-day');
+    const birthdayMonth = document.getElementById('birthday-month');
+    const birthdayYear = document.getElementById('birthday-year');
+    const backgroundInput = document.getElementById('backgroundInput');
+    
+    const editAvatarPreview = document.getElementById('edit-avatar-preview');
+    const previewAvatar = document.getElementById('preview-avatar');
+    const avatarInputImg = document.getElementById('avatarInput-img');
+    const previewUsername = document.getElementById('preview-username');
+    const previewDescription = document.getElementById('preview-description');
+    const previewTag = document.getElementById('preview-tag');
+    const previewBirthday = document.getElementById('preview-birthday');
+    const previewBackground = document.getElementById('preview-background');
+    const mainProfileBackground = document.querySelector('.profile-form .profile-preview-background');
+    
+    const initialValues = {
+        avatar: '{% if user.photo and user.photo.url %}{{ user.photo.url }}{% else %}{% static "pictures/login.png" %}{% endif %}',
+        username: '{{ user.username }}',
+        description: '{{ user.description|default:"No description"|escapejs }}',
+        tag: '{{ user.your_tag|default:"No tag"|escapejs }}',
+        birthday: '{{ user.birthday|default:"Not specified"|escapejs }}',
+        background: '{% if user.background and user.background.url %}{{ user.background.url }}{% else %}none{% endif %}'
+    };
+    
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('⚠️ Only JPG, PNG, GIF or WEBP images are allowed.');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                
+                if (editAvatarPreview) editAvatarPreview.src = imageUrl;
+                if (previewAvatar) previewAvatar.src = imageUrl;
+                if (avatarInputImg) avatarInputImg.src = imageUrl;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    if (usernameInput && previewUsername) {
+        usernameInput.addEventListener('input', function() {
+            previewUsername.textContent = this.value || initialValues.username;
+        });
+    }
+    
+    if (descriptionInput && previewDescription) {
+        descriptionInput.addEventListener('input', function() {
+            previewDescription.textContent = this.value || initialValues.description;
+        });
+    }
+    
+    if (tagInput && previewTag) {
+        tagInput.addEventListener('input', function() {
+            previewTag.textContent = this.value || initialValues.tag;
+        });
+    }
+    
+    function updateBirthdayPreview() {
+        if (birthdayDay && birthdayMonth && birthdayYear && previewBirthday) {
+            const day = birthdayDay.value;
+            const month = birthdayMonth.value;
+            const year = birthdayYear.value;
+            
+            if (day && month && year) {
+                const monthName = monthNames[parseInt(month) - 1] || month;
+                previewBirthday.textContent = `${monthName} ${day}, ${year}`;
+            } else {
+                previewBirthday.textContent = initialValues.birthday;
+            }
+        }
+    }
+    
+    if (birthdayDay) birthdayDay.addEventListener('change', updateBirthdayPreview);
+    if (birthdayMonth) birthdayMonth.addEventListener('change', updateBirthdayPreview);
+    if (birthdayYear) birthdayYear.addEventListener('change', updateBirthdayPreview);
+    
+    function syncBackgrounds() {
+        if (previewBackground && mainProfileBackground) {
+            if (previewBackground.style.backgroundImage && previewBackground.style.backgroundImage !== 'none') {
+                mainProfileBackground.style.backgroundImage = previewBackground.style.backgroundImage;
+                mainProfileBackground.style.display = previewBackground.style.display;
+            }
+            else if (mainProfileBackground.style.backgroundImage && mainProfileBackground.style.backgroundImage !== 'none') {
+                previewBackground.style.backgroundImage = mainProfileBackground.style.backgroundImage;
+                previewBackground.style.display = mainProfileBackground.style.display;
+            }
+        }
+    }
+    
+    if (backgroundInput) {
+        backgroundInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                if (previewBackground) {
+                    previewBackground.style.backgroundImage = `url('${event.target.result}')`;
+                    previewBackground.style.display = 'block';
+                }
+                syncBackgrounds();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    const form1Toggle = document.getElementById('form1-toggle');
+    const form1Overlay = document.querySelector('.form1-overlay');
+    
+    function resetPreviewToInitialValues() {
+        if (editAvatarPreview) editAvatarPreview.src = initialValues.avatar;
+        if (previewAvatar) previewAvatar.src = initialValues.avatar;
+        if (avatarInputImg) avatarInputImg.src = initialValues.avatar;
+        
+        if (previewUsername) previewUsername.textContent = initialValues.username;
+        if (previewDescription) previewDescription.textContent = initialValues.description;
+        if (previewTag) previewTag.textContent = initialValues.tag;
+        if (previewBirthday) previewBirthday.textContent = initialValues.birthday;
+        
+        if (previewBackground) {
+            if (initialValues.background !== 'none') {
+                previewBackground.style.backgroundImage = `url('${initialValues.background}')`;
+                previewBackground.style.display = 'block';
+            } else {
+                previewBackground.style.backgroundImage = 'none';
+                previewBackground.style.display = 'none';
+            }
+        }
+        
+        if (avatarInput) avatarInput.value = '';
+        if (backgroundInput) backgroundInput.value = '';
+    }
+    
+    if (form1Overlay) {
+        form1Overlay.addEventListener('click', function() {
+            setTimeout(resetPreviewToInitialValues, 100);
+        });
+    }
+    
+    if (form1Toggle) {
+        form1Toggle.addEventListener('change', function() {
+            if (!this.checked) {
+                setTimeout(resetPreviewToInitialValues, 100);
+            }
+        });
+    }
+    
+    setTimeout(function() {
+        if (previewBirthday && initialValues.birthday !== 'Not specified') {
+            const dateParts = initialValues.birthday.split(' ');
+            if (dateParts.length === 3) {
+                previewBirthday.textContent = initialValues.birthday;
+            }
+        }
+        
+        if (previewBackground && initialValues.background !== 'none') {
+            previewBackground.style.backgroundImage = `url('${initialValues.background}')`;
+            previewBackground.style.display = 'block';
+        }
+    }, 500);
+});
+
 window.confirmAvatarReset = function() {
     const lang = "{{ user.language|default:'English' }}";
     const confirmMsg = lang === 'Українська'
@@ -11585,7 +11761,7 @@ window.confirmAvatarReset = function() {
             if (data.success) {
                 const defaultAvatarUrl = data.avatar_url + '?t=' + new Date().getTime();
                 
-                document.querySelectorAll('.avatar, img.avatar').forEach(img => {
+                document.querySelectorAll('.avatar, img.avatar, #preview-avatar, #upload-avatar').forEach(img => {
                     img.src = defaultAvatarUrl;
                 });
                 
@@ -12020,17 +12196,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function initializeTextColor() {
         const userColor = "{{ user.color_text_button|default:'black' }}";
-        const savedColor = localStorage.getItem('buttonTextColor') || userColor;    
-
-        applyTextColorToAllButtons(savedColor); 
-
+        localStorage.setItem('buttonTextColor', userColor);
+        const savedColor = userColor;
+        applyTextColorToAllButtons(savedColor);
         textColorRadios.forEach(radio => {
             if (radio.value === savedColor) {
                 radio.checked = true;
             }
         });
-        
-        saveTextColor(savedColor);
     }
 
     function applyTextColorToAllButtons(color) {
@@ -12357,6 +12530,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    const chat = document.querySelector('.chat-container');
+    const colorThemeToggle = document.getElementById('color_theme-toggle');
+
+    if (chat && colorThemeToggle) {
+        chat.addEventListener('click', function () {
+            if (colorThemeToggle.checked) {
+                colorThemeToggle.checked = false;
+            }
+        });
+    }
+});
 
 // Color text button
 const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');

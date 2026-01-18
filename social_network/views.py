@@ -2569,7 +2569,6 @@ def home(request):
         'bin_plus_yearly': Decimal('49.99'),
         'bin_premium_monthly': Decimal('9.99'),
         'bin_premium_yearly': Decimal('99.99'),
-        'bin_plus_test': Decimal('0.01'),
     }
     
     subscription_types = {
@@ -2577,7 +2576,6 @@ def home(request):
         'bin_plus_yearly': ('Bin+', 'yearly', 365),
         'bin_premium_monthly': ('Bin_premium', 'monthly', 30),
         'bin_premium_yearly': ('Bin_premium', 'yearly', 365),
-        'bin_plus_test': ('Bin+', 'test', 0),
     }
 
     if request.method == 'POST':
@@ -2602,11 +2600,7 @@ def home(request):
                             sub_name, sub_period, days_count = subscription_types[plan]
                             user.subscribe = sub_name
                             user.subscribe_period = sub_period
-                            user.subscription_end = (
-                                timezone.now() + timedelta(seconds=15)
-                                if plan == 'bin_plus_test'
-                                else timezone.now() + timedelta(days=days_count)
-                            )
+                            user.subscription_end = timezone.now() + timedelta(days=days_count)
                             user.subscription_purchase_time = timezone.now()
                             user.subscription_purchase_amount = cost_usd
                             user.subscription_purchase_currency = current_currency
