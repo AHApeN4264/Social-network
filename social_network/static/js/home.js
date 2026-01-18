@@ -5311,6 +5311,187 @@ function setupSubscription(checkboxId, buttonId) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarInput = document.getElementById('avatarInput');
+    const usernameInput = document.getElementById('username-input');
+    const descriptionInput = document.querySelector('.description-input');
+    const tagInput = document.getElementById('tag-input');
+    const birthdayDay = document.getElementById('birthday-day');
+    const birthdayMonth = document.getElementById('birthday-month');
+    const birthdayYear = document.getElementById('birthday-year');
+    const backgroundInput = document.getElementById('backgroundInput');
+    
+    const editAvatarPreview = document.getElementById('edit-avatar-preview');
+    const previewAvatar = document.getElementById('preview-avatar');
+    const avatarInputImg = document.getElementById('avatarInput-img');
+    const previewUsername = document.getElementById('preview-username');
+    const previewDescription = document.getElementById('preview-description');
+    const previewTag = document.getElementById('preview-tag');
+    const previewBirthday = document.getElementById('preview-birthday');
+    const previewBackground = document.getElementById('preview-background');
+    const mainProfileBackground = document.querySelector('.profile-form .profile-preview-background');
+    
+    const initialValues = {
+        avatar: '{% if user.photo and user.photo.url %}{{ user.photo.url }}{% else %}{% static "pictures/login.png" %}{% endif %}',
+        username: '{{ user.username }}',
+        description: '{{ user.description|default:"No description"|escapejs }}',
+        tag: '{{ user.your_tag|default:"No tag"|escapejs }}',
+        birthday: '{{ user.birthday|default:"Not specified"|escapejs }}',
+        background: '{% if user.background and user.background.url %}{{ user.background.url }}{% else %}none{% endif %}'
+    };
+    
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('⚠️ Only JPG, PNG, GIF or WEBP images are allowed.');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                
+                if (editAvatarPreview) editAvatarPreview.src = imageUrl;
+                if (previewAvatar) previewAvatar.src = imageUrl;
+                if (avatarInputImg) avatarInputImg.src = imageUrl;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    if (usernameInput && previewUsername) {
+        usernameInput.addEventListener('input', function() {
+            previewUsername.textContent = this.value || initialValues.username;
+        });
+    }
+    
+    if (descriptionInput && previewDescription) {
+        descriptionInput.addEventListener('input', function() {
+            previewDescription.textContent = this.value || initialValues.description;
+        });
+    }
+    
+    if (tagInput && previewTag) {
+        tagInput.addEventListener('input', function() {
+            previewTag.textContent = this.value || initialValues.tag;
+        });
+    }
+    
+    function updateBirthdayPreview() {
+        if (birthdayDay && birthdayMonth && birthdayYear && previewBirthday) {
+            const day = birthdayDay.value;
+            const month = birthdayMonth.value;
+            const year = birthdayYear.value;
+            
+            if (day && month && year) {
+                const monthName = monthNames[parseInt(month) - 1] || month;
+                previewBirthday.textContent = `${monthName} ${day}, ${year}`;
+            } else {
+                previewBirthday.textContent = initialValues.birthday;
+            }
+        }
+    }
+    
+    if (birthdayDay) birthdayDay.addEventListener('change', updateBirthdayPreview);
+    if (birthdayMonth) birthdayMonth.addEventListener('change', updateBirthdayPreview);
+    if (birthdayYear) birthdayYear.addEventListener('change', updateBirthdayPreview);
+    
+    function syncBackgrounds() {
+        if (previewBackground && mainProfileBackground) {
+            if (previewBackground.style.backgroundImage && previewBackground.style.backgroundImage !== 'none') {
+                mainProfileBackground.style.backgroundImage = previewBackground.style.backgroundImage;
+                mainProfileBackground.style.display = previewBackground.style.display;
+            }
+            else if (mainProfileBackground.style.backgroundImage && mainProfileBackground.style.backgroundImage !== 'none') {
+                previewBackground.style.backgroundImage = mainProfileBackground.style.backgroundImage;
+                previewBackground.style.display = mainProfileBackground.style.display;
+            }
+        }
+    }
+    
+    if (backgroundInput) {
+        backgroundInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                if (previewBackground) {
+                    previewBackground.style.backgroundImage = `url('${event.target.result}')`;
+                    previewBackground.style.display = 'block';
+                }
+                syncBackgrounds();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    const form1Toggle = document.getElementById('form1-toggle');
+    const form1Overlay = document.querySelector('.form1-overlay');
+    
+    function resetPreviewToInitialValues() {
+        if (editAvatarPreview) editAvatarPreview.src = initialValues.avatar;
+        if (previewAvatar) previewAvatar.src = initialValues.avatar;
+        if (avatarInputImg) avatarInputImg.src = initialValues.avatar;
+        
+        if (previewUsername) previewUsername.textContent = initialValues.username;
+        if (previewDescription) previewDescription.textContent = initialValues.description;
+        if (previewTag) previewTag.textContent = initialValues.tag;
+        if (previewBirthday) previewBirthday.textContent = initialValues.birthday;
+        
+        if (previewBackground) {
+            if (initialValues.background !== 'none') {
+                previewBackground.style.backgroundImage = `url('${initialValues.background}')`;
+                previewBackground.style.display = 'block';
+            } else {
+                previewBackground.style.backgroundImage = 'none';
+                previewBackground.style.display = 'none';
+            }
+        }
+        
+        if (avatarInput) avatarInput.value = '';
+        if (backgroundInput) backgroundInput.value = '';
+    }
+    
+    if (form1Overlay) {
+        form1Overlay.addEventListener('click', function() {
+            setTimeout(resetPreviewToInitialValues, 100);
+        });
+    }
+    
+    if (form1Toggle) {
+        form1Toggle.addEventListener('change', function() {
+            if (!this.checked) {
+                setTimeout(resetPreviewToInitialValues, 100);
+            }
+        });
+    }
+    
+    setTimeout(function() {
+        if (previewBirthday && initialValues.birthday !== 'Not specified') {
+            const dateParts = initialValues.birthday.split(' ');
+            if (dateParts.length === 3) {
+                previewBirthday.textContent = initialValues.birthday;
+            }
+        }
+        
+        if (previewBackground && initialValues.background !== 'none') {
+            previewBackground.style.backgroundImage = `url('${initialValues.background}')`;
+            previewBackground.style.display = 'block';
+        }
+    }, 500);
+});
+
 window.confirmAvatarReset = function() {
     const lang = "{{ user.language|default:'English' }}";
     const confirmMsg = lang === 'Українська'
@@ -5334,7 +5515,7 @@ window.confirmAvatarReset = function() {
             if (data.success) {
                 const defaultAvatarUrl = data.avatar_url + '?t=' + new Date().getTime();
                 
-                document.querySelectorAll('.avatar, img.avatar').forEach(img => {
+                document.querySelectorAll('.avatar, img.avatar, #preview-avatar, #upload-avatar').forEach(img => {
                     img.src = defaultAvatarUrl;
                 });
                 
@@ -5608,21 +5789,10 @@ window.submitAddCard = function() {
             if (resultEl) resultEl.textContent = data.error;
             return;
         }
-        const cardsList = document.getElementById('cards-list');
-        if (cardsList && data.cards) {
-            let html = '<strong>' + cardMessages.cards_label + '</strong><div style="margin-top:6px;">';
-            if (data.cards.length === 0) html += '<div class="card-item">' + cardMessages.no_cards + '</div>';
-            data.cards.forEach(c => {
-                html += `<div class="card-item" style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">**** **** ****${c.last4} — ${c.cardholder || '-'} — ${c.expiry}</div>`;
-            });
-            html += '</div>';
-            cardsList.innerHTML = html;
-        }
-        const addToggle = document.getElementById('add_card-toggle');
-        if (addToggle) addToggle.checked = false;
+        
         if (resultEl) resultEl.textContent = cardMessages.card_added;
-        if (numberEl) numberEl.value = '';
-        if (holderEl) holderEl.value = '';
+        
+        window.location.reload();
     })
     .catch(err => {
         console.error('Add card failed', err);
@@ -5751,57 +5921,93 @@ document.addEventListener('click', function(e) {
 });
 
 // Checkbox in Color theme ======================================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const themeSelect = document.getElementById('themeSelect');
-    const applyThemeBtn = document.getElementById('applyThemeBtn');
+document.addEventListener('DOMContentLoaded', function () {
     const customThemeToggle = document.getElementById('customThemeToggle');
-    const customThemeLabel = document.getElementById('customThemeLabel');
-    const hiddenInput = document.getElementById('custom_button_input');
-    
-    const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
     const additionalContainer = document.getElementById('additional-checkboxes-container');
     const customOptionInput = document.getElementById('custom_option_input');
+    const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
+    const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
 
-    function applySelectedStyle(value) {
-        const allButtons = document.querySelectorAll('.main-btn, .deposit-btn, .add_card-btn, .other-profile-message-btn');
+    const BUTTON_SELECTORS = [
+        '.main-btn',
+        '.deposit-btn',
+        '.add_card-btn',
+        '.other-profile-message-btn',
+        '.subscribe-btn',
+        '.profile-btn',
+        '.setting-btn',
+        'label.main-btn-style-0',
+        'label.main-btn-style-1',
+        'label.main-btn-style-2',
+        'label.main-btn-style-3',
+        'label.main-btn-style-4',
+        '.main-btn.main-btn-style-0',
+        '.main-btn.main-btn-style-1',
+        '.main-btn.main-btn-style-2',
+        '.main-btn.main-btn-style-3',
+        '.main-btn.main-btn-style-4'
+    ].join(',');
+
+    function initializeTextColor() {
+        const userColor = "{{ user.color_text_button|default:'black' }}";
+        localStorage.setItem('buttonTextColor', userColor);
+        const savedColor = userColor;
+        applyTextColorToAllButtons(savedColor);
+        textColorRadios.forEach(radio => {
+            if (radio.value === savedColor) {
+                radio.checked = true;
+            }
+        });
+    }
+
+    function applyTextColorToAllButtons(color) {
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        
         allButtons.forEach(btn => {
-            btn.classList.add('changing');
-            setTimeout(() => {
-                btn.classList.remove('main-btn-style-0', 'main-btn-style-1', 'main-btn-style-2', 'main-btn-style-3', 'main-btn-style-4');
+            btn.style.cssText += `color: ${color === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${color === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
+        
+        localStorage.setItem('buttonTextColor', color);
+    }
 
-                if (value === '0') {
-                    btn.classList.remove('main-btn');
-                    btn.classList.add('main-btn-style-0');
-                } else {
-                    btn.classList.add('main-btn', 'main-btn-style-' + value);
-                }
+    function applyButtonStyle() {
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS); 
 
-                setTimeout(() => btn.classList.remove('changing'), 50);
-            }, 10);
+        const isEnabled = customThemeToggle?.checked ?? false;
+        const styleValue = isEnabled
+            ? (customOptionInput?.value || document.querySelector('input[name="customOption"]:checked')?.value || '1')
+            : '0';
+
+        const textColor = document.querySelector('input[name="textColorOption"]:checked')?.value || localStorage.getItem('buttonTextColor') || "{{ user.color_text_button|default:'black' }}";
+
+        allButtons.forEach(btn => {
+            btn.className = btn.className
+                .replace(/main-btn-style-\d+/g, '')
+                .replace(/\bmain-btn\b/g, '')
+                .trim();    
+
+            if (styleValue === '0') {
+                btn.classList.add('main-btn-style-0');
+            } else {
+                btn.classList.add('main-btn', `main-btn-style-${styleValue}`);
+            }
+
+            btn.style.cssText += `color: ${textColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${textColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
         });
     }
 
     function updateAdditionalVisibility() {
-        if (!additionalContainer) return;
-
-        if (customThemeToggle && customThemeToggle.checked) {
-            additionalContainer.style.display = 'block';
-
-            const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-            const selectedValue = selectedRadio ? selectedRadio.value : '1';
-            applySelectedStyle(selectedValue);
-        } else {
-            additionalContainer.style.display = 'none';
-
-            applySelectedStyle('0');
-            if (customOptionInput) customOptionInput.value = '0';
+        if (additionalContainer) {
+            additionalContainer.style.display = customThemeToggle.checked ? 'block' : 'none';
         }
     }
 
     function saveCustomOption(value) {
         const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
         if (!csrf) return;
-        
+
         fetch('/save-custom-option/', {
             method: 'POST',
             headers: {
@@ -5809,213 +6015,89 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': csrf,
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({custom_option: value})
+            body: JSON.stringify({ custom_option: value })
+        }).catch(() => {});
+    }
+
+    function saveTextColor(color) {
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        if (!csrf) return;
+        
+        fetch('/save-button-text-color/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({button_text_color: color})
         })
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
-                console.error('Error saving custom option:', data.error);
+                console.error('Error saving text color:', data.error);
             }
         })
-        .catch(err => console.error('Save custom option error:', err));
+        .catch(err => console.error('Save text color error:', err));
     }
 
-    customOptionRadios.forEach(r => r.addEventListener('change', function() {
-        const selectedValue = this.value;
-        
-        if (customThemeToggle && customThemeToggle.checked) {
-            applySelectedStyle(selectedValue);
-            if (customOptionInput) customOptionInput.value = selectedValue;
-            saveCustomOption(selectedValue);
-        }
-    }));
+    initializeTextColor();
+    updateAdditionalVisibility();
+    applyButtonStyle();
 
     if (customThemeToggle) {
-        customThemeToggle.addEventListener('change', function() {
-            const isChecked = this.checked;
-            
-            if (customThemeLabel) customThemeLabel.textContent = isChecked ? 'Custom enabled' : 'Enable Custom button';
-            
-            if (hiddenInput) hiddenInput.value = isChecked ? '1' : '0';
-            
+        customThemeToggle.addEventListener('change', function () {
             updateAdditionalVisibility();
-            
-            if (!isChecked) {
-                applySelectedStyle('0');
-                if (customOptionInput) customOptionInput.value = '0';
-                saveCustomOption('0');
-            } else {
-                const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-                const selectedValue = selectedRadio ? selectedRadio.value : '1';
-                applySelectedStyle(selectedValue);
-                if (customOptionInput) customOptionInput.value = selectedValue;
-                saveCustomOption(selectedValue);
-            }
-            
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || null;
-            if (!csrf) return;
-            
-            fetch('/toggle-custom-button/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrf,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({enabled: isChecked})
-            }).catch(err => console.error('Persist error', err));
-        });
+            applyButtonStyle();
 
-        const isInitiallyChecked = customThemeToggle.checked;
-        
-        if (customThemeLabel) customThemeLabel.textContent = isInitiallyChecked ? 'Custom enabled' : 'Enable Custom button';
-        if (hiddenInput) hiddenInput.value = isInitiallyChecked ? '1' : '0';
-        
-        if (!isInitiallyChecked) {
-            applySelectedStyle('0');
-            if (customOptionInput) customOptionInput.value = '0';
-        } else {
-            const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-            const initialValue = selectedRadio ? selectedRadio.value : (customOptionInput ? customOptionInput.value : '1');
-            applySelectedStyle(initialValue);
-            if (customOptionInput) customOptionInput.value = initialValue;
-        }
-        
-        updateAdditionalVisibility();
-    }
-    
-    if (colorThemeToggle) {
-        colorThemeToggle.addEventListener('change', updateMenuDisabled);
-        updateMenuDisabled();
-    }
+            const isChecked = this.checked;
+            const selectedValue = isChecked
+                ? (document.querySelector('input[name="customOption"]:checked')?.value || '1')
+                : '0';
 
-    function applyCustomButtonUI(enabled) {
-        const selected = (customOptionInput && customOptionInput.value) ? customOptionInput.value : '1';
-        
-        const allMainBtns = document.querySelectorAll('.main-btn');
-        const otherMsgBtn = document.querySelector('.other-profile-message-btn');   
+            if (customOptionInput) customOptionInput.value = selectedValue;
 
-        const applyStyle = (el) => {
-            if (!el) return;
-            if (enabled) {
-                el.classList.add('main-btn');
-                el.classList.remove('main-btn-style-0', 'main-btn-style-1', 'main-btn-style-2', 'main-btn-style-3', 'main-btn-style-4');
-                el.classList.add('main-btn-style-' + (selected || '1'));
-            } else {
-                el.classList.remove('main-btn');
-                el.classList.remove('main-btn-style-1','main-btn-style-2','main-btn-style-3','main-btn-style-4');
-            }
-        };  
-
-        allMainBtns.forEach(applyStyle);
-        if (otherMsgBtn) applyStyle(otherMsgBtn);
-    }
-
-    function applyButtonTextColor(value) {
-        const buttons = document.querySelectorAll('.main-btn, .deposit-btn, .add_card-btn, .other-profile-message-btn');
-        buttons.forEach(btn => {
-            if (!btn) return;
-            btn.style.color = (value === 'black') ? '#000' : '#fff';
-            
-            if (value === 'white') {
-                btn.style.textShadow = '0 1px 2px rgba(0,0,0,0.3)';
-            } else {
-                btn.style.textShadow = 'none';
+            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (csrf) {
+                fetch('/toggle-custom-button/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ enabled: isChecked })
+                }).catch(() => {});
             }
         });
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Custom button enabled:', {% if user.custom_button_enabled %}true{% else %}false{% endif %});
-        console.log('Custom option:', "{{ user.custom_option|default:'1' }}");
-        
-        const depositBtn = document.querySelector('.deposit-btn');
-        const addCardBtn = document.querySelector('.add_card-btn');
-        console.log('Deposit button classes:', depositBtn?.className);
-        console.log('Add card button classes:', addCardBtn?.className);
-        
-        setTimeout(() => {
-            applyCustomButtonUI({% if user.custom_button_enabled %}true{% else %}false{% endif %});
-            applyButtonTextColor("{{ user.color_text_button|default:'white' }}");
-        }, 200);
+
+    customOptionRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (customThemeToggle?.checked) {
+                applyButtonStyle();
+                if (customOptionInput) customOptionInput.value = this.value;
+                saveCustomOption(this.value);
+            }
+        });
     });
 
-    const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
-    textColorRadios.forEach(r => r.addEventListener('change', function() {
-        const value = this.value;
-        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-        if (!csrf) return;
-        fetch('/save-button-text-color/', {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json', 'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest' },
-            body: JSON.stringify({ button_text_color: value })
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                applyButtonTextColor(value);
-            } else {
-                console.error('Could not save button text color', data.error);
-            }
-        }).catch(e => console.error('Save color error', e));
-    }));
-
-    try {
-        const initialColor = "{{ user.color_text_button|default:'white' }}";
-        applyButtonTextColor(initialColor);
-        applyCustomButtonUI(!!({% if user.custom_button_enabled %}true{% else %}false{% endif %}));
-    } catch(e) {}
-
-    if (customThemeToggle) {
-        customThemeToggle.addEventListener('change', function() {
-            applyCustomButtonUI(this.checked);
+    textColorRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const selectedColor = this.value;
+            
+            applyTextColorToAllButtons(selectedColor);
+            
+            saveTextColor(selectedColor);
+            
+            applyButtonStyle();
         });
-    }
-    
-    if (themeSelect && applyThemeBtn) {
-        const userSubscribe = "{{ user.subscribe }}";  
-        const body = document.body;
+    });
 
-        const savedTheme = localStorage.getItem('selectedTheme');
-        if (savedTheme) {
-            body.classList.add(`theme-${savedTheme}`);
-            themeSelect.value = savedTheme;
-        }
+    const observer = new MutationObserver(applyButtonStyle);
+    observer.observe(document.body, { childList: true, subtree: true });
 
-        if (userSubscribe === "Basic") {
-            themeSelect.querySelector('option[value="pink"]').disabled = true;
-            themeSelect.querySelector('option[value="green"]').disabled = true;
-        }
-
-        applyThemeBtn.addEventListener('click', () => {
-            const selected = themeSelect.value;
-
-            if ((selected === "pink" || selected === "green") && userSubscribe === "Basic") {
-                alert("❌ This theme is available only for subscribers!");
-                return;
-            }
-
-            body.classList.remove('theme-light', 'theme-dark', 'theme-pink', 'theme-green');
-
-            body.classList.add(`theme-${selected}`);
-
-            localStorage.setItem('selectedTheme', selected);
-        });
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const chatContainer = document.querySelector('.chat-container');
-    const colorThemeToggle = document.getElementById('color_theme-toggle');
-    
-    if (chatContainer && colorThemeToggle) {
-        chatContainer.addEventListener('click', function(e) {
-            if (colorThemeToggle.checked) {
-                colorThemeToggle.checked = false;
-                
-                updateFormOpenState();
-                
-                e.stopPropagation();
-            }
-        });
-    }
+    setTimeout(applyButtonStyle, 500);
 });
 
 // chat-settings
@@ -6203,6 +6285,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    const chat = document.querySelector('.chat-container');
+    const colorThemeToggle = document.getElementById('color_theme-toggle');
+
+    if (chat && colorThemeToggle) {
+        chat.addEventListener('click', function () {
+            if (colorThemeToggle.checked) {
+                colorThemeToggle.checked = false;
+            }
+        });
+    }
+});
+
 // Color text button
 const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
 const textColorContainer = document.getElementById('text-color-container');
@@ -6219,18 +6314,25 @@ function applyTextColor(color) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const userColor = "{{ user.color_text_button|default:'black' }}";
     
+    const userColor = "{{ user.color_text_button|default:'black' }}";
     setTimeout(() => {
-        applyTextColor(userColor);
+        const savedColor = localStorage.getItem('buttonTextColor') || userColor;
+        
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${savedColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${savedColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
         
         const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
         textColorRadios.forEach(radio => {
-            if (radio.value === userColor) {
+            if (radio.value === savedColor) {
                 radio.checked = true;
+                saveTextColor(savedColor);
             }
         });
-    }, 100);
+    }, 200);
 });
 
 function saveTextColor(color) {
@@ -6261,7 +6363,16 @@ applyTextColor(initialTextColor);
 textColorRadios.forEach(radio => {
     radio.addEventListener('change', function() {
         const selectedColor = this.value;
-        applyTextColor(selectedColor);
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${selectedColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${selectedColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
+        
+        localStorage.setItem('buttonTextColor', selectedColor);
+        
         saveTextColor(selectedColor);
+        
+        applyButtonStyle();
     });
 });

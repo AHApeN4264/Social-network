@@ -4,8 +4,8 @@
 {% block title %}
 <title>Main</title>
 <link rel="icon" href="{% static 'icons/Bin.jpg' %}" type="image/png">
-<!-- <link rel="stylesheet" href="{% static 'css/home.css' %}"> -->
-<!-- <link rel="stylesheet" href="{% static 'js/home.js' %}"> -->
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'js/home.js' %}">
 
 <style>
 :root {
@@ -109,21 +109,60 @@ input, textarea, select {
 .preview-bg-updated {
     box-shadow: 0 0 0 4px rgba(0,0,0,0.06);
 }
-.color-swatch .swatch-label { display:none; font-size:12px; }
-.color-swatch[data-theme="light"] { background: linear-gradient(180deg,#ffffff,#f6f7fb); }
-.color-swatch[data-theme="dark"] { background: linear-gradient(180deg,#0f1720,#07111a); }
-.color-swatch[data-theme="pink"] { background: linear-gradient(180deg,#ffeef7,#ffd1e8); }
-.color-swatch[data-theme="green"] { background: linear-gradient(180deg,#e6fff8,#d2fff0); }
+
+.color-swatch .swatch-label {
+  display: none;
+  font-size: 12px;
+}
+
+.color-swatch[data-theme="light"] {
+  background: linear-gradient(180deg, #ffffff, #f6f7fb);
+}
+
+.color-swatch[data-theme="dark"] {
+  background: linear-gradient(180deg, #0f1720, #07111a);
+}
+
+.color-swatch[data-theme="pink"] {
+  background: linear-gradient(180deg, #ffeef7, #ffd1e8);
+}
+
+.color-swatch[data-theme="green"] {
+  background: linear-gradient(180deg, #e6fff8, #d2fff0);
+}
+
 .color-swatch.selected { 
     outline: 3px solid rgba(0,0,0,0.06); 
     transform: translateY(-2px); 
 }
 
-.apply-theme-btn { padding:8px 12px; border-radius:8px; background:var(--accent); color:#fff; border:none; cursor:pointer }
-.reset-theme-btn { padding:8px 12px; border-radius:8px; background:#eee; color:var(--text); border:none; cursor:pointer }
+.apply-theme-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
 
-.message.sent { background: var(--accent); color: white; }
-.message.received { background: rgba(0,0,0,0.03); color: var(--text); }
+.reset-theme-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #eee;
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+.message.sent {
+  background: var(--accent);
+  color: white;
+}
+
+.message.received {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--text);
+}
 
 .profile-btn {
     background: linear-gradient(135deg, #007bff, #0056b3);
@@ -166,10 +205,28 @@ input, textarea, select {
     color: #fff !important;
 }
 
-.color-swatch.selected::after { content: '✓'; color: #fff; font-weight: 700; font-size: 14px; }
-.color-swatch { transition: transform 0.15s ease, box-shadow 0.15s ease; }
-.color-theme .theme-note { font-size: 13px; color: var(--muted); margin-bottom:6px; }
-.color-theme .theme-sub-note { font-size: 12px; color: var(--muted); margin-top:6px; }
+.color-swatch.selected::after {
+  content: '✓';
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.color-swatch {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.color-theme .theme-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.color-theme .theme-sub-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
 
 .setting-form,
 .form1 {
@@ -509,6 +566,28 @@ input, textarea, select {
 
 .theme-dark .kebab-btn {
     color: #ffffff !important;
+}
+
+.theme-dark .side-menu .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4),
+.theme-dark .setting-form .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4) {
+    background: rgba(50, 50, 50, 0.7);
+    color: #ffffff;
+    padding: 10px 15px;
+    border: 1px solid #555555;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    margin: 5px 0;
+    text-align: center;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    text-decoration: none;
+}
+
+.theme-dark .side-menu .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4):hover,
+.theme-dark .setting-form .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4):hover {
+    background: rgba(70, 70, 70, 0.9);
+    border-color: #b30086;
+    color: #ffffff;
 }
 
 .theme-dark .plan {
@@ -3219,20 +3298,73 @@ body {
     color: white;
 }
 
-.sticker-render { display:inline-block; }
-.sticker-render.large { display:block; text-align:center; }
-.sticker-render.large img.sticker-img-large { width:220px; height:auto; display:block; margin:0 auto; }
-.sticker-item { transition: transform 0.08s ease; }
-.sticker-item:active { transform: scale(0.96); }
-.inline-sticker img.sticker-img { width:28px; height:auto; display:block; }
-.inline-sticker .sticker-emoji { font-size:26px; }
-.sticker-emoji-large { font-size:160px; display:block; text-align:center; }
-.sticker-img { width:32px; height:auto; }
-#sticker-category-nav { padding:6px 8px; border-bottom:1px solid rgba(0,0,0,0.04); }
-.sticker-cat-btn { background:transparent; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; color:var(--text); }
-.sticker-cat-btn:hover { background: rgba(0,0,0,0.04); }
-.sticker-cat-btn.active { background: var(--accent); color: #fff; }
+.sticker-render {
+  display: inline-block;
+}
 
+.sticker-render.large {
+  display: block;
+  text-align: center;
+}
+
+.sticker-render.large img.sticker-img-large {
+  width: 220px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.sticker-img {
+  width: 32px;
+  height: auto;
+}
+
+.sticker-item {
+  transition: transform 0.08s ease;
+}
+
+.sticker-item:active {
+  transform: scale(0.96);
+}
+
+.inline-sticker img.sticker-img {
+  width: 28px;
+  height: auto;
+  display: block;
+}
+
+.inline-sticker .sticker-emoji {
+  font-size: 26px;
+}
+
+.sticker-emoji-large {
+  font-size: 160px;
+  display: block;
+  text-align: center;
+}
+
+#sticker-category-nav {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.sticker-cat-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.sticker-cat-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.sticker-cat-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
 
 .chat-header {
     background: var(--surface);
