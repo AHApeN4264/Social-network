@@ -5715,9 +5715,11 @@ body.form-open .chat-container {
                 <div class="preview-badge">PREVIEW</div>        
 
                 <div class="profile-preview-header">
-                    <img id="preview-avatar" class="profile-preview-avatar other-profile-avatar" 
-                         src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                         alt="Avatar">
+                    {% if user.photo and user.photo.url %}
+                        <img id="edit-avatar-preview" class="avatar" src="{{ user.photo.url }}" alt="Avatar" onerror="this.src='{% static 'pictures/login.png' %}'">
+                    {% else %}
+                        <img id="edit-avatar-preview" class="avatar" src="{% static 'pictures/login.png' %}" alt="Avatar">
+                    {% endif %}
                     <div class="profile-preview-info">
                         <h3 id="preview-username" class="other-profile-username">{{ user.username }}</h3>
                         <div class="profile-preview-status">
