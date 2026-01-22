@@ -5,7 +5,7 @@
 # git checkout -b Add_Bot_Bin_Currency_conversion_Security_Stikers_Uploads_photos/videos_Account_recovery_Copy/edit/delete_messages_Scroll_Hour_format_Support_Edit_Color_theme_Chat_Terms_Subscription_Profile
 
 # git add .
-# git commit -m "edit_chat_edit-comment"
+# git commit -m "edit-chat_edit-comment_bug-fix_and_more"
 # git push -u origin Add_Bot_Bin_Currency_conversion_Security_Stikers_Uploads_photos/videos_Account_recovery_Copy/edit/delete_messages_Scroll_Hour_format_Support_Edit_Color_theme_Chat_Terms_Subscription_Profile
 
 #!/usr/bin/env python
