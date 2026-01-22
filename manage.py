@@ -1,13 +1,11 @@
 # python manage.py runserver
-# & .\.venv\Scripts\python.exe manage.py runserver 192.168.1.53:5000
-# Для запуска с телефона
-# python manage.py runserver 0.0.0.0:8000
+# daphne --bind 0.0.0.0 --port 8000 main.asgi:application
 
 # создание ветки
 # git checkout -b Add_Bot_Bin_Currency_conversion_Security_Stikers_Uploads_photos/videos_Account_recovery_Copy/edit/delete_messages_Scroll_Hour_format_Support_Edit_Color_theme_Chat_Terms_Subscription_Profile
 
 # git add .
-# git commit -m "Add_Bot_Bin_Currency_conversion_Security_Stikers_Uploads_photos/videos_Account_recovery_Copy/edit/delete_messages_Scroll_Hour_format_Support_Edit_Color_theme_Chat_Terms_Subscription_Profile"
+# git commit -m "fix_bugs"
 # git push -u origin Add_Bot_Bin_Currency_conversion_Security_Stikers_Uploads_photos/videos_Account_recovery_Copy/edit/delete_messages_Scroll_Hour_format_Support_Edit_Color_theme_Chat_Terms_Subscription_Profile
 
 #!/usr/bin/env python

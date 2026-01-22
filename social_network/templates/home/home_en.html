@@ -5,7 +5,7 @@
 <title>Main</title>
 <link rel="icon" href="{% static 'icons/Bin.jpg' %}" type="image/png">
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
-<!-- <link rel="stylesheet" href="{% static 'js/home.js' %}"> -->
+<link rel="stylesheet" href="{% static 'js/home.js' %}">
 
 <style>
 :root {
@@ -57,7 +57,6 @@ body.theme-green {
 }
 
 .side-menu,
-.profile-form,
 .profile-preview-card,
 .setting-form,
 .form1,
@@ -110,21 +109,60 @@ input, textarea, select {
 .preview-bg-updated {
     box-shadow: 0 0 0 4px rgba(0,0,0,0.06);
 }
-.color-swatch .swatch-label { display:none; font-size:12px; }
-.color-swatch[data-theme="light"] { background: linear-gradient(180deg,#ffffff,#f6f7fb); }
-.color-swatch[data-theme="dark"] { background: linear-gradient(180deg,#0f1720,#07111a); }
-.color-swatch[data-theme="pink"] { background: linear-gradient(180deg,#ffeef7,#ffd1e8); }
-.color-swatch[data-theme="green"] { background: linear-gradient(180deg,#e6fff8,#d2fff0); }
+
+.color-swatch .swatch-label {
+  display: none;
+  font-size: 12px;
+}
+
+.color-swatch[data-theme="light"] {
+  background: linear-gradient(180deg, #ffffff, #f6f7fb);
+}
+
+.color-swatch[data-theme="dark"] {
+  background: linear-gradient(180deg, #0f1720, #07111a);
+}
+
+.color-swatch[data-theme="pink"] {
+  background: linear-gradient(180deg, #ffeef7, #ffd1e8);
+}
+
+.color-swatch[data-theme="green"] {
+  background: linear-gradient(180deg, #e6fff8, #d2fff0);
+}
+
 .color-swatch.selected { 
     outline: 3px solid rgba(0,0,0,0.06); 
     transform: translateY(-2px); 
 }
 
-.apply-theme-btn { padding:8px 12px; border-radius:8px; background:var(--accent); color:#fff; border:none; cursor:pointer }
-.reset-theme-btn { padding:8px 12px; border-radius:8px; background:#eee; color:var(--text); border:none; cursor:pointer }
+.apply-theme-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
 
-.message.sent { background: var(--accent); color: white; }
-.message.received { background: rgba(0,0,0,0.03); color: var(--text); }
+.reset-theme-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #eee;
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+.message.sent {
+  background: var(--accent);
+  color: white;
+}
+
+.message.received {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--text);
+}
 
 .profile-btn {
     background: linear-gradient(135deg, #007bff, #0056b3);
@@ -167,10 +205,28 @@ input, textarea, select {
     color: #fff !important;
 }
 
-.color-swatch.selected::after { content: '✓'; color: #fff; font-weight: 700; font-size: 14px; }
-.color-swatch { transition: transform 0.15s ease, box-shadow 0.15s ease; }
-.color-theme .theme-note { font-size: 13px; color: var(--muted); margin-bottom:6px; }
-.color-theme .theme-sub-note { font-size: 12px; color: var(--muted); margin-top:6px; }
+.color-swatch.selected::after {
+  content: '✓';
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.color-swatch {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.color-theme .theme-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.color-theme .theme-sub-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
 
 .setting-form,
 .form1 {
@@ -211,12 +267,10 @@ input, textarea, select {
 
 .profile-form {
     position: fixed;
-    top: 249px;
-    right: 755px;
-    transform: none;
-    background: var(--surface);
-    /* padding: 20px; */
-    border-radius: 8px;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
     display: none;
     z-index: 2000;
     width: 400px;
@@ -224,15 +278,154 @@ input, textarea, select {
     box-sizing: border-box;
     flex-direction: column;
     gap: 20px;
-    transition: background 0.3s, color 0.3s;
-} 
+}
 
-#profile-toggle:checked ~ .profile-form {
+.profile-header {
     display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-header .info h2 {
+    margin: 0 0 5px 0;
+    font-size: 22px;
+    color: #333;
+}
+
+.profile-header .info p {
+    margin: 5px 0 0 0;
+    color: #777;
+    font-size: 15px;
+}
+
+.profile-preview-card {
+    position: relative;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: var(--surface);
+    overflow: hidden;
+}
+
+.profile-preview-background {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+    opacity: 1;
+    transition: background-image 0.3s ease;
+}
+
+.profile-preview-card * {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.profile-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-preview-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+}
+
+.profile-preview-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 22px;
+    color: var(--text);
+    word-wrap: break-word;
+}
+
+.profile-preview-status {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.profile-preview-tag {
+    font-size: 13px;
+    color: #007bff;
+    font-weight: 600;
+    background: #e3f2fd;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.profile-preview-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 20px 0;
+}
+
+.profile-preview-section {
+    margin-bottom: 15px;
+}
+
+.profile-preview-label {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.profile-preview-value {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.profile-preview-birthday {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-size: 15px;
+}
+
+.system-bot-label {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.theme-light .profile-preview-card {
+    background: linear-gradient(to right, #ffffff, #e0e0e0);
+    color: #000000;
+}
+
+.theme-dark .profile-preview-card {
+    background: linear-gradient(to right, #2c2c2c, #1a1a1a);
+    color: #ffffff;
+}
+
+.theme-pink .profile-preview-card {
+    background: linear-gradient(to right, #ffb6c1, #b30086);
+    color: #000000;
+}
+
+.theme-green .profile-preview-card {
+    background: linear-gradient(to right, #a8e6a2, #2e7d32);
+    color: #ffffff;
 }
 
 .theme-light {
-  /* background-color: #ffffff; */
   color: #000000;
 }
 
@@ -267,6 +460,10 @@ input, textarea, select {
 .theme-light .deposit-btn {
     background: linear-gradient(135deg, #008080) !important;
     color: #ffffff !important;
+}
+
+.theme-light .kebab-btn {
+    color: #000000 !important;
 }
 
 .theme-light .profile-form label,
@@ -363,12 +560,34 @@ input, textarea, select {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
 }
 
-.theme-dark .main-btn-style-0:hover {
-    background: linear-gradient(135deg, #2c2c2c, #3a3a3a) !important;
-}
-
 .theme-dark .currency-item {
     background: #1e1e1e;
+}
+
+.theme-dark .kebab-btn {
+    color: #ffffff !important;
+}
+
+.theme-dark .side-menu .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4),
+.theme-dark .setting-form .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4) {
+    background: rgba(50, 50, 50, 0.7);
+    color: #ffffff;
+    padding: 10px 15px;
+    border: 1px solid #555555;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    margin: 5px 0;
+    text-align: center;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    text-decoration: none;
+}
+
+.theme-dark .side-menu .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4):hover,
+.theme-dark .setting-form .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4):hover {
+    background: rgba(70, 70, 70, 0.9);
+    border-color: #b30086;
+    color: #ffffff;
 }
 
 .theme-dark .plan {
@@ -3079,20 +3298,73 @@ body {
     color: white;
 }
 
-.sticker-render { display:inline-block; }
-.sticker-render.large { display:block; text-align:center; }
-.sticker-render.large img.sticker-img-large { width:220px; height:auto; display:block; margin:0 auto; }
-.sticker-item { transition: transform 0.08s ease; }
-.sticker-item:active { transform: scale(0.96); }
-.inline-sticker img.sticker-img { width:28px; height:auto; display:block; }
-.inline-sticker .sticker-emoji { font-size:26px; }
-.sticker-emoji-large { font-size:160px; display:block; text-align:center; }
-.sticker-img { width:32px; height:auto; }
-#sticker-category-nav { padding:6px 8px; border-bottom:1px solid rgba(0,0,0,0.04); }
-.sticker-cat-btn { background:transparent; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; color:var(--text); }
-.sticker-cat-btn:hover { background: rgba(0,0,0,0.04); }
-.sticker-cat-btn.active { background: var(--accent); color: #fff; }
+.sticker-render {
+  display: inline-block;
+}
 
+.sticker-render.large {
+  display: block;
+  text-align: center;
+}
+
+.sticker-render.large img.sticker-img-large {
+  width: 220px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.sticker-img {
+  width: 32px;
+  height: auto;
+}
+
+.sticker-item {
+  transition: transform 0.08s ease;
+}
+
+.sticker-item:active {
+  transform: scale(0.96);
+}
+
+.inline-sticker img.sticker-img {
+  width: 28px;
+  height: auto;
+  display: block;
+}
+
+.inline-sticker .sticker-emoji {
+  font-size: 26px;
+}
+
+.sticker-emoji-large {
+  font-size: 160px;
+  display: block;
+  text-align: center;
+}
+
+#sticker-category-nav {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.sticker-cat-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.sticker-cat-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.sticker-cat-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
 
 .chat-header {
     background: var(--surface);
@@ -4074,8 +4346,7 @@ body.modal-open .chat-container {
 .main-btn {
     display: block;
     width: 100%;
-    background: linear-gradient(135deg, #ffffff);
-    color: #000;
+    color: inherit;
     border-radius: 6px;
     padding: 8px 10px;
     border: 1px solid rgba(0,0,0,0.06);
@@ -4160,10 +4431,47 @@ body.modal-open .chat-container {
 }
 
 .main-btn-style-0 {
-    background: linear-gradient(135deg, #ffffff 100%);
-    color: #000;
-    border: 1px solid rgba(0,0,0,0.06);
-} 
+    background: linear-gradient(135deg, #ffffff, #ffffff) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 10px 15px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    margin: 5px 0 !important;
+    font-size: 17px !important;
+    font-weight: 500 !important;
+    box-sizing: border-box !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+}
+
+.main-btn-style-0,
+.main-btn.main-btn-style-0 {
+    background: linear-gradient(135deg, #ffffff, #ffffff) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 10px 15px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    margin: 5px 0 !important;
+    font-size: 17px !important;
+    font-weight: 500 !important;
+    box-sizing: border-box !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+}
+
+body.theme-dark .main-btn.main-btn-style-0 {
+    background: linear-gradient(135deg, #ffffff, #ffffff) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+}
 
 .main-btn-style-1 {
     background: linear-gradient(90deg, 
@@ -4971,12 +5279,18 @@ body.form-open .chat-container {
 <label class="hamburger" for="menu-toggle"><span></span><span></span><span></span></label>
 <label for="menu-toggle" class="overlay"></label>
 <div class="side-menu">
-    <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Avatar">
+    {% if user.photo and user.photo.url %}
+        <img class="avatar" src="{{ user.photo.url }}" alt="Avatar" onerror="this.src='{% static 'pictures/login.png' %}'">
+    {% else %}
+        <img class="avatar" src="{% static 'pictures/login.png' %}" alt="Avatar">
+    {% endif %}
     <div class="username">{{ user.username }}</div>
     {% if user.subscribe == "Bin+" %}
         <div style="color:#0056b3" class="username-line">Bin+</div>
     {% elif user.subscribe == "Bin_premium" %}
         <div style="color:#b3009b" class="username-line">Bin premium</div>
+    {% else %}
+        <div class="username-line"></div>
     {% endif %}
     <label for="profile-toggle" class="main-btn main-btn-style-1">My profile</label>
     <label for="wallet-toggle" class="main-btn main-btn-style-1">Wallet</label>
@@ -5006,12 +5320,14 @@ body.form-open .chat-container {
         <div class="profile-preview-background" id="main-profile-background"
              style="{% if user.background and user.background.url %}background-image: url('{{ user.background.url }}'); display: block;{% else %}display: none;{% endif %}"></div>
         
-        <div class="profile-preview-header">
-            <img class="profile-preview-avatar avatar" 
-                 src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                 alt="Avatar">
-            <div class="profile-preview-info">
-                <h3 class="username-text">{{ user.username }}</h3>
+            <div class="profile-preview-header">
+                {% if user.photo and user.photo.url %}
+                    <img id="avatarInput-img" class="profile-preview-avatar" src="{{ user.photo.url }}" alt="Avatar" onerror="this.src='{% static 'pictures/login.png' %}'">
+                {% else %}
+                    <img id="avatarInput-img" class="profile-preview-avatar" src="{% static 'pictures/login.png' %}" alt="Avatar">
+                {% endif %}
+                <div class="profile-preview-info">
+                    <h3 class="username-text">{{ user.username }}</h3>
                 <div class="profile-preview-status">
                     <span class="status-value {% if user.status == 'Online' %}online{% else %}offline{% endif %}">
                         ● {{ user.status|default:"Offline" }}
@@ -5024,16 +5340,31 @@ body.form-open .chat-container {
                 <br>
                 <label for="form1-toggle" class="edit-icon">Edit profile</label>
             </div>
-        </div>    
-
-        <hr class="profile-preview-divider">        
+        </div>
+        
+        <hr class="profile-preview-divider">
+        
+        <div class="profile-preview-section">
+            <div class="profile-preview-value">
+                {% if user.role == 'Administrator' %}
+                    <span style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        👑 Administrator
+                    </span>
+                {% elif user.role == 'Moderator' %}
+                    <span style="background: linear-gradient(135deg, #ffc107, #e0a800); color: #212529; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        🛡️ Moderator
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        
         <div class="profile-preview-section">
             <div class="profile-preview-label">Description</div>
             <div class="profile-preview-value" id="my-profile-description">
-                {{ user.description }}
+                {{ user.description|default:"No description" }}
             </div>
-        </div>     
-
+        </div>
+        
         <div class="profile-preview-section">
             <div class="profile-preview-label">Birthday</div>
             <div class="profile-preview-birthday">
@@ -5046,72 +5377,64 @@ body.form-open .chat-container {
                 <span class="birthday-value">{{ user.birthday|default:"Not specified" }}</span>
             </div>
         </div>
-
-        <div class="user-info">
-            {% if role == 'Administrator' %}
-                <span class="badge bg-danger">👑 Administrator</span>
-            {% elif role == 'Moderator' %}
-                <span class="badge bg-warning">🛡️ Moderator</span>
-            {% endif %}
-        </div>
     </div>
-</div>  
+</div>
 
 <div class="other-profile-form">
     <div class="profile-preview-card">
         <div class="profile-preview-background" id="other-profile-background"
-             style="{% if user.background and user.background.url %}background-image: url('{{ user.background.url }}'); display: block;{% elif user.your_tag == '@Bin_bot' %}{% else %}display: none;{% endif %}"></div>
+             style="display: none;"></div>
         
-            <div class="profile-preview-header">
-                <img class="profile-preview-avatar other-profile-avatar" 
-                     src="{% static 'pictures/login.png' %}" 
-                     alt="Avatar">
-                <div class="profile-preview-info">
-                    <h3 class="username-text other-profile-username">{{ user.username }}</h3>
-                    <div class="profile-preview-status">
-                        <span class="status-value offline other-profile-status">
-                            ● Offline
-                        </span>
-                    </div>
-                    <div class="profile-preview-tag tag-copy other-profile-tag" onclick="copyOtherUserTag()">
-                        @{{ user.your_tag|default:user.username }}
-                    </div>
-                    {% if user.your_tag|default:''|lower == "@hello" or user.your_tag|default:''|lower == "@bin_bot" or user.role == "System Bot" or user.username|default:''|lower == 'bin' %}
-                        <div class="system-bot-label">System Bot</div>
-                    {% endif %}
+        <div class="profile-preview-header">
+            <img class="profile-preview-avatar" 
+                 src="/static/pictures/login.png" 
+                 alt="Avatar">
+            <div class="profile-preview-info">
+                <h3 class="username-text other-profile-username">{{ user.username }}</h3>
+                <div class="profile-preview-status">
+                    <span class="status-value offline other-profile-status">
+                        ● Offline
+                    </span>
                 </div>
-            </div>            
-            <hr class="profile-preview-divider">          
-                  
-            <div class="profile-preview-section">
-                <div class="profile-preview-label" id="role-label"></div>
-                <div class="profile-preview-value" id="other-profile-role"></div>
+                <div class="profile-preview-tag tag-copy other-profile-tag" onclick="copyOtherUserTag()">
+                    @{{ user.your_tag|default:user.username }}
+                </div>
             </div>
-            <div class="profile-preview-section">
-                <div class="profile-preview-label">Description</div>
-                <div class="profile-preview-value other-profile-description">
-                    No description
-                </div>
-            </div>       
-
-            <div class="profile-preview-section">
-                <div class="profile-preview-label">Birthday</div>
-                <div class="profile-preview-birthday">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    <span class="birthday-value other-profile-birthday">Not specified</span>
-                </div>
-
-            <button class="other-profile-message-btn {% if user.custom_button_enabled %}main-btn main-btn-style-{{ user.custom_option|default:'1' }}{% endif %}" style="padding:10px 20px; border:none; border-radius:6px; cursor:pointer; flex:1;">
+        </div>
+        
+        <hr class="profile-preview-divider">
+        
+        <!-- <div class="profile-preview-section"> -->
+            <!-- <div class="profile-preview-label">Role</div> -->
+            <!-- <div class="profile-preview-value" id="other-profile-role"> -->
+                <!-- User -->
+            <!-- </div> -->
+        <!-- </div> -->
+        
+        <div class="profile-preview-section">
+            <div class="profile-preview-label">Description</div>
+            <div class="profile-preview-value other-profile-description">
+                No description
+            </div>
+        </div>
+        
+        <div class="profile-preview-section">
+            <div class="profile-preview-label">Birthday</div>
+            <div class="profile-preview-birthday">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span class="birthday-value other-profile-birthday">Not specified</span>
+            </div>
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="other-profile-message-btn main-btn-style-1" onclick="openChatWithOtherUser()">
                 Message
             </button>
-            </div>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
         </div>
     </div>
 </div>
@@ -5119,7 +5442,7 @@ body.form-open .chat-container {
 <div class="color_theme-form">
     <h2>Color theme settings</h2>
     <select id="themeSelect">
-        <option value="" disabled>=== Busic ===</option>
+        <option value="" disabled>=== Basic ===</option>
         <option value="light">Light</option>
         <option value="dark">Dark</option>
         <option value="" disabled>=== Subscribe ===</option>
@@ -5128,17 +5451,17 @@ body.form-open .chat-container {
     </select>
     <button id="applyThemeBtn">Apply</button>   
 
-<div class="icon-checkbox-container">
-    <input type="checkbox" id="customThemeToggle" class="icon-checkbox" {% if user.custom_button_enabled %}checked{% endif %}>
-    <label for="customThemeToggle">
-        <span class="check-icon">
-            <svg viewBox="0 0 20 20" style="display: none;">
-                <polyline points="4 10 8 14 16 6"></polyline>
-            </svg>
-        </span>
-        <span id="customThemeLabel">{% if user.custom_button_enabled %}Custom enabled{% else %}Enable Custom button{% endif %}</span>
-    </label>
-</div>
+    <div class="icon-checkbox-container">
+        <input type="checkbox" id="customThemeToggle" class="icon-checkbox" {% if user.custom_button_enabled %}checked{% endif %}>
+        <label for="customThemeToggle">
+            <span class="check-icon">
+                <svg viewBox="0 0 20 20" style="display: none;">
+                    <polyline points="4 10 8 14 16 6"></polyline>
+                </svg>
+            </span>
+            <span id="customThemeLabel">{% if user.custom_button_enabled %}Custom enabled{% else %}Enable Custom button{% endif %}</span>
+        </label>
+    </div>
 
     <div id="additional-checkboxes-container" style="{% if not user.custom_button_enabled %}display: none;{% endif %} margin-top: 15px; padding: 10px; border-radius: 6px;">
         <h4 style="margin-top: 0; margin-bottom: 10px;">Custom Options</h4>         
@@ -5203,7 +5526,7 @@ body.form-open .chat-container {
     </div>
 
     <div id="text-color-container" style="margin-top: 15px; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-        <h4 style="margin-top: 0; margin-bottom: 10px;">Button Text Color</h4>                          
+        <h4 style="margin-top: 0; margin-bottom: 10px;">Button Text Color</h4>                              
 
         <div style="display: flex; flex-direction: column; gap: 15px; align-items: flex-start;">
             <div class="icon-checkbox3-container" style="margin: 0;">
@@ -5218,7 +5541,7 @@ body.form-open .chat-container {
                     </span>
                     <span>White Text</span>
                 </label>
-            </div>                                                  
+            </div>                                                      
 
             <div class="icon-checkbox3-container" style="margin: 0;">
                 <input type="radio" name="textColorOption" id="textColorBlack" class="icon-checkbox3" 
@@ -5237,7 +5560,7 @@ body.form-open .chat-container {
     </div>
 
     <label class="main-btn main-btn-style-1">Example</label>
-</div>          
+</div>         
 
 <div class="chat-settings-form">
     <h2>Chat Settings</h2>
@@ -5318,10 +5641,13 @@ body.form-open .chat-container {
                 {% csrf_token %}        
 
                 <div class="avatar-upload-section">
-                    <img id="avatarInput-img" class="avatar" 
-                         src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                         alt="Avatar">
-                    <br>                        
+                    {% if user.photo and user.photo.url %}
+                        <img id="edit-avatar-preview" class="avatar" src="{{ user.photo.url }}" alt="Avatar" onerror="this.src='{% static 'pictures/login.png' %}'">
+                    {% else %}
+                        <img id="edit-avatar-preview" class="avatar" src="{% static 'pictures/login.png' %}" alt="Avatar">
+                    {% endif %}
+                    <br>
+                    <br>                                        
 
                     <label for="avatarInput" style="display: inline-block; padding: 8px 16px; background: #007bff; color: white; border-radius: 6px; cursor: pointer;">
                         Choose New Avatar
@@ -5329,7 +5655,7 @@ body.form-open .chat-container {
                     </label>
                     <button type="button" class="btn-delete-avatar" onclick="confirmAvatarReset()">
                         Delete Avatar
-                    </button>           
+                    </button>   
                                 
                     <!-- <label for="backgroundInput" style="display: inline-block; padding: 8px 16px; background: #28a745; color: white; border-radius: 6px; cursor: pointer; margin-top: 10px; {% if user.subscribe == 'Basic' %}opacity: 0.6; cursor: not-allowed;{% endif %}" title="{% if user.subscribe == 'Basic' %}Backgrounds available for Bin+ and Bin Premium{% elif user.subscribe == 'Bin+' %}Images only (GIF for Bin Premium){% else %}All image formats including GIF{% endif %}"> -->
                         <!-- Choose New Background -->
@@ -5338,7 +5664,7 @@ body.form-open .chat-container {
                     <!-- <button type="button" class="btn-delete-background" onclick="confirmBackgroundReset()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px;" {% if not user.background or not user.background.url %}disabled{% endif %}> -->
                         <!-- Remove Background -->
                     <!-- </button>         -->
-                </div>    
+                </div>  
 
                 <div class="form-group">
                     <label for="username-input"><strong>Username:</strong></label>
@@ -5389,9 +5715,11 @@ body.form-open .chat-container {
                 <div class="preview-badge">PREVIEW</div>        
 
                 <div class="profile-preview-header">
-                    <img id="preview-avatar" class="profile-preview-avatar other-profile-avatar" 
-                         src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                         alt="Avatar">
+                    {% if user.photo and user.photo.url %}
+                        <img id="edit-avatar-preview" class="avatar" src="{{ user.photo.url }}" alt="Avatar" onerror="this.src='{% static 'pictures/login.png' %}'">
+                    {% else %}
+                        <img id="edit-avatar-preview" class="avatar" src="{% static 'pictures/login.png' %}" alt="Avatar">
+                    {% endif %}
                     <div class="profile-preview-info">
                         <h3 id="preview-username" class="other-profile-username">{{ user.username }}</h3>
                         <div class="profile-preview-status">
@@ -5528,7 +5856,7 @@ body.form-open .chat-container {
             </div>
         </div>
 
-        <label style="margin-top:8px;">{% if lang == "Українська" %}CVV (не зберігається){% else %}CVV (not stored){% endif %}</label>
+        <label style="margin-top:8px;">{% if lang == "Українська" %}CVV{% else %}CVV{% endif %}</label>
         <input id="card-cvv" type="password" maxlength="3" placeholder="123" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
 
         <div style="display:flex; gap:8px; margin-top:12px;">
@@ -5656,18 +5984,18 @@ body.form-open .chat-container {
                             <strong>You can write up to 150 characters in the description</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
+                    <!-- <li> -->
+                        <!-- <span class="icon" style="margin-right: 10px; flex-shrink: 0;"> -->
+                            <!-- <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> -->
+                                  <!-- <path d="M0 0h24v24H0z" fill="none"></path> -->
+                                 <!-- <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path> -->
+                            <!-- </svg> -->
+                        <!-- </span> -->
+                        <!-- <span> -->
                             <!-- <strong>Can place a background in your profile</strong> -->
-                             <strong></strong>
-                        </span>
-                    </li>
+                             <!-- <strong></strong> -->
+                        <!-- </span> -->
+                    <!-- </li> -->
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -5679,18 +6007,19 @@ body.form-open .chat-container {
                             <strong>Upload a file up to 50 MB</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>.</strong>
-                        </span>
-                    </li>
-                </ul>
+                    <!-- <li> -->
+                        <!-- <span class="icon" style="margin-right: 10px; flex-shrink: 0;"> -->
+                            <!-- <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> -->
+                                  <!-- <path d="M0 0h24v24H0z" fill="none"></path> -->
+                                 <!-- <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path> -->
+                            <!-- </svg> -->
+                        <!-- </span> -->
+                        <!-- <span> -->
+                            <!-- <strong>.</strong> -->
+                        <!-- </span> -->
+                    <!-- </li> -->
+                <!-- </ul> -->
+                <br><br><br><br><br>
                 <div class="action">
                     <label for="bin_premium_mouth-toggle" class="button">Choose plan</label>
                 </div>
@@ -5806,18 +6135,18 @@ body.form-open .chat-container {
                             <strong>You can write up to 150 characters in the description</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
+                    <!-- <li> -->
+                        <!-- <span class="icon" style="margin-right: 10px; flex-shrink: 0;"> -->
+                            <!-- <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> -->
+                                  <!-- <path d="M0 0h24v24H0z" fill="none"></path> -->
+                                 <!-- <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path> -->
+                            <!-- </svg> -->
+                        <!-- </span> -->
+                        <!-- <span> -->
                             <!-- <strong>Can place a background in your profile</strong> -->
-                             <strong></strong>
-                        </span>
-                    </li>
+                             <!-- <strong></strong> -->
+                        <!-- </span> -->
+                    <!-- </li> -->
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -5829,17 +6158,18 @@ body.form-open .chat-container {
                             <strong>Upload a file up to 50 MB</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>.</strong>
-                        </span>
-                    </li>
+                    <!-- <li> -->
+                        <!-- <span class="icon" style="margin-right: 10px; flex-shrink: 0;"> -->
+                            <!-- <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> -->
+                                  <!-- <path d="M0 0h24v24H0z" fill="none"></path> -->
+                                 <!-- <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path> -->
+                            <!-- </svg> -->
+                        <!-- </span> -->
+                        <!-- <span> -->
+                            <!-- <strong>.</strong> -->
+                        <!-- </span> -->
+                    <!-- </li> -->
+                     <br><br><br><br>
                 </ul>
                 <div class="action">
                     <label for="bin_premium_years-toggle" class="button">Choose plan</label>
@@ -11361,6 +11691,187 @@ function setupSubscription(checkboxId, buttonId) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarInput = document.getElementById('avatarInput');
+    const usernameInput = document.getElementById('username-input');
+    const descriptionInput = document.querySelector('.description-input');
+    const tagInput = document.getElementById('tag-input');
+    const birthdayDay = document.getElementById('birthday-day');
+    const birthdayMonth = document.getElementById('birthday-month');
+    const birthdayYear = document.getElementById('birthday-year');
+    const backgroundInput = document.getElementById('backgroundInput');
+    
+    const editAvatarPreview = document.getElementById('edit-avatar-preview');
+    const previewAvatar = document.getElementById('preview-avatar');
+    const avatarInputImg = document.getElementById('avatarInput-img');
+    const previewUsername = document.getElementById('preview-username');
+    const previewDescription = document.getElementById('preview-description');
+    const previewTag = document.getElementById('preview-tag');
+    const previewBirthday = document.getElementById('preview-birthday');
+    const previewBackground = document.getElementById('preview-background');
+    const mainProfileBackground = document.querySelector('.profile-form .profile-preview-background');
+    
+    const initialValues = {
+        avatar: '{% if user.photo and user.photo.url %}{{ user.photo.url }}{% else %}{% static "pictures/login.png" %}{% endif %}',
+        username: '{{ user.username }}',
+        description: '{{ user.description|default:"No description"|escapejs }}',
+        tag: '{{ user.your_tag|default:"No tag"|escapejs }}',
+        birthday: '{{ user.birthday|default:"Not specified"|escapejs }}',
+        background: '{% if user.background and user.background.url %}{{ user.background.url }}{% else %}none{% endif %}'
+    };
+    
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('⚠️ Only JPG, PNG, GIF or WEBP images are allowed.');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                
+                if (editAvatarPreview) editAvatarPreview.src = imageUrl;
+                if (previewAvatar) previewAvatar.src = imageUrl;
+                if (avatarInputImg) avatarInputImg.src = imageUrl;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    if (usernameInput && previewUsername) {
+        usernameInput.addEventListener('input', function() {
+            previewUsername.textContent = this.value || initialValues.username;
+        });
+    }
+    
+    if (descriptionInput && previewDescription) {
+        descriptionInput.addEventListener('input', function() {
+            previewDescription.textContent = this.value || initialValues.description;
+        });
+    }
+    
+    if (tagInput && previewTag) {
+        tagInput.addEventListener('input', function() {
+            previewTag.textContent = this.value || initialValues.tag;
+        });
+    }
+    
+    function updateBirthdayPreview() {
+        if (birthdayDay && birthdayMonth && birthdayYear && previewBirthday) {
+            const day = birthdayDay.value;
+            const month = birthdayMonth.value;
+            const year = birthdayYear.value;
+            
+            if (day && month && year) {
+                const monthName = monthNames[parseInt(month) - 1] || month;
+                previewBirthday.textContent = `${monthName} ${day}, ${year}`;
+            } else {
+                previewBirthday.textContent = initialValues.birthday;
+            }
+        }
+    }
+    
+    if (birthdayDay) birthdayDay.addEventListener('change', updateBirthdayPreview);
+    if (birthdayMonth) birthdayMonth.addEventListener('change', updateBirthdayPreview);
+    if (birthdayYear) birthdayYear.addEventListener('change', updateBirthdayPreview);
+    
+    function syncBackgrounds() {
+        if (previewBackground && mainProfileBackground) {
+            if (previewBackground.style.backgroundImage && previewBackground.style.backgroundImage !== 'none') {
+                mainProfileBackground.style.backgroundImage = previewBackground.style.backgroundImage;
+                mainProfileBackground.style.display = previewBackground.style.display;
+            }
+            else if (mainProfileBackground.style.backgroundImage && mainProfileBackground.style.backgroundImage !== 'none') {
+                previewBackground.style.backgroundImage = mainProfileBackground.style.backgroundImage;
+                previewBackground.style.display = mainProfileBackground.style.display;
+            }
+        }
+    }
+    
+    if (backgroundInput) {
+        backgroundInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                if (previewBackground) {
+                    previewBackground.style.backgroundImage = `url('${event.target.result}')`;
+                    previewBackground.style.display = 'block';
+                }
+                syncBackgrounds();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    const form1Toggle = document.getElementById('form1-toggle');
+    const form1Overlay = document.querySelector('.form1-overlay');
+    
+    function resetPreviewToInitialValues() {
+        if (editAvatarPreview) editAvatarPreview.src = initialValues.avatar;
+        if (previewAvatar) previewAvatar.src = initialValues.avatar;
+        if (avatarInputImg) avatarInputImg.src = initialValues.avatar;
+        
+        if (previewUsername) previewUsername.textContent = initialValues.username;
+        if (previewDescription) previewDescription.textContent = initialValues.description;
+        if (previewTag) previewTag.textContent = initialValues.tag;
+        if (previewBirthday) previewBirthday.textContent = initialValues.birthday;
+        
+        if (previewBackground) {
+            if (initialValues.background !== 'none') {
+                previewBackground.style.backgroundImage = `url('${initialValues.background}')`;
+                previewBackground.style.display = 'block';
+            } else {
+                previewBackground.style.backgroundImage = 'none';
+                previewBackground.style.display = 'none';
+            }
+        }
+        
+        if (avatarInput) avatarInput.value = '';
+        if (backgroundInput) backgroundInput.value = '';
+    }
+    
+    if (form1Overlay) {
+        form1Overlay.addEventListener('click', function() {
+            setTimeout(resetPreviewToInitialValues, 100);
+        });
+    }
+    
+    if (form1Toggle) {
+        form1Toggle.addEventListener('change', function() {
+            if (!this.checked) {
+                setTimeout(resetPreviewToInitialValues, 100);
+            }
+        });
+    }
+    
+    setTimeout(function() {
+        if (previewBirthday && initialValues.birthday !== 'Not specified') {
+            const dateParts = initialValues.birthday.split(' ');
+            if (dateParts.length === 3) {
+                previewBirthday.textContent = initialValues.birthday;
+            }
+        }
+        
+        if (previewBackground && initialValues.background !== 'none') {
+            previewBackground.style.backgroundImage = `url('${initialValues.background}')`;
+            previewBackground.style.display = 'block';
+        }
+    }, 500);
+});
+
 window.confirmAvatarReset = function() {
     const lang = "{{ user.language|default:'English' }}";
     const confirmMsg = lang === 'Українська'
@@ -11384,7 +11895,7 @@ window.confirmAvatarReset = function() {
             if (data.success) {
                 const defaultAvatarUrl = data.avatar_url + '?t=' + new Date().getTime();
                 
-                document.querySelectorAll('.avatar, img.avatar').forEach(img => {
+                document.querySelectorAll('.avatar, img.avatar, #preview-avatar, #upload-avatar').forEach(img => {
                     img.src = defaultAvatarUrl;
                 });
                 
@@ -11658,21 +12169,10 @@ window.submitAddCard = function() {
             if (resultEl) resultEl.textContent = data.error;
             return;
         }
-        const cardsList = document.getElementById('cards-list');
-        if (cardsList && data.cards) {
-            let html = '<strong>' + cardMessages.cards_label + '</strong><div style="margin-top:6px;">';
-            if (data.cards.length === 0) html += '<div class="card-item">' + cardMessages.no_cards + '</div>';
-            data.cards.forEach(c => {
-                html += `<div class="card-item" style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">**** **** ****${c.last4} — ${c.cardholder || '-'} — ${c.expiry}</div>`;
-            });
-            html += '</div>';
-            cardsList.innerHTML = html;
-        }
-        const addToggle = document.getElementById('add_card-toggle');
-        if (addToggle) addToggle.checked = false;
+        
         if (resultEl) resultEl.textContent = cardMessages.card_added;
-        if (numberEl) numberEl.value = '';
-        if (holderEl) holderEl.value = '';
+        
+        window.location.reload();
     })
     .catch(err => {
         console.error('Add card failed', err);
@@ -11801,57 +12301,93 @@ document.addEventListener('click', function(e) {
 });
 
 // Checkbox in Color theme ======================================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const themeSelect = document.getElementById('themeSelect');
-    const applyThemeBtn = document.getElementById('applyThemeBtn');
+document.addEventListener('DOMContentLoaded', function () {
     const customThemeToggle = document.getElementById('customThemeToggle');
-    const customThemeLabel = document.getElementById('customThemeLabel');
-    const hiddenInput = document.getElementById('custom_button_input');
-    
-    const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
     const additionalContainer = document.getElementById('additional-checkboxes-container');
     const customOptionInput = document.getElementById('custom_option_input');
+    const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
+    const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
 
-    function applySelectedStyle(value) {
-        const allButtons = document.querySelectorAll('.main-btn, .deposit-btn, .add_card-btn, .other-profile-message-btn');
+    const BUTTON_SELECTORS = [
+        '.main-btn',
+        '.deposit-btn',
+        '.add_card-btn',
+        '.other-profile-message-btn',
+        '.subscribe-btn',
+        '.profile-btn',
+        '.setting-btn',
+        'label.main-btn-style-0',
+        'label.main-btn-style-1',
+        'label.main-btn-style-2',
+        'label.main-btn-style-3',
+        'label.main-btn-style-4',
+        '.main-btn.main-btn-style-0',
+        '.main-btn.main-btn-style-1',
+        '.main-btn.main-btn-style-2',
+        '.main-btn.main-btn-style-3',
+        '.main-btn.main-btn-style-4'
+    ].join(',');
+
+    function initializeTextColor() {
+        const userColor = "{{ user.color_text_button|default:'black' }}";
+        localStorage.setItem('buttonTextColor', userColor);
+        const savedColor = userColor;
+        applyTextColorToAllButtons(savedColor);
+        textColorRadios.forEach(radio => {
+            if (radio.value === savedColor) {
+                radio.checked = true;
+            }
+        });
+    }
+
+    function applyTextColorToAllButtons(color) {
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        
         allButtons.forEach(btn => {
-            btn.classList.add('changing');
-            setTimeout(() => {
-                btn.classList.remove('main-btn-style-0', 'main-btn-style-1', 'main-btn-style-2', 'main-btn-style-3', 'main-btn-style-4');
+            btn.style.cssText += `color: ${color === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${color === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
+        
+        localStorage.setItem('buttonTextColor', color);
+    }
 
-                if (value === '0') {
-                    btn.classList.remove('main-btn');
-                    btn.classList.add('main-btn-style-0');
-                } else {
-                    btn.classList.add('main-btn', 'main-btn-style-' + value);
-                }
+    function applyButtonStyle() {
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS); 
 
-                setTimeout(() => btn.classList.remove('changing'), 50);
-            }, 10);
+        const isEnabled = customThemeToggle?.checked ?? false;
+        const styleValue = isEnabled
+            ? (customOptionInput?.value || document.querySelector('input[name="customOption"]:checked')?.value || '1')
+            : '0';
+
+        const textColor = document.querySelector('input[name="textColorOption"]:checked')?.value || localStorage.getItem('buttonTextColor') || "{{ user.color_text_button|default:'black' }}";
+
+        allButtons.forEach(btn => {
+            btn.className = btn.className
+                .replace(/main-btn-style-\d+/g, '')
+                .replace(/\bmain-btn\b/g, '')
+                .trim();    
+
+            if (styleValue === '0') {
+                btn.classList.add('main-btn-style-0');
+            } else {
+                btn.classList.add('main-btn', `main-btn-style-${styleValue}`);
+            }
+
+            btn.style.cssText += `color: ${textColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${textColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
         });
     }
 
     function updateAdditionalVisibility() {
-        if (!additionalContainer) return;
-
-        if (customThemeToggle && customThemeToggle.checked) {
-            additionalContainer.style.display = 'block';
-
-            const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-            const selectedValue = selectedRadio ? selectedRadio.value : '1';
-            applySelectedStyle(selectedValue);
-        } else {
-            additionalContainer.style.display = 'none';
-
-            applySelectedStyle('0');
-            if (customOptionInput) customOptionInput.value = '0';
+        if (additionalContainer) {
+            additionalContainer.style.display = customThemeToggle.checked ? 'block' : 'none';
         }
     }
 
     function saveCustomOption(value) {
         const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
         if (!csrf) return;
-        
+
         fetch('/save-custom-option/', {
             method: 'POST',
             headers: {
@@ -11859,213 +12395,89 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': csrf,
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({custom_option: value})
+            body: JSON.stringify({ custom_option: value })
+        }).catch(() => {});
+    }
+
+    function saveTextColor(color) {
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        if (!csrf) return;
+        
+        fetch('/save-button-text-color/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({button_text_color: color})
         })
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
-                console.error('Error saving custom option:', data.error);
+                console.error('Error saving text color:', data.error);
             }
         })
-        .catch(err => console.error('Save custom option error:', err));
+        .catch(err => console.error('Save text color error:', err));
     }
 
-    customOptionRadios.forEach(r => r.addEventListener('change', function() {
-        const selectedValue = this.value;
-        
-        if (customThemeToggle && customThemeToggle.checked) {
-            applySelectedStyle(selectedValue);
-            if (customOptionInput) customOptionInput.value = selectedValue;
-            saveCustomOption(selectedValue);
-        }
-    }));
+    initializeTextColor();
+    updateAdditionalVisibility();
+    applyButtonStyle();
 
     if (customThemeToggle) {
-        customThemeToggle.addEventListener('change', function() {
-            const isChecked = this.checked;
-            
-            if (customThemeLabel) customThemeLabel.textContent = isChecked ? 'Custom enabled' : 'Enable Custom button';
-            
-            if (hiddenInput) hiddenInput.value = isChecked ? '1' : '0';
-            
+        customThemeToggle.addEventListener('change', function () {
             updateAdditionalVisibility();
-            
-            if (!isChecked) {
-                applySelectedStyle('0');
-                if (customOptionInput) customOptionInput.value = '0';
-                saveCustomOption('0');
-            } else {
-                const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-                const selectedValue = selectedRadio ? selectedRadio.value : '1';
-                applySelectedStyle(selectedValue);
-                if (customOptionInput) customOptionInput.value = selectedValue;
-                saveCustomOption(selectedValue);
-            }
-            
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || null;
-            if (!csrf) return;
-            
-            fetch('/toggle-custom-button/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrf,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({enabled: isChecked})
-            }).catch(err => console.error('Persist error', err));
-        });
+            applyButtonStyle();
 
-        const isInitiallyChecked = customThemeToggle.checked;
-        
-        if (customThemeLabel) customThemeLabel.textContent = isInitiallyChecked ? 'Custom enabled' : 'Enable Custom button';
-        if (hiddenInput) hiddenInput.value = isInitiallyChecked ? '1' : '0';
-        
-        if (!isInitiallyChecked) {
-            applySelectedStyle('0');
-            if (customOptionInput) customOptionInput.value = '0';
-        } else {
-            const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-            const initialValue = selectedRadio ? selectedRadio.value : (customOptionInput ? customOptionInput.value : '1');
-            applySelectedStyle(initialValue);
-            if (customOptionInput) customOptionInput.value = initialValue;
-        }
-        
-        updateAdditionalVisibility();
-    }
-    
-    if (colorThemeToggle) {
-        colorThemeToggle.addEventListener('change', updateMenuDisabled);
-        updateMenuDisabled();
-    }
+            const isChecked = this.checked;
+            const selectedValue = isChecked
+                ? (document.querySelector('input[name="customOption"]:checked')?.value || '1')
+                : '0';
 
-    function applyCustomButtonUI(enabled) {
-        const selected = (customOptionInput && customOptionInput.value) ? customOptionInput.value : '1';
-        
-        const allMainBtns = document.querySelectorAll('.main-btn');
-        const otherMsgBtn = document.querySelector('.other-profile-message-btn');   
+            if (customOptionInput) customOptionInput.value = selectedValue;
 
-        const applyStyle = (el) => {
-            if (!el) return;
-            if (enabled) {
-                el.classList.add('main-btn');
-                el.classList.remove('main-btn-style-0', 'main-btn-style-1', 'main-btn-style-2', 'main-btn-style-3', 'main-btn-style-4');
-                el.classList.add('main-btn-style-' + (selected || '1'));
-            } else {
-                el.classList.remove('main-btn');
-                el.classList.remove('main-btn-style-1','main-btn-style-2','main-btn-style-3','main-btn-style-4');
-            }
-        };  
-
-        allMainBtns.forEach(applyStyle);
-        if (otherMsgBtn) applyStyle(otherMsgBtn);
-    }
-
-    function applyButtonTextColor(value) {
-        const buttons = document.querySelectorAll('.main-btn, .deposit-btn, .add_card-btn, .other-profile-message-btn');
-        buttons.forEach(btn => {
-            if (!btn) return;
-            btn.style.color = (value === 'black') ? '#000' : '#fff';
-            
-            if (value === 'white') {
-                btn.style.textShadow = '0 1px 2px rgba(0,0,0,0.3)';
-            } else {
-                btn.style.textShadow = 'none';
+            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (csrf) {
+                fetch('/toggle-custom-button/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ enabled: isChecked })
+                }).catch(() => {});
             }
         });
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Custom button enabled:', {% if user.custom_button_enabled %}true{% else %}false{% endif %});
-        console.log('Custom option:', "{{ user.custom_option|default:'1' }}");
-        
-        const depositBtn = document.querySelector('.deposit-btn');
-        const addCardBtn = document.querySelector('.add_card-btn');
-        console.log('Deposit button classes:', depositBtn?.className);
-        console.log('Add card button classes:', addCardBtn?.className);
-        
-        setTimeout(() => {
-            applyCustomButtonUI({% if user.custom_button_enabled %}true{% else %}false{% endif %});
-            applyButtonTextColor("{{ user.color_text_button|default:'white' }}");
-        }, 200);
+
+    customOptionRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (customThemeToggle?.checked) {
+                applyButtonStyle();
+                if (customOptionInput) customOptionInput.value = this.value;
+                saveCustomOption(this.value);
+            }
+        });
     });
 
-    const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
-    textColorRadios.forEach(r => r.addEventListener('change', function() {
-        const value = this.value;
-        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-        if (!csrf) return;
-        fetch('/save-button-text-color/', {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json', 'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest' },
-            body: JSON.stringify({ button_text_color: value })
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                applyButtonTextColor(value);
-            } else {
-                console.error('Could not save button text color', data.error);
-            }
-        }).catch(e => console.error('Save color error', e));
-    }));
-
-    try {
-        const initialColor = "{{ user.color_text_button|default:'white' }}";
-        applyButtonTextColor(initialColor);
-        applyCustomButtonUI(!!({% if user.custom_button_enabled %}true{% else %}false{% endif %}));
-    } catch(e) {}
-
-    if (customThemeToggle) {
-        customThemeToggle.addEventListener('change', function() {
-            applyCustomButtonUI(this.checked);
+    textColorRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const selectedColor = this.value;
+            
+            applyTextColorToAllButtons(selectedColor);
+            
+            saveTextColor(selectedColor);
+            
+            applyButtonStyle();
         });
-    }
-    
-    if (themeSelect && applyThemeBtn) {
-        const userSubscribe = "{{ user.subscribe }}";  
-        const body = document.body;
+    });
 
-        const savedTheme = localStorage.getItem('selectedTheme');
-        if (savedTheme) {
-            body.classList.add(`theme-${savedTheme}`);
-            themeSelect.value = savedTheme;
-        }
+    const observer = new MutationObserver(applyButtonStyle);
+    observer.observe(document.body, { childList: true, subtree: true });
 
-        if (userSubscribe === "Basic") {
-            themeSelect.querySelector('option[value="pink"]').disabled = true;
-            themeSelect.querySelector('option[value="green"]').disabled = true;
-        }
-
-        applyThemeBtn.addEventListener('click', () => {
-            const selected = themeSelect.value;
-
-            if ((selected === "pink" || selected === "green") && userSubscribe === "Basic") {
-                alert("❌ This theme is available only for subscribers!");
-                return;
-            }
-
-            body.classList.remove('theme-light', 'theme-dark', 'theme-pink', 'theme-green');
-
-            body.classList.add(`theme-${selected}`);
-
-            localStorage.setItem('selectedTheme', selected);
-        });
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const chatContainer = document.querySelector('.chat-container');
-    const colorThemeToggle = document.getElementById('color_theme-toggle');
-    
-    if (chatContainer && colorThemeToggle) {
-        chatContainer.addEventListener('click', function(e) {
-            if (colorThemeToggle.checked) {
-                colorThemeToggle.checked = false;
-                
-                updateFormOpenState();
-                
-                e.stopPropagation();
-            }
-        });
-    }
+    setTimeout(applyButtonStyle, 500);
 });
 
 // chat-settings
@@ -12253,6 +12665,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    const chat = document.querySelector('.chat-container');
+    const colorThemeToggle = document.getElementById('color_theme-toggle');
+
+    if (chat && colorThemeToggle) {
+        chat.addEventListener('click', function () {
+            if (colorThemeToggle.checked) {
+                colorThemeToggle.checked = false;
+            }
+        });
+    }
+});
+
 // Color text button
 const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
 const textColorContainer = document.getElementById('text-color-container');
@@ -12269,18 +12694,25 @@ function applyTextColor(color) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const userColor = "{{ user.color_text_button|default:'black' }}";
     
+    const userColor = "{{ user.color_text_button|default:'black' }}";
     setTimeout(() => {
-        applyTextColor(userColor);
+        const savedColor = localStorage.getItem('buttonTextColor') || userColor;
+        
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${savedColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${savedColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
         
         const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
         textColorRadios.forEach(radio => {
-            if (radio.value === userColor) {
+            if (radio.value === savedColor) {
                 radio.checked = true;
+                saveTextColor(savedColor);
             }
         });
-    }, 100);
+    }, 200);
 });
 
 function saveTextColor(color) {
@@ -12311,8 +12743,17 @@ applyTextColor(initialTextColor);
 textColorRadios.forEach(radio => {
     radio.addEventListener('change', function() {
         const selectedColor = this.value;
-        applyTextColor(selectedColor);
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${selectedColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${selectedColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
+        
+        localStorage.setItem('buttonTextColor', selectedColor);
+        
         saveTextColor(selectedColor);
+        
+        applyButtonStyle();
     });
 });
 </script>

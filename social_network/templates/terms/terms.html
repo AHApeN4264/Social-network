@@ -87,49 +87,34 @@
 {% block body %}
     {% if lang == "English" %}
         <div class="terms-container">
-            <h1>Terms and Conditions</h1>
+            <h1>Terms and Conditions</h1>   
 
-            <p>Welcome to Bin Messenger. By using our service you agree to these Terms and Conditions. Please read them carefully.</p>
+            <p>Welcome to Bin Messenger. By using our service, you agree to these Terms and Conditions. Please read them carefully.</p> 
 
             <h3>1. Subscriptions</h3>
             <p>We offer two paid tiers:</p>
             <ul>
-                <li><strong>Bin+</strong> — monthly or yearly subscription that unlocks additional themes, extra sticker packs, and priority support.</li>
-                <li><strong>Bin Premium</strong> — includes all Bin+ features plus higher upload limits, exclusive stickers, and early access to new features.</li>
-            </ul>
+                <li><strong>Bin+</strong></li>
+                <li><strong>Bin Premium</strong></li>
+            </ul>   
 
             <h3>2. Subscription Features</h3>
             <ul>
                 <li>Extra themes (pink, green)</li>
-                <li>Additional sticker packs and larger available sticker sets</li>
-                <li>Increased upload size and more cloud storage for your media</li>
-                <li>Priority customer support and faster processing for billing issues</li>
+                <li>Increased bio character limit (without subscription 70, with subscription 100 or 150)</li>
+                <li>Increased upload size limit (without subscription 10 MB, with subscription 20 MB or 50 MB)</li>
+                <li>Ability to set GIF avatar</li>
                 <li>Early access to new features and beta releases (Premium)</li>
-            </ul>
+            </ul>   
 
             <h3>3. Refunds and Cancellation</h3>
-            <p>You may cancel a subscription within 24 hours of purchase for a full refund. After 24 hours refund decisions will be handled case-by-case.</p>
+            <p>You may cancel your subscription within 24 hours of purchase and receive a full refund. After 24 hours, subscription refunds are not available.</p>  
 
             <h3>4. Payments</h3>
-            <p>Payments are processed through third-party payment providers. We do not store complete payment card data on our servers.</p>
+            <p>Payments are accepted only through crypto wallet. We do not store full payment card details on our servers.</p>  
 
-            <h3>5. Account and Content</h3>
-            <p>You are responsible for maintaining the security of your account. Content you post must follow community rules and applicable laws.</p>
-
-            <h3>6. Prohibited Conduct</h3>
-            <ul>
-                <li>No harassment, hate speech, or illegal content.</li>
-                <li>No sharing of personal data of others without consent.</li>
-            </ul>
-
-            <h3>7. Termination</h3>
-            <p>We may suspend or terminate accounts that violate these Terms. Subscriptions will not be refunded for terminated accounts except as required by law.</p>
-
-            <h3>8. Data & Privacy</h3>
-            <p>Your use of the service is also governed by our Privacy Policy. We process personal data to provide the service and improve the product.</p>
-
-            <h3>9. Contact</h3>
-            <p>For support or questions about these Terms, contact: support@bin-messenger.com</p>
+            <h3>5. Contact</h3>
+            <p>For support or questions regarding these Terms, please contact: support@bin-messenger.com</p>    
 
             <form class="language-form" method="POST" action="{% url 'change-language' %}">
                 {% csrf_token %}
@@ -151,41 +136,26 @@
             <h3>1. Підписки</h3>
             <p>Ми пропонуємо два платних рівні:</p>
             <ul>
-                <li><strong>Bin+</strong> — щомісячна або річна підписка, яка розблоковує додаткові теми, набори стікерів і пріоритетну підтримку.</li>
-                <li><strong>Bin Premium</strong> — включає всі функції Bin+ плюс більші ліміти завантаження, ексклюзивні стікери та ранній доступ до нових функцій.</li>
+                <li><strong>Bin+</strong></li>
+                <li><strong>Bin Premium</strong></li>
             </ul>
 
             <h3>2. Можливості підписки</h3>
             <ul>
                 <li>Додаткові теми (рожева, зелена)</li>
-                <li>Додаткові набори стікерів і більші комплекти стікерів</li>
-                <li>Збільшений розмір завантаження та більше хмарного сховища для медіафайлів</li>
-                <li>Пріоритетна підтримка клієнтів і швидша обробка питань оплати</li>
+                <li>Збільшення символів в опису (Без підписки 70 з підпискою 100 або 150)</li>
+                <li>Збільшений розмір завантаження (Без підписки 10 з підпискою 20MB або 50MB)</li>
+                <li>Можливість ставити GIF аватар</li>
                 <li>Ранній доступ до нових функцій та бета-релізів (Premium)</li>
             </ul>
 
             <h3>3. Повернення коштів і скасування</h3>
-            <p>Ви можете скасувати підписку протягом 24 годин після покупки та отримати повне повернення коштів. Після 24 годин питання повернення вирішуються індивідуально.</p>
+            <p>Ви можете скасувати підписку протягом 24 годин після покупки та отримати повне повернення коштів. Після 24 годин повернути підписку неможливо.</p>
 
             <h3>4. Оплата</h3>
-            <p>Платежі оброблюються сторонніми платіжними провайдерами. Ми не зберігаємо повні дані платіжних карт на наших серверах.</p>
+            <p>Тільки через гаманець. Ми не зберігаємо повні дані платіжних карт на наших серверах.</p>
 
-            <h3>5. Акаунт і вміст</h3>
-            <p>Ви відповідаєте за безпеку свого акаунта. Вміст, який ви розміщуєте, має відповідати правилам спільноти та застосовним законам.</p>
-
-            <h3>6. Заборонена поведінка</h3>
-            <ul>
-                <li>Забороняється переслідування, мова ворожнечі або незаконний вміст.</li>
-                <li>Заборонено поширювати персональні дані інших без згоди.</li>
-            </ul>
-
-            <h3>7. Припинення</h3>
-            <p>Ми можемо призупинити або припинити акаунти, які порушують ці Умови. Підписки не відшкодовуються для припинених акаунтів, за винятком випадків, передбачених законом.</p>
-
-            <h3>8. Дані та конфіденційність</h3>
-            <p>Використання сервісу також регулюється нашою Політикою конфіденційності. Ми обробляємо персональні дані для надання сервісу та покращення продукту.</p>
-
-            <h3>9. Зв'язок</h3>
+            <h3>5. Зв'язок</h3>
             <p>Для підтримки або питань щодо цих Умов зв'яжіться з: support@bin-messenger.com</p>
 
             <form class="language-form" method="POST" action="{% url 'change-language' %}">
@@ -195,7 +165,7 @@
                     <option value="English" {% if lang == "English" %}selected{% endif %}>English</option>
                     <option value="Українська" {% if lang == "Українська" %}selected{% endif %}>Українська</option>
                 </select>
-                <button type="submit">Change</button>
+                <button type="submit">Змінити</button>
             </form>
         </div>
     {% endif %}
