@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Verification Codes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 200px;
+            border-left: 4px solid #007bff;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+        }
+        .filter-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .search-box {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 300px;
+        }
+        .code-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .code-table th, .code-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .code-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .valid { color: #28a745; }
+        .expired { color: #dc3545; }
+        .used { color: #6c757d; }
+        .code-cell {
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .pagination {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .pagination a {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .pagination a.active {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Verification Codes Management</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_codes }}</div>
+                <div class="stat-label">Total Codes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ valid_codes }}</div>
+                <div class="stat-label">Valid Codes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ used_codes }}</div>
+                <div class="stat-label">Used Codes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ expired_codes }}</div>
+                <div class="stat-label">Expired Codes</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <a href="?filter=all" class="filter-btn {% if filter_type == 'all' %}active{% endif %}">All</a>
+            <a href="?filter=valid" class="filter-btn {% if filter_type == 'valid' %}active{% endif %}">Valid</a>
+            <a href="?filter=used" class="filter-btn {% if filter_type == 'used' %}active{% endif %}">Used</a>
+            <a href="?filter=expired" class="filter-btn {% if filter_type == 'expired' %}active{% endif %}">Expired</a>
+            
+            <form method="GET" style="display: inline;">
+                <input type="text" name="search" class="search-box" placeholder="Search by email..." value="{{ search_email }}">
+                <button type="submit" class="filter-btn">Search</button>
+                {% if search_email %}
+                <a href="?" class="filter-btn">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+        
+        <table class="code-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Code</th>
+                    <th>Created</th>
+                    <th>Expires</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for code in codes %}
+                <tr>
+                    <td>{{ code.id }}</td>
+                    <td>{% if code.user %}{{ code.user.username }}{% else %}—{% endif %}</td>
+                    <td>{{ code.email }}</td>
+                    <td class="code-cell">{{ code.code }}</td>
+                    <td>{{ code.created_at|date:"Y-m-d H:i:s" }}</td>
+                    <td>{{ code.expires_at|date:"Y-m-d H:i:s" }}</td>
+                    <td>
+                        {% if code.is_used %}
+                            <span class="used">✅ Used</span>
+                        {% elif code.is_valid %}
+                            <span class="valid">🟢 Valid</span>
+                        {% else %}
+                            <span class="expired">🔴 Expired</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">
+                        No verification codes found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if codes.paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if codes.has_previous %}
+            <a href="?page={{ codes.previous_page_number }}{% if filter_type != 'all' %}&filter={{ filter_type }}{% endif %}{% if search_email %}&search={{ search_email }}{% endif %}">← Previous</a>
+            {% endif %}
+            
+            {% for num in codes.paginator.page_range %}
+            {% if codes.number == num %}
+            <a href="?page={{ num }}{% if filter_type != 'all' %}&filter={{ filter_type }}{% endif %}{% if search_email %}&search={{ search_email }}{% endif %}" class="active">{{ num }}</a>
+            {% else %}
+            <a href="?page={{ num }}{% if filter_type != 'all' %}&filter={{ filter_type }}{% endif %}{% if search_email %}&search={{ search_email }}{% endif %}">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+            
+            {% if codes.has_next %}
+            <a href="?page={{ codes.next_page_number }}{% if filter_type != 'all' %}&filter={{ filter_type }}{% endif %}{% if search_email %}&search={{ search_email }}{% endif %}">Next →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <p style="margin-top: 20px; color: #666;">
+            <a href="/admin/">← Back to Admin</a> | 
+            <a href="{% url 'home' %}">← Back to Home</a>
+        </p>
+    </div>
+<script>
+function refreshTable() {
+    fetch(window.location.href + (window.location.search ? '&' : '?') + '_=' + Date.now())
+        .then(response => {
+            if (!response.ok) throw new Error('Сетевая ошибка');
+            return response.text();
+        })
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const newTbody = doc.querySelector('.code-table tbody');
+            const currentTbody = document.querySelector('.code-table tbody');
+            
+            const newStats = doc.querySelector('.stats');
+            const currentStats = document.querySelector('.stats');
+            
+            if (newTbody && currentTbody) {
+                currentTbody.innerHTML = newTbody.innerHTML;
+            }
+            
+            if (newStats && currentStats) {
+                currentStats.innerHTML = newStats.innerHTML;
+            }
+        })
+        .catch(err => {
+            console.warn('Не удалось обновить таблицу:', err);
+        });
+}
+
+refreshTable();
+setInterval(refreshTable, 5000);
+</script>
+</body>
+</html>

@@ -71,7 +71,7 @@ def get_user_role(user):
             user.save()
         return 'Administrator'
     
-    elif username_lower == "andrey":
+    elif username_lower == "andriy":
         if user.role != 'Moderator':
             user.role = 'Moderator'
             user.save()
@@ -114,7 +114,13 @@ def get_user_profile(request):
         return JsonResponse({'success': False, 'error': 'Username is required'})
     
     try:
-        user = User.objects.get(username=username)
+        if username.lower() in ('bin', 'bin_bot'):
+            bin_user = User.objects.filter(username__iexact='Bin_bot').first()
+            if not bin_user:
+                bin_user = create_bin_user()  # ваша функція створення
+            user = bin_user
+        else:
+            user = User.objects.get(username=username)
         
         role = get_user_role(user)
         
@@ -172,7 +178,7 @@ def get_user_profile(request):
     except Exception as e:
         print(f"Error loading user profile: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)})
-    
+
 def error(request):
     lang = "English"
     if request.session.get("language"):
@@ -1153,6 +1159,8 @@ def update_profile(request):
                 user.birthday = date(int(year), int(month), int(day))
             except Exception:
                 pass
+            
+        user.show_birthday = 'show_birthday' in request.POST
 
         if 'photo' in request.FILES:
             photo = request.FILES['photo']
@@ -1582,12 +1590,11 @@ def edit_message(request):
         if message.sender != request.user:
             return JsonResponse({'success': False, 'error': 'You can only edit your own messages'}, status=403)
         
-        time_since_sent = timezone.now() - message.timestamp
-        if time_since_sent > timedelta(minutes=15):
-            return JsonResponse({'success': False, 'error': 'Message is too old to edit'}, status=403)
+        if not hasattr(message, 'original_text'):
+            message.original_text = message.text
         
         message.text = new_text
-        message.timestamp = timezone.now()
+        message.edited_at = timezone.now()
         message.save()
         
         try:
@@ -1602,7 +1609,8 @@ def edit_message(request):
                     'text': new_text,
                     'sender': request.user.username,
                     'receiver': message.receiver.username,
-                    'timestamp': message.timestamp.isoformat(),
+                    'timestamp': message.edited_at.isoformat(),
+                    'edited': True
                 }
             )
         except Exception as e:
@@ -1612,7 +1620,8 @@ def edit_message(request):
             'success': True,
             'message_id': message.id,
             'text': new_text,
-            'timestamp': message.timestamp.isoformat()
+            'timestamp': message.edited_at.isoformat(),
+            'edited': True
         })
         
     except json.JSONDecodeError:
@@ -1897,42 +1906,6 @@ def get_recent_contacts(request):
         print(f"Error getting recent contacts: {str(e)}")
         return JsonResponse([], safe=False)
 
-@login_required
-def get_user_profile(request):
-    username = request.GET.get('username')
-    
-    if not username:
-        return JsonResponse({'success': False, 'error': 'Username is required'})
-
-    try:
-        if username.lower() in ('bin', 'bin_bot'):
-            bin_user = User.objects.filter(username__iexact='Bin_bot').first()
-            if not bin_user:
-                bin_user = create_bin_user()
-            user = bin_user
-        else:
-            user = User.objects.get(username=username)
-        
-        user_data = {
-            'success': True,
-            'username': user.username,
-            'status': user.status or 'Offline',
-            'your_tag': user.your_tag or '',
-            'description': user.description or '',
-            'birthday': user.birthday.strftime('%d.%m.%Y') if user.birthday else 'Not specified',
-            'photo_url': user.photo.url if user.photo and hasattr(user.photo, 'url') else ('/static/pictures/bin.jpg' if user.role == 'System Bot' or user.username.lower() == 'bin_bot' else '/static/pictures/login.png'),
-            'background_url': user.background.url if user.background and hasattr(user.background, 'url') else '',
-            'subscribe': user.subscribe
-        }
-        
-        return JsonResponse(user_data)
-        
-    except User.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'User not found'})
-    except Exception as e:
-        print(f"Error loading user profile: {str(e)}")
-        return JsonResponse({'success': False, 'error': str(e)})
-    
 def get_user_by_tag(request):
     tag = request.GET.get('tag', '').strip().lstrip('@')
     
@@ -2295,13 +2268,6 @@ def get_chat_messages(request):
             (models.Q(sender=other_user) & models.Q(receiver=request.user))
         ).order_by('timestamp')
 
-        if other_username.lower() != 'bin_bot':
-            Message.objects.filter(
-                sender=other_user,
-                receiver=request.user,
-                is_read=False
-            ).update(is_read=True)
-
         messages_data = []
         for msg in messages:
             message_data = {
@@ -2317,7 +2283,8 @@ def get_chat_messages(request):
                 'file_name': msg.file_name,
                 'file_type': msg.file_type,
                 'file_size': msg.file_size,
-                'is_editable': msg.sender == request.user and (timezone.now() - msg.timestamp) < timedelta(minutes=15)
+                'edited': bool(msg.edited_at),
+                'edited_at': msg.edited_at.isoformat() if msg.edited_at else None
             }
             messages_data.append(message_data)
 
@@ -2331,7 +2298,6 @@ def get_chat_messages(request):
 
 @login_required
 def start_chat(request):
-    """Start or open a chat with another user. Returns room name and user info."""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=400)
 
@@ -2421,14 +2387,16 @@ def check_user_exists(request):
 
 def create_bin_user():
     try:
-        bin_user = User.objects.filter(username__in=["Bin", "Bin_bot"]).first()
+        bin_user = User.objects.filter(username__in=["Bin"]).first()
 
         if bin_user:
             bin_user.description = "Official Bin Messenger bot. I provide verification codes and assistance."
-            bin_user.your_tag = "@Bin_bot"
+            bin_user.your_tag = "@Bin"
             bin_user.status = "Online"
             bin_user.is_active = True
-            bin_user.subscribe = "System"
+            bin_user.subscribe = 'Bin_premium'
+            bin_user.subscription_end = None
+            bin_user.subscription_period = 'forever'
             bin_user.role = "System Bot"
             bin_user.birthday = date(2025, 12, 20)
 
@@ -2440,17 +2408,19 @@ def create_bin_user():
 
         else:
             bin_user = User.objects.create(
-                username="Bin_bot",
+                username="Bin",
                 photo='static/pictures/bin.jpg',
                 email="bot@bin-messenger.com",
                 password=make_password(
                     'bin_system_password_' + str(random.randint(1000, 9999))
                 ),
                 description="Official Bin Messenger bot. I provide verification codes and assistance.",
-                your_tag="@Bin_bot",
+                your_tag="@Bin",
                 status="Online",
                 is_active=True,
-                subscribe="System",
+                subscribe='Bin_premium',
+                subscription_end=None,
+                subscription_period='forever',
                 language="English",
                 role="System Bot",
                 birthday=date(2025, 12, 20),
@@ -2461,6 +2431,45 @@ def create_bin_user():
     except Exception as e:
         print(f"Error creating Bin user: {e}")
         return None
+
+@staff_member_required(login_url='/error')
+@login_required
+def verification_codes(request):
+    codes = EmailVerificationCode.objects.all().order_by('-created_at')
+    
+    total_codes = codes.count()
+    valid_codes = codes.filter(expires_at__gt=timezone.now(), is_used=False).count()
+    used_codes = codes.filter(is_used=True).count()
+    expired_codes = codes.filter(expires_at__lt=timezone.now(), is_used=False).count()
+    
+    filter_type = request.GET.get('filter', 'all')
+    if filter_type == 'valid':
+        codes = codes.filter(expires_at__gt=timezone.now(), is_used=False)
+    elif filter_type == 'used':
+        codes = codes.filter(is_used=True)
+    elif filter_type == 'expired':
+        codes = codes.filter(expires_at__lt=timezone.now(), is_used=False)
+    
+    search_email = request.GET.get('search', '')
+    if search_email:
+        codes = codes.filter(email__icontains=search_email)
+    
+    paginator = Paginator(codes, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'codes': page_obj,
+        'total_codes': total_codes,
+        'valid_codes': valid_codes,
+        'used_codes': used_codes,
+        'expired_codes': expired_codes,
+        'filter_type': filter_type,
+        'search_email': search_email,
+        'lang': getattr(request.user, 'language', 'English')
+    }
+    
+    return render(request, 'login_codes/verification_codes.html', context)
 
 def get_file_size_limit(user):
     if user.subscribe == 'Bin_premium':
@@ -2496,7 +2505,6 @@ def home(request):
         if request.session.get("language") and request.user.language != request.session.get("language"):
             request.user.language = request.session.get("language")
             request.user.save()
-        
         elif not request.session.get("language") and hasattr(request.user, "language"):
             request.session['language'] = request.user.language
             lang = request.user.language
@@ -2506,6 +2514,17 @@ def home(request):
 
     create_bin_user()
 
+    viewed_username = request.GET.get('username')
+
+    if viewed_username:
+        try:
+            profile_user = User.objects.get(username=viewed_username)
+        except User.DoesNotExist:
+            profile_user = user
+            messages.warning(request, "Пользователь не найден, показываем ваш профиль")
+    else:
+        profile_user = user
+
     search_query = request.GET.get('search', '').strip()
     found_users = []
     if search_query:
@@ -2514,17 +2533,17 @@ def home(request):
             search_query = '@' + search_query
         found_users = User.objects.filter(Q(your_tag__iexact=search_query)).exclude(id=user.id)
 
-    if user.subscription_end and user.subscription_end < timezone.now():
-        old_subscription = user.subscribe
-        old_period = user.subscribe_period
-        user.subscribe = 'Basic'
-        user.subscribe_period = 'none'
-        user.subscription_end = None
-        user.save()
+    if profile_user.subscription_end and profile_user.subscription_end < timezone.now():
+        old_subscription = profile_user.subscribe
+        old_period = profile_user.subscribe_period
+        profile_user.subscribe = 'Basic'
+        profile_user.subscribe_period = 'none'
+        profile_user.subscription_end = None
+        profile_user.save()
 
         msg = (
             f"Термін підписки {old_subscription} ({old_period}) закінчився."
-            if user.language == 'Українська'
+            if profile_user.language == 'Українська'
             else f"Your {old_subscription} ({old_period}) subscription has expired."
         )
         messages.warning(request, msg)
@@ -2544,24 +2563,24 @@ def home(request):
         formatted = re.sub(r'@(\w+)', repl, text)
         return mark_safe(formatted)
 
-    description_html = format_description(user.description)
+    description_html = format_description(profile_user.description)
 
     def convert(amount):
         try:
             amt = Decimal(amount)
         except Exception:
             amt = Decimal('0')
-        if getattr(user, 'currency', 'USD') == 'UAH':
+        if getattr(profile_user, 'currency', 'USD') == 'UAH':
             converted = (amt * Decimal('42.1')).quantize(Decimal('0.01'))
             return f"{converted} ₴"
         return f"{amt.quantize(Decimal('0.01'))} $"
 
-    price_converted = convert(getattr(user, 'wallet', 0) or 0)
+    price_converted = convert(getattr(profile_user, 'wallet', 0) or 0)
 
     background_url = None
     background_exists = False
-    if user.background:
-        background_url = user.background.url
+    if profile_user.background:
+        background_url = profile_user.background.url
         background_exists = True
 
     subscription_prices_USD = {
@@ -2587,62 +2606,62 @@ def home(request):
             if plan in subscription_prices_USD:
                 cost_usd = subscription_prices_USD[plan]
                 
-                current_currency = getattr(user, 'currency', 'USD')
+                current_currency = getattr(profile_user, 'currency', 'USD')
                 if current_currency == 'UAH':
                     cost_for_check = cost_usd * Decimal('42.1')
                 else:
                     cost_for_check = cost_usd
                 
-                if user.wallet >= cost_for_check:
+                if profile_user.wallet >= cost_for_check:
                     try:
                         with transaction.atomic():
-                            user.wallet -= cost_for_check
+                            profile_user.wallet -= cost_for_check
                             sub_name, sub_period, days_count = subscription_types[plan]
-                            user.subscribe = sub_name
-                            user.subscribe_period = sub_period
-                            user.subscription_end = timezone.now() + timedelta(days=days_count)
-                            user.subscription_purchase_time = timezone.now()
-                            user.subscription_purchase_amount = cost_usd
-                            user.subscription_purchase_currency = current_currency
-                            user.save()
+                            profile_user.subscribe = sub_name
+                            profile_user.subscribe_period = sub_period
+                            profile_user.subscription_end = timezone.now() + timedelta(days=days_count)
+                            profile_user.subscription_purchase_time = timezone.now()
+                            profile_user.subscription_purchase_amount = cost_usd
+                            profile_user.subscription_purchase_currency = current_currency
+                            profile_user.save()
 
                         msg = (
-                            f"Підписка {user.subscribe} ({user.subscribe_period}) успішно оформлена!"
-                            if user.language == 'Українська'
-                            else f"Subscription {user.subscribe} ({user.subscribe_period}) successful!"
+                            f"Підписка {profile_user.subscribe} ({profile_user.subscribe_period}) успішно оформлена!"
+                            if profile_user.language == 'Українська'
+                            else f"Subscription {profile_user.subscribe} ({profile_user.subscribe_period}) successful!"
                         )
                         messages.success(request, msg)
                     except Exception:
                         messages.error(
                             request,
-                            "Помилка при оформленні!" if user.language == 'Українська'
+                            "Помилка при оформленні!" if profile_user.language == 'Українська'
                             else "Error processing subscription!"
                         )
                 else:
-                    missing = cost_for_check - user.wallet
+                    missing = cost_for_check - profile_user.wallet
                     messages.error(
                         request,
                         f"Недостатньо коштів! Потрібно ще {missing:.2f}."
-                        if user.language == 'Українська'
+                        if profile_user.language == 'Українська'
                         else f"Not enough funds! You need {missing:.2f} more."
                     )
             return redirect('home')
 
         if action == "refund_subscription":
-            if user.subscribe != "Basic" and getattr(user, "subscription_purchase_time", None):
-                time_diff = timezone.now() - user.subscription_purchase_time        
+            if profile_user.subscribe != "Basic" and getattr(profile_user, "subscription_purchase_time", None):
+                time_diff = timezone.now() - profile_user.subscription_purchase_time        
 
                 if time_diff <= timedelta(hours=24):
-                    purchase_amount = getattr(user, 'subscription_purchase_amount', Decimal('0.00'))
-                    purchase_currency = getattr(user, 'subscription_purchase_currency', 'USD')
+                    purchase_amount = getattr(profile_user, 'subscription_purchase_amount', Decimal('0.00'))
+                    purchase_currency = getattr(profile_user, 'subscription_purchase_currency', 'USD')
                     
                     if purchase_amount == Decimal('0.00'):
-                        if user.subscribe == 'Bin+':
-                            purchase_amount = Decimal('4.99') if user.subscribe_period == 'monthly' else Decimal('49.99')
-                        elif user.subscribe == 'Bin_premium':
-                            purchase_amount = Decimal('9.99') if user.subscribe_period == 'monthly' else Decimal('99.99')
+                        if profile_user.subscribe == 'Bin+':
+                            purchase_amount = Decimal('4.99') if profile_user.subscribe_period == 'monthly' else Decimal('49.99')
+                        elif profile_user.subscribe == 'Bin_premium':
+                            purchase_amount = Decimal('9.99') if profile_user.subscribe_period == 'monthly' else Decimal('99.99')
 
-                    current_currency = getattr(user, 'currency', 'USD')
+                    current_currency = getattr(profile_user, 'currency', 'USD')
                     
                     if purchase_currency == 'UAH':
                         original_charged_amount = purchase_amount * Decimal('42.1')
@@ -2651,16 +2670,16 @@ def home(request):
                     
                     refund_amount = original_charged_amount
 
-                    user.wallet += refund_amount
-                    user.subscribe = 'Basic'
-                    user.subscribe_period = 'none'
-                    user.subscription_end = None
-                    user.subscription_purchase_time = None
-                    user.subscription_purchase_currency = None
-                    user.subscription_purchase_amount = Decimal('0.00')
-                    user.photo = 'login.png'
-                    user.background = None
-                    user.save()     
+                    profile_user.wallet += refund_amount
+                    profile_user.subscribe = 'Basic'
+                    profile_user.subscribe_period = 'none'
+                    profile_user.subscription_end = None
+                    profile_user.subscription_purchase_time = None
+                    profile_user.subscription_purchase_currency = None
+                    profile_user.subscription_purchase_amount = Decimal('0.00')
+                    profile_user.photo = 'login.png'
+                    profile_user.background = None
+                    profile_user.save()     
 
                     def format_refund_amount(amount, currency):
                         if currency == 'UAH':
@@ -2672,46 +2691,46 @@ def home(request):
                     messages.success(
                         request,
                         f"Підписку скасовано. Повернено {refund_display}!"
-                        if user.language == "Українська"
+                        if profile_user.language == "Українська"
                         else f"Subscription refunded. {refund_display} returned!"
                     )
                 else:
                     messages.error(
                         request,
-                        "Термін повернення підписки минув." if user.language == "Українська"
+                        "Термін повернення підписки минув." if profile_user.language == "Українська"
                         else "The refund period has expired."
                     )       
 
             return redirect("home")
 
     today = date.today()
-    birthday = getattr(user, 'birthday', None) or today
+    birthday = getattr(profile_user, 'birthday', None) or today
     days = range(1, 32)
     months = range(1, 13)
     years = range(today.year - 100, today.year + 1)
-    cards = Card.objects.filter(user=user)
+    cards = Card.objects.filter(user=profile_user)
     current_year = timezone.now().year
 
-    active_sessions = user.get_active_sessions()
-    login_history = user.get_login_history()
+    active_sessions = profile_user.get_active_sessions()
+    login_history = profile_user.get_login_history()
 
     can_refund = False
-    if user.subscribe != 'Basic' and getattr(user, 'subscription_purchase_time', None):
-        time_diff = timezone.now() - user.subscription_purchase_time
+    if profile_user.subscribe != 'Basic' and getattr(profile_user, 'subscription_purchase_time', None):
+        time_diff = timezone.now() - profile_user.subscription_purchase_time
         can_refund = time_diff <= timedelta(hours=24)
 
-    file_size_limit_mb = get_file_size_limit(request.user) // (1024 * 1024)
+    file_size_limit_mb = get_file_size_limit(profile_user) // (1024 * 1024)
 
     sticker_category_labels = {
-        'people': 'Люди' if getattr(user, 'language', 'English') == 'Українська' else 'People',
-        'animals': 'Тварини' if getattr(user, 'language', 'English') == 'Українська' else 'Animals',
-        'transport': 'Транспорт' if getattr(user, 'language', 'English') == 'Українська' else 'Transport',
-        'nature': 'Природа' if getattr(user, 'language', 'English') == 'Українська' else 'Nature',
-        'food': 'Їжа' if getattr(user, 'language', 'English') == 'Українська' else 'Food',
-        'love': 'Любов' if getattr(user, 'language', 'English') == 'Українська' else 'Love',
-        'flags': 'Прапори' if getattr(user, 'language', 'English') == 'Українська' else 'Flags',
-        'misc': 'Інше' if getattr(user, 'language', 'English') == 'Українська' else 'Misc',
-        'extras': 'Додатково' if getattr(user, 'language', 'English') == 'Українська' else 'Extras'
+        'people': 'Люди' if lang == 'Українська' else 'People',
+        'animals': 'Тварини' if lang == 'Українська' else 'Animals',
+        'transport': 'Транспорт' if lang == 'Українська' else 'Transport',
+        'nature': 'Природа' if lang == 'Українська' else 'Nature',
+        'food': 'Їжа' if lang == 'Українська' else 'Food',
+        'love': 'Любов' if lang == 'Українська' else 'Love',
+        'flags': 'Прапори' if lang == 'Українська' else 'Flags',
+        'misc': 'Інше' if lang == 'Українська' else 'Misc',
+        'extras': 'Додатково' if lang == 'Українська' else 'Extras'
     }
 
     sticker_category_labels_json = json.dumps(sticker_category_labels, ensure_ascii=False)
@@ -2719,6 +2738,7 @@ def home(request):
     template = 'home/home_uk.html' if lang == 'Українська' else 'home/home_en.html'
     return render(request, template, {
         'user': user,
+        'profile_user': profile_user,
         'description_html': description_html,
         'price_converted': price_converted,
         'cards': cards,

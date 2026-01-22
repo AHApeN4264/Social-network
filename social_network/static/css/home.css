@@ -789,6 +789,475 @@ input, textarea, select {
   color: #000000;
 }
 
+.theme-pink .side-menu,
+.theme-pink .profile-form,
+.theme-pink .profile-preview-card,
+.theme-pink .setting-form,
+.theme-pink .form1,
+.theme-pink .form2,
+.theme-pink .add_card,
+.theme-pink .color_theme,
+.theme-pink .wallet-form,
+.theme-pink .deposit-form,
+.theme-pink .subscribe-form-month,
+.theme-pink .subscribe-form-year,
+.theme-pink .bin_mouth-form,
+.theme-pink .bin_premium_mouth-form,
+.theme-pink .bin_years-form,
+.theme-pink .bin_premium_years-form,
+.theme-pink .check-subscription-form {
+    background: linear-gradient(to right, #ffb6c1, #b30086);
+    color: #000000;
+}
+
+.theme-pink .status-value.online { color: #00be00; }
+.theme-pink .status-value.offline { color: #ff4444; }
+
+.theme-pink #additional-checkboxes-container {
+    background: rgba(0,0,0,0.02) !important;
+}
+
+.theme-pink .deposit-btn {
+    background: linear-gradient(135deg, #008080) !important;
+    color: #ffffff !important;
+}
+
+.theme-pink .kebab-btn {
+    color: #000000 !important;
+}
+
+.theme-pink .profile-form label,
+.theme-pink .setting-form label,
+.theme-pink .form1 label,
+.theme-pink .form2 label {
+    color: #000000;
+}
+
+.theme-pink .profile-form input,
+.theme-pink .setting-form input,
+.theme-pink .form1 input,
+.theme-pink .form2 input,
+.theme-pink .profile-form textarea,
+.theme-pink .setting-form textarea,
+.theme-pink .form1 textarea,
+.theme-pink .form2 textarea,
+.theme-pink .profile-form select,
+.theme-pink .setting-form select,
+.theme-pink .form1 select,
+.theme-pink .form2 select {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    border: 1px solid #999999;
+    border-radius: 5px;
+    padding: 8px;
+    outline: none;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.theme-pink .profile-form input:focus,
+.theme-pink .setting-form input:focus,
+.theme-pink .form1 input:focus,
+.theme-pink .form2 input:focus,
+.theme-pink .profile-form textarea:focus,
+.theme-pink .setting-form textarea:focus,
+.theme-pink .form1 textarea:focus,
+.theme-pink .form2 textarea:focus,
+.theme-pink .profile-form select:focus,
+.theme-pink .setting-form select:focus,
+.theme-pink .form1 select:focus,
+.theme-pink .form2 select:focus {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #666666;
+}
+
+.theme-pink .profile-form select option,
+.theme-pink .setting-form select option,
+.theme-pink .form1 select option,
+.theme-pink .form2 select option {
+    background: #ffffff;
+    color: #000000;
+}
+
+.theme-pink .side-menu .profile-btn,
+.theme-pink .setting-form .profile-btn {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    padding: 10px 15px;
+    border: 1px solid #999999;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    margin: 5px 0;
+    text-align: center;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    text-decoration: none;
+}
+
+.theme-pink .side-menu .profile-btn:hover,
+.theme-pink .setting-form .profile-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #666666;
+    color: #000000;
+}
+
+.theme-pink .hamburger span {
+    background: #000000 !important;
+}
+
+.theme-pink .recent-contact:hover {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+.theme-pink .currency-item {
+    background: #1e1e1e;
+}
+
+.theme-pink .kebab-btn {
+    color: #ffffff !important;
+}
+
+.theme-pink .side-menu .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4),
+.theme-pink .setting-form .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4) {
+    background: rgba(50, 50, 50, 0.7);
+    color: #ffffff;
+    padding: 10px 15px;
+    border: 1px solid #555555;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    margin: 5px 0;
+    text-align: center;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    text-decoration: none;
+}
+
+.theme-pink .side-menu .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4):hover,
+.theme-pink .setting-form .profile-btn:not(.main-btn-style-0):not(.main-btn-style-1):not(.main-btn-style-2):not(.main-btn-style-3):not(.main-btn-style-4):hover {
+    background: rgba(70, 70, 70, 0.9);
+    border-color: #b30086;
+    color: #ffffff;
+}
+
+.theme-pink #savechangesform1 {
+    background: #ff00bf !important;  
+}
+
+.theme-pink .plan {
+    background: #272727 !important;
+    color: #ffffff !important;
+    border: 1px solid #555555 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+}
+
+.theme-pink .inner,
+.theme-pink .inner p,
+.theme-pink .inner strong {
+    background: #3f3f3f !important;
+    color: #ffffff !important;
+}
+
+.theme-pink .deposit-btn,
+.theme-pink .add_card-btn {
+    background: linear-gradient(135deg, #003b3b) !important;
+    color: #ffffff !important;
+    border: 1px solid #555555 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+}
+
+.theme-pink .username-text,
+.theme-pink .edit-icon,
+.theme-pink .profile-preview-label,
+.theme-pink .profile-preview-value,
+.theme-pink .birthday-value {
+    color: #ffffff;
+}
+
+.theme-pink .profile-preview-section .profile-preview-label,
+.theme-pink .profile-preview-section .profile-preview-birthday,
+.theme-pink .profile-preview-birthday span,
+.theme-pink .profile-preview-birthday svg {
+    color: #ffffff;  
+    stroke: #ffffff; 
+}
+
+.theme-pink .color_theme-form .icon-checkbox3-container span,
+.theme-pink .color_theme-form .icon-checkbox2-container span,
+.theme-pink .color_theme-form #customThemeLabel {
+    color: #ffffff !important;
+}
+
+.theme-pink #additional-checkboxes-container,
+.theme-pink #icon-checkbox-container {
+    background: #2e2e2e !important;
+}
+
+.theme-pink .icon-checkbox-container {
+    background: #2e2e2e !important;
+    color: #000000 !important;
+}
+
+.theme-pink #additional-checkboxes-container,
+.theme-pink #icon-checkbox2-container,
+.theme-pink #icon-checkbox3-container {
+    background: #2e2e2e !important;
+}
+
+.theme-pink .icon-checkbox2-container,
+.theme-pink .icon-checkbox3-container {
+    background: #2e2e2e !important;
+    color: #000000 !important;
+}
+
+.theme-pink .icon-checkbox:checked + label .check-icon,
+.theme-pink .icon-checkbox2:checked + label .check-icon2,
+.theme-pink .icon-checkbox3:checked + label .check-icon3 {
+    border-color: #4CAF50 !important;
+    background-color: #4CAF50 !important;
+}
+
+.theme-pink .recent-contact {
+    background: #ff00bf !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+}
+
+.theme-pink .currency-item {
+    background: #ff00bf !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+}
+.theme-pink .check-icon1,
+.theme-pink .check-icon2,
+.theme-pink .check-icon3{
+    background: #ff42d0 !important;
+}
+
+.theme-pink .icon-checkbox1-container,
+.theme-pink .icon-checkbox2-container,
+.theme-pink .icon-checkbox3-container,
+.theme-pink option,
+.theme-pink select{
+    background: #ff00aa !important;
+    color: #ffffff
+}
+
+.theme-pink .chat-input,
+.theme-pink .chat-messages h3,
+.theme-pink .chat-messages{
+    background: #ff00bf !important;
+    color: #ffffff
+}
+
+.theme-pink .language-change-btn,
+.theme-pink .main-btn-style-0,
+.theme-pink .deposit-btn,
+.theme-pink .add_card-btn {
+    background: #ff00bf !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+}
+
+.theme-pink #searchInput {
+    background: rgba(255, 182, 193, 0.8) !important;
+    color: #000000 !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink #searchInput::placeholder {
+    color: #8a0061 !important;
+    opacity: 0.8;
+}
+
+.theme-pink #chat-messages {
+    background: linear-gradient(to right, #ffe6eb, #ffd1dc) !important;
+}
+
+.theme-pink .message.sent {
+    background: #b30086 !important;
+    color: white !important;
+}
+
+.theme-pink .message.received {
+    background: #ffd1dc !important;
+    color: #000000 !important;
+}
+
+.theme-pink .message-time {
+    color: #8a0061 !important;
+}
+
+.theme-pink .chat-input-container,
+.theme-pink .chat-header {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+    color: #000000 !important;
+}
+
+.theme-pink .attach-btn,
+.theme-pink #sticker-btn {
+    color: #000000 !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink .attach-btn:hover,
+.theme-pink #sticker-btn:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+    color: #b30086 !important;
+}
+
+.theme-pink .chat-send-btn {
+    background: #b30086 !important;
+    color: white !important;
+    border: 1px solid #8a0061 !important;
+}
+
+.theme-pink .chat-send-btn:hover {
+    background: #8a0061 !important;
+    border-color: #670047 !important;
+}
+
+.theme-pink #chat-username {
+    color: #000000 !important;
+}
+
+.theme-pink .kebab-btn {
+    color: #000000 !important;
+}
+
+.theme-pink .kebab-menu {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+    border: 1px solid #b30086 !important;
+    color: #000000 !important;
+}
+
+.theme-pink .kebab-item {
+    color: #000000 !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.theme-pink .kebab-item:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.theme-pink .chat-input::placeholder {
+    color: #8a0061 !important;
+    opacity: 0.8;
+}
+
+.theme-pink .recent-contact .contact-last-message,
+.theme-pink .recent-contact .contact-time {
+    color: #b9b9b9 !important;
+}
+
+.theme-pink #preview-username,
+.theme-pink .profile-preview-label,
+.theme-pink #preview-description,
+.theme-pink #preview-birthday,
+.theme-pink .profile-preview-birthday svg {
+    color: #ffffff;
+    stroke: #ffffff;
+}
+
+.theme-pink .status-value.online { color: #00ff00; }
+.theme-pink .status-value.offline { color: #ff4444; }
+
+.theme-pink .side-menu,
+.theme-pink .profile-form,
+.theme-pink .profile-preview-card,
+.theme-pink .setting-form,
+.theme-pink .form1,
+.theme-pink .form2,
+.theme-pink .add_card,
+.theme-pink .color_theme-form,
+.theme-pink .chat-settings-form,
+.theme-pink .wallpaper-form,
+.theme-pink .wallet-form,
+.theme-pink .deposit-form,
+.theme-pink .subscribe-form-month,
+.theme-pink .subscribe-form-year,
+.theme-pink .bin_mouth-form,
+.theme-pink .bin_premium_mouth-form,
+.theme-pink .bin_years-form,
+.theme-pink .bin_premium_years-form,
+.theme-pink .check-subscription-form {
+    background: linear-gradient(to right, #ffb6c1, #b30086);
+    color: #ffffff;
+}
+
+.theme-pink .profile-form label,
+.theme-pink .setting-form label,
+.theme-pink .form1 label,
+.theme-pink .form2 label {
+    color: #ffffff;
+}
+
+.theme-pink .profile-form input,
+.theme-pink .setting-form input,
+.theme-pink .form1 input,
+.theme-pink .form2 input,
+.theme-pink .profile-form textarea,
+.theme-pink .setting-form textarea,
+.theme-pink .form1 textarea,
+.theme-pink .form2 textarea,
+.theme-pink .profile-form select,
+.theme-pink .setting-form select,
+.theme-pink .form1 select,
+.theme-pink .form2 select {
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    border: 1px solid #555555;
+    border-radius: 5px;
+    padding: 8px;
+    outline: none;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.theme-pink .profile-form input:focus,
+.theme-pink .setting-form input:focus,
+.theme-pink .form1 input:focus,
+.theme-pink .form2 input:focus,
+.theme-pink .profile-form textarea:focus,
+.theme-pink .setting-form textarea:focus,
+.theme-pink .form1 textarea:focus,
+.theme-pink .form2 textarea:focus,
+.theme-pink .profile-form select:focus,
+.theme-pink .setting-form select:focus,
+.theme-pink .form1 select:focus,
+.theme-pink .form2 select:focus {
+    background: rgba(50, 50, 50, 0.7);
+}
+
+.theme-pink .profile-form select option,
+.theme-pink .setting-form select option,
+.theme-pink .form1 select option,
+.theme-pink .form2 select option {
+    background: #2c2c2c;
+    color: #ffffff;
+}
+
+.theme-pink .side-menu .profile-btn,
+.theme-pink .setting-form .profile-btn {
+    background: rgba(50, 50, 50, 0.7);
+    color: #ffffff;
+    padding: 10px 15px;
+    border: 1px solid #555555;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    margin: 5px 0;
+    text-align: center;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    text-decoration: none;
+}
+
+.theme-pink .side-menu .profile-btn:hover,
+.theme-pink .setting-form .profile-btn:hover {
+    background: rgba(70, 70, 70, 0.9);
+    border-color: #b30086;
+    color: #ffffff;
+}
+
 .theme-pink .color_theme-form .icon-checkbox2-container span,
 .theme-pink .color_theme-form #customThemeLabel {
     color: #000000 !important;
@@ -800,7 +1269,7 @@ input, textarea, select {
 }
 
 .theme-pink .icon-checkbox-container {
-    background: #ff009d !important;
+    background: #ff00aa !important;
     color: #000000 !important;
 }
 
@@ -950,10 +1419,189 @@ input, textarea, select {
     text-decoration: none;
 }
 
+.theme-pink #chat-scroll-bottom-btn {
+    background: #b30086 !important;
+    color: white !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink #chat-scroll-bottom-btn:hover {
+    background: #9a0073 !important;
+}
+
+.theme-pink .file-preview {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+    color: #000000 !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink .edit-panel {
+    background: #ffb6c1 !important;
+    color: #000000 !important;
+    border-bottom: 1px solid #b30086 !important;
+}
+
+.theme-pink .message-context-menu,
+.theme-pink .image-context-menu,
+.theme-pink .kebab-menu {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+    color: #000000 !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink .plan strong,
+.theme-pink .inner strong,
+.theme-pink .subscribe-form-year .title,
+.theme-pink .subscribe-form-year .info,
+.theme-pink .features strong {
+    background: transparent !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+.theme-pink .subscribe-form-year .plan{
+    background: #ff90a0 !important;
+
+}
+.theme-pink .subscribe-form-year .strong,
+.theme-pink .subscribe-form-year .inner {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+}
+
+.theme-pink #deposit-amount,
+.theme-pink #card-number,
+.theme-pink #card-cardholder,
+.theme-pink #card-cvv {
+    background: rgba(255, 182, 193, 0.8) !important;
+    color: #000000 !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink #deposit-amount::placeholder,
+.theme-pink #card-number::placeholder,
+.theme-pink #card-cardholder::placeholder,
+.theme-pink #card-cvv::placeholder {
+    color: #8a0061 !important;
+    opacity: 0.8;
+}
+
+.theme-pink .plan strong,
+.theme-pink .inner strong,
+.theme-pink .subscribe-form-month .title,
+.theme-pink .subscribe-form-month .info,
+.theme-pink .features strong {
+    background: transparent !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+.theme-pink .subscribe-form-month .plan{
+    background: #ff90a0 !important;
+
+}
+.theme-pink .subscribe-form-month .strong,
+.theme-pink .subscribe-form-month .inner {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+}
+
+.theme-pink .security-form button {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+    color: #000000 !important;
+    border: 1px solid #b30086 !important;
+}
+
 .theme-pink .setting-form .profile-btn:hover {
     background: rgba(255, 255, 255, 0.4);
     border-color: #b30086;
     color: #000000;
+}
+
+.theme-pink .recent-contact:hover {
+    background: rgba(179, 0, 134, 0.1) !important;
+    border-color: #b30086 !important;
+}
+
+.theme-pink .chat-input {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #000000 !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink .chat-send-btn {
+    background: #b30086 !important;
+    color: white !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink .chat-send-btn:hover {
+    background: #9a0073 !important;
+}
+
+.theme-pink #sticker-panel {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+    color: #000000 !important;
+}
+
+.theme-pink .sticker-cat-btn {
+    color: #000000 !important;
+}
+
+.theme-pink .sticker-cat-btn.active {
+    background: #b30086 !important;
+    color: white !important;
+}
+
+.theme-pink .kebab-menu {
+    background: linear-gradient(to right, #ffb6c1, #b30086) !important;
+    color: #000000 !important;
+    border: 1px solid #b30086 !important;
+}
+
+.theme-pink .kebab-item {
+    color: #000000 !important;
+}
+
+.theme-pink .kebab-item:hover {
+    background: rgba(179, 0, 134, 0.2) !important;
+}
+
+.theme-pink .message.received {
+    background: #e9ecef !important;
+    color: #000000 !important;
+}
+
+.theme-pink .security-form {
+    background: linear-gradient(to right, #ffffff, #e0e0e0);
+    color: #000000;
+}
+
+.theme-pink .security-form input {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    border: 1px solid #999999;
+}
+
+.theme-pink .password-toggle h4 { color: #000000; }
+.theme-pink .password-toggle-arrow { color: #000000; }
+.theme-pink .password-form input { 
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    border: 1px solid #999999;
+}
+
+.theme-pink .bin-login-form {
+    background: linear-gradient(to right, #ffffff, #e0e0e0);
+    color: #000000;
+}
+
+.theme-pink .bin-login-form input {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    border: 1px solid #999999;
+}
+
+.theme-pink .main-btn.main-btn-style-0 {
+    background: linear-gradient(135deg, #ffffff, #ffffff) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
 }
 
 .theme-green {
@@ -4983,7 +5631,6 @@ body.theme-dark .main-btn.main-btn-style-0 {
     display: block;
 }
 
-
 .toggle-label {
     user-select: none;
 }
@@ -5099,6 +5746,30 @@ body.form-open .chat-container {
 #sticker-panel:not([style*="translateX(100%)"]) ~ .chat-container {
     opacity: 1;
     filter: brightness(1);
+}
+
+.edit-panel {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.message-edited {
+    font-size: 10px;
+    color: #888;
+    margin-left: 6px;
+    font-style: italic;
+}
+
+.chat-input {
+    min-height: 20px;
+}
+
+.chat-input:focus:empty::before {
+    content: "";
 }
 
 #chat-toggle:checked ~ .profile-form,
