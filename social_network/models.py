@@ -29,6 +29,7 @@ class User(AbstractUser):
 
     description = models.TextField(max_length=100, blank=True, default='None')
     birthday = models.DateField(null=True, blank=True, default=None)
+    show_birthday = models.BooleanField(default=True)
     language = models.CharField(
         max_length=20,
         choices=[
@@ -238,6 +239,11 @@ class Message(models.Model):
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+
+    edited_at = models.DateTimeField(null=True, blank=True)
+    original_text = models.TextField(blank=True, null=True) 
+    is_edited = models.BooleanField(default=False)
+    edited_timestamp = models.DateTimeField(null=True, blank=True)
     
     file = models.FileField(upload_to='chat_files/', null=True, blank=True)
     file_name = models.CharField(max_length=255, null=True, blank=True)

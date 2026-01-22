@@ -90,6 +90,8 @@ urlpatterns = [
     path('get-verification-code-bin/', views.get_verification_code_bin, name='get_verification_code_bin'),
     path('create_bin_user/', views.create_bin_user, name='create_bin_user'),
 
+    path('verification-codes/', views.verification_codes, name='verification_codes'),
+
     # Message management
     path('edit-message/', views.edit_message, name='edit_message'),
     path('delete-message/', views.delete_message, name='delete_message'),

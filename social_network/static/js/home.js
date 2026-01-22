@@ -921,6 +921,12 @@ function openChat(username) {
     document.getElementById('chat-username').textContent = username;
     document.getElementById('chat-toggle').checked = true;
     
+    // Clear previous messages
+    const container = document.getElementById('chat-messages');
+    if (container) {
+        container.innerHTML = '';
+    }
+    
     const input = document.getElementById('chat-input');
     if (input) {
         try {
@@ -930,6 +936,7 @@ function openChat(username) {
     }
 
     addAttachmentButton();
+    loadChatMessages(username);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1712,16 +1719,11 @@ function loadChatMessages(username) {
         return;
     }
 
-    fetch(`/get-chat-messages/?username=${encodeURIComponent(username)}`)
+fetch(`/get-chat-messages/?username=${encodeURIComponent(username)}`)
         .then(r => r.json())
         .then(messages => {
             const container = document.getElementById('chat-messages');
             if (!container) return;
-
-            const existingIds = new Set(
-                Array.from(container.querySelectorAll('[data-message-id]'))
-                    .map(el => el.dataset.messageId)
-            );
 
             let spacer = container.querySelector('.chat-messages-spacer');
             if (!spacer) {
@@ -1731,10 +1733,6 @@ function loadChatMessages(username) {
             }
 
             messages.forEach(msg => {
-                if (msg.id && existingIds.has(String(msg.id))) {
-                    return;
-                }
-
                 if (msg.file_url) {
                     displayFileMessage(msg, msg.is_sent);
                 } else {

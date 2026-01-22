@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 
 {% block title %}
@@ -8,8 +8,13 @@
 <!-- <link rel="stylesheet" href="{% static 'js/home.js' %}"> -->
 
 <style>
-
+.chat-input:empty::before {
+    content: "Введіть своє повідомлення...";
+    color: #aaa;
+    pointer-events: none;
+}
 </style>
+
 {% endblock %}
 
 {% block body %}
@@ -87,12 +92,18 @@
 <label class="hamburger" for="menu-toggle"><span></span><span></span><span></span></label>
 <label for="menu-toggle" class="overlay"></label>
 <div class="side-menu">
-    <img class="avatar" src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" alt="Аватар">
+    {% if user.photo and user.photo.url %}
+        <img class="avatar" src="{{ user.photo.url }}" alt="Аватар" onerror="this.src='{% static 'pictures/login.png' %}'">
+    {% else %}
+        <img class="avatar" src="{% static 'pictures/login.png' %}" alt="Аватар">
+    {% endif %}
     <div class="username">{{ user.username }}</div>
     {% if user.subscribe == "Bin+" %}
-        <div style="color:#0056b3" class="username-line">Бін+</div>
+        <div style="color:#0056b3" class="username-line">Bin+</div>
     {% elif user.subscribe == "Bin_premium" %}
-        <div style="color:#b3009b" class="username-line">Бін преміум</div>
+        <div style="color:#b3009b" class="username-line">Bin Premium</div>
+    {% else %}
+        <div class="username-line"></div>
     {% endif %}
     <label for="profile-toggle" class="main-btn main-btn-style-1">Мій профіль</label>
     <label for="wallet-toggle" class="main-btn main-btn-style-1">Гаманець</label>
@@ -103,7 +114,7 @@
     <h2>Налаштування</h2>
     <label for="form1-toggle" class="main-btn main-btn-style-1">Редагувати профіль</label>
     <label for="form2-toggle" class="main-btn main-btn-style-1">Мова</label>
-    <label for="color_theme-toggle" class="main-btn main-btn-style-1">Колір теми</label>
+    <label for="color_theme-toggle" class="main-btn main-btn-style-1">Колірна тема</label>
     <label for="chat-settings-toggle" class="main-btn main-btn-style-1">Налаштування чату</label>
     <a class="main-btn main-btn-style-1" href="https://t.me/lakilach_bot" target="_blank" style="text-decoration: none; color: inherit;">Підтримка</a>
     <label for="subscribe-month-toggle" class="main-btn main-btn-style-1">Підписка</label>
@@ -112,7 +123,7 @@
     {% csrf_token %}
     </form>
     <label class="main-btn main-btn-style-1" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        Вийти з акаунту
+        Вийти
     </label>
 </div>
 
@@ -122,107 +133,178 @@
              style="{% if user.background and user.background.url %}background-image: url('{{ user.background.url }}'); display: block;{% else %}display: none;{% endif %}"></div>
         
         <div class="profile-preview-header">
-            <img class="profile-preview-avatar avatar" 
-                 src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                 alt="Аватар">
+            {% if user.photo and user.photo.url %}
+                <img id="avatarInput-img" class="profile-preview-avatar" src="{{ user.photo.url }}" alt="Аватар" onerror="this.src='{% static 'pictures/login.png' %}'">
+            {% else %}
+                <img id="avatarInput-img" class="profile-preview-avatar" src="{% static 'pictures/login.png' %}" alt="Аватар">
+            {% endif %}
             <div class="profile-preview-info">
                 <h3 class="username-text">{{ user.username }}</h3>
                 <div class="profile-preview-status">
                     <span class="status-value {% if user.status == 'Online' %}online{% else %}offline{% endif %}">
-                        ● {{ user.status|default:"Офлайн" }}
+                        ● {{ user.status|default:"Не в мережі" }}
                     </span>
                 </div>
                 <div class="profile-preview-tag tag-copy" id="user-tag">{{ user.your_tag }}</div>
-                {% if user.your_tag|default:''|lower == "@hello" or user.your_tag|default:''|lower == "@bin_bot" or user.role == "System Bot" or user.username|default:''|lower == 'bin' %}
-                    <div class="system-bot-label">Системний бот</div>
-                {% endif %}
                 <br>
                 <label for="form1-toggle" class="edit-icon">Редагувати профіль</label>
             </div>
-        </div>    
+        </div>
+        
+        <hr class="profile-preview-divider">
+        {% if profile_user.role == "Administrator" or profile_user.role == "Moderator" or profile_user.subscribe == "Bin_premium" or profile_user.subscribe == "Bin+" %}
+            <div class="profile-preview-section" style="display: inline-flex; align-items: center; gap: 6px;">
+                <div class="profile-preview-value">
+                    {% if profile_user.role == 'Administrator' %}
+                        <span style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            👑 Адміністратор
+                        </span>
+                        {% if profile_user.subscribe == 'Bin_premium' or profile_user.subscribe == 'Bin+' %}
+                            &nbsp;|
+                        {% endif %}
+                    {% elif profile_user.role == 'Moderator' %}
+                        <span style="background: linear-gradient(135deg, #ffc107, #e0a800); color: #212529; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            🛡️ Модератор
+                        </span>
+                        {% if profile_user.subscribe == 'Bin_premium' or profile_user.subscribe == 'Bin+' %}
+                            &nbsp;|
+                        {% endif %}
+                    {% endif %}
+                </div>      
 
-        <hr class="profile-preview-divider">        
+                <div class="profile-preview-value">
+                    {% if profile_user.subscribe == 'Bin_premium' %}
+                        <span style="background: linear-gradient(135deg, #6f42c1, #5a32a3); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            💎 Bin Premium
+                        </span>
+                    {% elif profile_user.subscribe == 'Bin+' %}
+                        <span style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            🌟 Bin+
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        
         <div class="profile-preview-section">
             <div class="profile-preview-label">Опис</div>
             <div class="profile-preview-value" id="my-profile-description">
-                {{ user.description }}
-            </div>
-        </div>     
-
-        <div class="profile-preview-section">
-            <div class="profile-preview-label">День народження</div>
-            <div class="profile-preview-birthday">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                <span class="birthday-value">{{ user.birthday|default:"Не вказано" }}</span>
+                {{ user.description|default:"Опис відсутній" }}
             </div>
         </div>
+                
+        <span class="birthday-value">
+            {% if user.show_birthday and user.birthday %}
+                <div class="profile-preview-section">
+                    <div class="profile-preview-label">День народження</div>        
 
-        <div class="user-info">
-            {% if role == 'Administrator' %}
-                <span class="badge bg-danger">👑 Адміністратор</span>
-            {% elif role == 'Moderator' %}
-                <span class="badge bg-warning">🛡️ Модератор</span>
+                    <div class="profile-preview-birthday" style="display: flex; align-items: center; gap: 10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>     
+
+                        <span class="birthday-value">
+                            {% if user.show_birthday and user.birthday %}
+                                {{ user.birthday|date:"d.m.Y" }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
             {% endif %}
-        </div>
+        </span>
     </div>
-</div>  
+</div>
 
 <div class="other-profile-form">
     <div class="profile-preview-card">
         <div class="profile-preview-background" id="other-profile-background"
-             style="{% if user.background and user.background.url %}background-image: url('{{ user.background.url }}'); display: block;{% elif user.your_tag == '@Bin_bot' %}{% else %}display: none;{% endif %}"></div>
+             style="{% if profile_user.background and profile_user.background.url %}background-image: url('{{ profile_user.background.url }}'); display: block;{% else %}display: none;{% endif %}"></div>
         
         <div class="profile-preview-header">
             <img class="profile-preview-avatar other-profile-avatar" 
-                 src="{% static 'pictures/login.png' %}" 
+                 src="{% if profile_user.photo and profile_user.photo.url %}{{ profile_user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
                  alt="Аватар">
             <div class="profile-preview-info">
-                <h3 class="username-text other-profile-username">{{ user.username }}</h3>
+                <h3 class="username-text other-profile-username">{{ profile_user.username }}</h3>
                 <div class="profile-preview-status">
-                    <span class="status-value offline other-profile-status">
-                        ● Офлайн
+                    <span class="status-value {% if profile_user.status == 'Online' %}online{% else %}offline{% endif %} other-profile-status">
+                        ● {{ profile_user.status|default:"Не в мережі" }}
                     </span>
                 </div>
                 <div class="profile-preview-tag tag-copy other-profile-tag" onclick="copyOtherUserTag()">
-                    @{{ user.your_tag|default:user.username }}
+                    @{{ profile_user.your_tag|default:profile_user.username }}
                 </div>
-                {% if user.your_tag|default:''|lower == "@hello" or user.your_tag|default:''|lower == "@bin_bot" or user.role == "System Bot" or user.username|default:''|lower == 'bin' %}
-                    <div class="system-bot-label">Системний бот</div>
-                {% endif %}
             </div>
-        </div>            
-        <hr class="profile-preview-divider">          
-              
-        <div class="profile-preview-section">
-            <div class="profile-preview-label" id="role-label"></div>
-            <div class="profile-preview-value" id="other-profile-role"></div>
         </div>
+        
+        <hr class="profile-preview-divider">
+        
+        {% if profile_user.role in 'Administrator,Moderator,System Bot' or profile_user.subscribe in 'Bin_premium,Bin+' %}
+            <div class="profile-preview-section" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <div class="profile-preview-value" id="other-profile-role">
+                    {% if profile_user.role == 'Administrator' %}
+                        <span style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            👑 Адміністратор
+                        </span>
+                    {% elif profile_user.role == 'Moderator' %}
+                        <span style="background: linear-gradient(135deg, #ffc107, #e0a800); color: #212529; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            🛡️ Модератор
+                        </span>
+                    {% elif profile_user.role == 'System Bot' %}
+                        <span style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            🤖 Системний бот
+                        </span>
+                    {% endif %}
+                </div>      
+
+                {% if profile_user.role in 'Administrator,Moderator,System Bot' and profile_user.subscribe in 'Bin_premium,Bin+' %}
+                    <span style="color: #6c757d; font-weight: bold; user-select: none; margin: 0 4px;">|</span>
+                {% endif %}     
+
+                <div class="profile-preview-value" id="other-profile-subscribe">
+                    {% if profile_user.subscribe == 'Bin_premium' %}
+                        <span style="background: linear-gradient(135deg, #6f42c1, #5a32a3); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            💎 Бін преміум
+                        </span>
+                    {% elif profile_user.subscribe == 'Bin+' %}
+                        <span style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            🌟 Бін+
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
         <div class="profile-preview-section">
             <div class="profile-preview-label">Опис</div>
             <div class="profile-preview-value other-profile-description">
-                Немає опису
+                {{ profile_user.description|default:"Опис відсутній" }}
             </div>
-        </div>       
-
-        <div class="profile-preview-section">
-            <div class="profile-preview-label">День народження</div>
-            <div class="profile-preview-birthday">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                <span class="birthday-value other-profile-birthday">Не вказано</span>
+        </div>
+        
+        {% if profile_user.show_birthday and profile_user.birthday %}
+            <div class="profile-preview-section">
+                <div class="profile-preview-label">Birthday</div>
+                <div class="profile-preview-birthday" style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>              
+                    <span class="birthday-value other-profile-birthday">
+                        {{ profile_user.birthday|date:"d.m.Y" }}
+                    </span>
+                </div>
             </div>
-
-            <button class="other-profile-message-btn {% if user.custom_button_enabled %}main-btn main-btn-style-{{ user.custom_option|default:'1' }}{% endif %}" style="padding:10px 20px; border:none; border-radius:6px; cursor:pointer; flex:1;">
-                Повідомлення
+        {% endif %}
+        
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="other-profile-message-btn main-btn-style-1" onclick="openChatWithOtherUser()">
+                Написати
             </button>
         </div>
     </div>
@@ -234,9 +316,9 @@
         <option value="" disabled>=== Базові ===</option>
         <option value="light">Світла</option>
         <option value="dark">Темна</option>
-        <option value="" disabled>=== З підпискою ===</option>
+        <option value="" disabled>=== Для підписки ===</option>
         <option value="pink">Рожева</option>
-        <option value="green">Зелена</option>
+        <!-- <option value="green">Зелена</option> -->
     </select>
     <button id="applyThemeBtn">Застосувати</button>   
 
@@ -248,12 +330,12 @@
                     <polyline points="4 10 8 14 16 6"></polyline>
                 </svg>
             </span>
-            <span id="customThemeLabel">{% if user.custom_button_enabled %}Налаштування активовано{% else %}Увімкнути користувацьку кнопку{% endif %}</span>
+            <span id="customThemeLabel">{% if user.custom_button_enabled %}Кастом увімкнено{% else %}Увімкнути кастомну кнопку{% endif %}</span>
         </label>
     </div>
 
     <div id="additional-checkboxes-container" style="{% if not user.custom_button_enabled %}display: none;{% endif %} margin-top: 15px; padding: 10px; border-radius: 6px;">
-        <h4 style="margin-top: 0; margin-bottom: 10px;">Кастомні налаштування</h4>         
+        <h4 style="margin-top: 0; margin-bottom: 10px;">Кастомні опції</h4>         
 
         <div style="display: flex; flex-direction: column; gap: 15px; align-items: flex-start;">
             <div class="icon-checkbox2-container" style="margin: 0;">
@@ -266,7 +348,7 @@
                             <polyline points="4 10 8 14 16 6"></polyline>
                         </svg>
                     </span>
-                    <span>Яскраве темне</span>
+                    <span>Світло-темна</span>
                 </label>
             </div>          
 
@@ -280,7 +362,7 @@
                             <polyline points="4 10 8 14 16 6"></polyline>
                         </svg>
                     </span>
-                    <span>Райдужне</span>
+                    <span>Веселка</span>
                 </label>
             </div>          
 
@@ -294,7 +376,7 @@
                             <polyline points="4 10 8 14 16 6"></polyline>
                         </svg>
                     </span>
-                    <span>Яскраве</span>
+                    <span>Яскрава</span>
                 </label>
             </div>  
 
@@ -308,14 +390,14 @@
                             <polyline points="4 10 8 14 16 6"></polyline>
                         </svg>
                     </span>
-                    <span>Темне</span>
+                    <span>Темна</span>
                 </label>
             </div>
         </div>
     </div>
 
     <div id="text-color-container" style="margin-top: 15px; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-        <h4 style="margin-top: 0; margin-bottom: 10px;">Колір тексту кнопки</h4>                          
+        <h4 style="margin-top: 0; margin-bottom: 10px;">Колір тексту кнопок</h4>                              
 
         <div style="display: flex; flex-direction: column; gap: 15px; align-items: flex-start;">
             <div class="icon-checkbox3-container" style="margin: 0;">
@@ -330,7 +412,7 @@
                     </span>
                     <span>Білий текст</span>
                 </label>
-            </div>                                                  
+            </div>                                                      
 
             <div class="icon-checkbox3-container" style="margin: 0;">
                 <input type="radio" name="textColorOption" id="textColorBlack" class="icon-checkbox3" 
@@ -348,8 +430,8 @@
         </div>
     </div>
 
-    <label class="main-btn main-btn-style-1">Приклад</label>
-</div>          
+    <label class="main-btn main-btn-style-1">Гаманець</label>
+</div>         
 
 <div class="chat-settings-form">
     <h2>Налаштування чату</h2>
@@ -365,63 +447,6 @@
     </div>
 </div>
 
-<div class="wallpaper-form">
-    <div class="wallpaper-grid" style="display: flex; flex-direction: column; gap: 30px; align-items: center;">     
-
-        <div class="wallpapers-row" style="display: flex; gap: 20px; justify-content: center; width: 100%;">
-            <div class="wallpaper-item" data-url="{% static 'wallpapers/wall1.jpg' %}">
-                <div class="wallpaper-preview">
-                    <img src="{% static 'wallpapers/wall1.jpg' %}" 
-                         alt="Фон 1"
-                         style="width: 280px; height: 170px; object-fit: cover; border-radius: 10px;">
-                </div>
-            </div>      
-
-            <div class="wallpaper-item" data-url="{% static 'wallpapers/wall2.webp' %}">
-                <div class="wallpaper-preview">
-                    <img src="{% static 'wallpapers/wall2.webp' %}" 
-                         alt="Фон 2"
-                         style="width: 280px; height: 170px; object-fit: cover; border-radius: 10px;">
-                </div>
-            </div>      
-
-            <div class="wallpaper-item" data-url="{% static 'wallpapers/wall3.avif' %}">
-                <div class="wallpaper-preview">
-                    <img src="{% static 'wallpapers/wall3.avif' %}" 
-                         alt="Фон 3"
-                         style="width: 280px; height: 170px; object-fit: cover; border-radius: 10px;">
-                </div>
-            </div>
-        </div>      
-        
-        <div class="buttons-section" style="display: flex; flex-direction: column; gap: 20px; width: 100%; align-items: center; margin-top: 20px;">
-            <button type="button" class="wallpaper-action-btn upload-btn" 
-                    onclick="document.getElementById('wallpaper-upload').click()"
-                    style="width: 90%; max-width: 600px; padding: 18px; border: none; border-radius: 10px; 
-                           background: linear-gradient(135deg, var(--accent), var(--accent-2)); 
-                           color: white; cursor: pointer; font-size: 17px; font-weight: 500; 
-                           display: flex; flex-direction: column; align-items: center; gap: 10px;
-                           transition: transform 0.2s, box-shadow 0.2s;">
-                <div style="font-size: 28px;">📁</div>
-                <span>Завантажити свій фон</span>
-            </button>       
-
-            <button type="button" class="wallpaper-action-btn reset-btn"
-                    onclick="resetWallpaper()"
-                    style="width: 90%; max-width: 600px; padding: 18px; border: 2px solid var(--accent); border-radius: 10px; 
-                           background: transparent; color: var(--accent); cursor: pointer; 
-                           font-size: 17px; font-weight: 500; display: flex; flex-direction: column; 
-                           align-items: center; gap: 10px; transition: all 0.2s;">
-                <div style="font-size: 28px;">🔄</div>
-                <span>Скинути до стандартного</span>
-            </button>
-        </div>
-    </div>      
-
-    <input type="file" id="wallpaper-upload" accept="image/*" style="display: none;" 
-           onchange="handleWallpaperUpload(event)">
-</div>
-
 <div class="form1">
     <h2>Редагувати профіль</h2>
     <div class="form1-inner">
@@ -430,10 +455,12 @@
                 {% csrf_token %}        
 
                 <div class="avatar-upload-section">
-                    <img id="avatarInput-img" class="avatar" 
-                         src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                         alt="Аватар">
-                    <br>                        
+                    {% if user.photo and user.photo.url %}
+                        <img id="edit-avatar-preview" class="avatar" src="{{ user.photo.url }}" alt="Аватар" onerror="this.src='{% static 'pictures/login.png' %}'">
+                    {% else %}
+                        <img id="edit-avatar-preview" class="avatar" src="{% static 'pictures/login.png' %}" alt="Аватар">
+                    {% endif %}
+                    <br><br>
 
                     <label for="avatarInput" style="display: inline-block; padding: 8px 16px; background: #007bff; color: white; border-radius: 6px; cursor: pointer;">
                         Вибрати новий аватар
@@ -441,8 +468,8 @@
                     </label>
                     <button type="button" class="btn-delete-avatar" onclick="confirmAvatarReset()">
                         Видалити аватар
-                    </button>           
-                </div>    
+                    </button>   
+                </div>  
 
                 <div class="form-group">
                     <label for="username-input"><strong>Ім'я користувача:</strong></label>
@@ -457,7 +484,7 @@
 
                 <div class="form-group">
                     <label for="tag-input"><strong>Тег:</strong></label>
-                    <input type="text" id="tag-input" name="your_tag" value="{{ user.your_tag }}">
+                    <input type="text" id="tag-input" name="your_tag" value="{{ user.your_tag }}" maxlength="20">
                 </div>          
 
                 <div class="form-group">
@@ -479,9 +506,19 @@
                             {% endfor %}
                         </select>
                     </div>
-                </div>          
+                </div>   
+                
+                <div class="form-group" style="margin-top: 12px;">
+                    <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" 
+                               name="show_birthday" 
+                               id="show-birthday-checkbox"
+                               {% if user.show_birthday %}checked{% endif %}>
+                        <span>Показувати день народження</span>
+                    </label>
+                </div>
 
-                <button type="submit">Зберегти зміни</button>
+                <button id="savechangesform1" type="submit">Зберегти зміни</button>
             </form>
         </div>          
 
@@ -493,14 +530,16 @@
                 <div class="preview-badge">ПЕРЕГЛЯД</div>        
 
                 <div class="profile-preview-header">
-                    <img id="preview-avatar" class="profile-preview-avatar other-profile-avatar" 
-                         src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'pictures/login.png' %}{% endif %}" 
-                         alt="Аватар">
+                    {% if user.photo and user.photo.url %}
+                        <img id="edit-avatar-preview" class="avatar" src="{{ user.photo.url }}" alt="Аватар" onerror="this.src='{% static 'pictures/login.png' %}'">
+                    {% else %}
+                        <img id="edit-avatar-preview" class="avatar" src="{% static 'pictures/login.png' %}" alt="Аватар">
+                    {% endif %}
                     <div class="profile-preview-info">
                         <h3 id="preview-username" class="other-profile-username">{{ user.username }}</h3>
                         <div class="profile-preview-status">
                             <span class="status-value other-profile-status {% if user.status == 'Online' %}online{% else %}offline{% endif %}">
-                                ● {{ user.status|default:"Офлайн" }}
+                                ● {{ user.status|default:"Не в мережі" }}
                             </span>
                         </div>
                         <div class="profile-preview-tag other-profile-tag" id="preview-tag">{{ user.your_tag }}</div>
@@ -512,11 +551,11 @@
                 <div class="profile-preview-section">
                     <div class="profile-preview-label">Опис</div>
                     <div class="profile-preview-value" id="preview-description">
-                        {{ user.description|default:"Немає опису" }}
+                        {{ user.description|default:"Опис відсутній" }}
                     </div>
                 </div>          
 
-                <div class="profile-preview-section">
+                <div class="profile-preview-section" id="preview-birthday-section">
                     <div class="profile-preview-label">День народження</div>
                     <div class="profile-preview-birthday">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -543,7 +582,6 @@
         <button class="language-change-btn" type="submit">Змінити</button>
     </form>
 </div>
-
 
 <div class="wallet wallet-form">
     <p id="wallet-amount">Гаманець: {{ price_converted }}</p>
@@ -632,12 +670,12 @@
             </div>
         </div>
 
-        <label style="margin-top:8px;">CVV (не зберігається)</label>
+        <label style="margin-top:8px;">CVV</label>
         <input id="card-cvv" type="password" maxlength="3" placeholder="123" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
 
         <div style="display:flex; gap:8px; margin-top:12px;">
             <button type="button" class="deposit-btn" onclick="submitAddCard()">Додати</button>
-            <button type="button" class="deposit-btn" onclick="(function(){ const cb=document.getElementById('add_card-toggle'); if(cb) cb.checked=false; })()">Відмінити</button>
+            <button type="button" class="deposit-btn" onclick="(function(){ const cb=document.getElementById('add_card-toggle'); if(cb) cb.checked=false; })()">Скасувати</button>
         </div>
         <p id="add-card-result" style="margin-top:8px;color:#333;font-weight:600;"></p>
     </form>
@@ -681,47 +719,47 @@
                         {% endif %}
                     </span>
                 </span>
-                <p class="title">Бін+</p>
-                <p class="info">Усе, що є в Basic, плюс:</p>
+                <p class="title">Bin+</p>
+                <p class="info">Усе з Basic, а також:</p>
                 <ul class="features" style="list-style: none; padding: 0; margin: 0;">
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
                         <span>
-                            <strong>Опис до 100 символів</strong>
+                            <strong>Можна писати до 100 символів в описі</strong>
                         </span>
                     </li>
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
                         <span>
-                            <strong>Можна додавати GIF-аватар</strong>
+                            <strong>Можна додати GIF-аватар</strong>
                         </span>
                     </li>
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
                         <span>
-                            <strong>Додаткові теми: Рожева та Зелена</strong>
+                            <strong>Можна змінювати тему (доступна рожева)</strong>
                         </span>
                     </li>
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
                         <span>
@@ -730,7 +768,7 @@
                     </li>
                 </ul>
                 <div class="action">
-                    <label for="bin_mouth-toggle" class="button">Обрати план</label>
+                    <label for="bin_mouth-toggle" class="button">Обрати тариф</label>
                 </div>
             </div>
         </div>      
@@ -746,62 +784,44 @@
                         {% endif %}
                     </span>
                 </span>
-                <p class="title">Бін преміум</p>
-                <p class="info">Усе, що є в Бін+, плюс:</p>
+                <p class="title">Bin Premium</p>
+                <p class="info">Усе з Bin+, а також:</p>
                 <ul class="features" style="list-style: none; padding: 0; margin: 0;">
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
                         <span>
-                            <strong>Опис до 150 символів</strong>
+                            <strong>Можна писати до 150 символів в описі</strong>
                         </span>
                     </li>
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
                             <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong></strong>
-                        </span>
-                    </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
                         <span>
                             <strong>Завантаження файлів до 50 МБ</strong>
                         </span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>.</strong>
-                        </span>
-                    </li>
                 </ul>
+                <br><br><br><br><br>
                 <div class="action">
-                    <label for="bin_premium_mouth-toggle" class="button">Обрати план</label>
+                    <label for="bin_premium_mouth-toggle" class="button">Обрати тариф</label>
                 </div>
             </div>
-        </div>      
+        </div>
     </div>
+
     <div style="text-align: center; margin-top: 30px;">
-        <label for="check-subscription-toggle" class="check-subscription-btn">Перевірити статус підписки</label>
+        <label for="check-subscription-toggle" class="check-subscription-btn">
+            Перевірити статус підписки
+        </label>
     </div>
 </div>
 
@@ -828,59 +848,53 @@
                         {% endif %}
                     </span>
                 </span>
-                <p class="title">Бін+</p>
-                <p class="info">Усе, що є в Basic, плюс:</p>
+                <p class="title">Bin+</p>
+                <p class="info">Усе з Basic, а також:</p>
                 <ul class="features" style="list-style: none; padding: 0; margin: 0;">
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                            <svg height="24" width="24" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                            </svg>
+                        </span>
+                        <span><strong>Можна писати до 100 символів в описі</strong></span>
+                    </li>
+                    <li>
+                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
+                            <svg height="24" width="24" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                            </svg>
+                        </span>
+                        <span><strong>Можна додати GIF-аватар</strong></span>
+                    </li>
+                    <li>
+                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
+                            <svg height="24" width="24" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
                         <span>
-                            <strong>Опис до 100 символів</strong>
+                            <strong>Можна змінити тему (додати рожеву)</strong>
                         </span>
                     </li>
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                            <svg height="24" width="24" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
-                        <span>
-                            <strong>Можна додавати GIF-аватар</strong>
-                        </span>
-                    </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>Додаткові теми: Рожева та Зелена</strong>
-                        </span>
-                    </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>Завантаження файлів до 20 МБ</strong>
-                        </span>
+                        <span><strong>Завантаження файлів до 20 МБ</strong></span>
                     </li>
                 </ul>
                 <div class="action">
                     <label for="bin_years-toggle" class="button">Обрати план</label>
                 </div>
             </div>
-        </div>      
+        </div>
 
         <div class="plan">
             <div class="inner">
@@ -895,53 +909,28 @@
                         {% endif %}
                     </span>
                 </span>
-                <p class="title">Бін преміум</p>
-                <p class="info">Усе, що є в Бін+, плюс:</p>
+                <p class="title">Bin Premium</p>
+                <p class="info">Усе з Bin+, а також:</p>
                 <ul class="features" style="list-style: none; padding: 0; margin: 0;">
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                            <svg height="24" width="24" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
-                        <span>
-                            <strong>Опис до 150 символів</strong>
-                        </span>
+                        <span><strong>Можна писати до 150 символів в описі</strong></span>
                     </li>
                     <li>
                         <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                            <svg height="24" width="24" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
                             </svg>
                         </span>
-                        <span>
-                            <strong></strong>
-                        </span>
+                        <span><strong>Завантаження файлів до 50 МБ</strong></span>
                     </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>Завантаження файлів до 50 МБ</strong>
-                        </span>
-                    </li>
-                    <li>
-                        <span class="icon" style="margin-right: 10px; flex-shrink: 0;">
-                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M0 0h24v24H0z" fill="none"></path>
-                                 <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <strong>.</strong>
-                        </span>
-                    </li>
+                    <br><br><br><br>
                 </ul>
                 <div class="action">
                     <label for="bin_premium_years-toggle" class="button">Обрати план</label>
@@ -949,28 +938,31 @@
             </div>
         </div>
     </div>
+
     <div style="text-align: center; margin-top: 30px;">
-        <label for="check-subscription-toggle" class="check-subscription-btn">Перевірити статус підписки</label>
+        <label for="check-subscription-toggle" class="check-subscription-btn">
+            Перевірити статус підписки
+        </label>
     </div>
 </div>
 
 <div class="check-subscription-form">
-    <h2>Статус вашої підписки:             
+    <h2>Статус вашої підписки:
     {% if user.subscribe == "Bin+" %}
         <div style="color:#0056b3" class="username-line">Бін+</div>
     {% elif user.subscribe == "Bin_premium" %}
         <div style="color:#b3009b" class="username-line">Бін преміум</div>
-    {% endif %}</h2>     
+    {% endif %}</h2>
 
     {% if user.subscription_end %}
         <p>Залишилось часу: <span id="countdown"></span></p>
     {% else %}
-        <p>У вас базова підписка</p>
+        <p>Ваша підписка — Базова</p>
     {% endif %}
 
     {% if can_refund %}
         <div style="margin-top:10px;">
-            <span>Можна повернути кошти протягом 24 годин після покупки.</span><br>
+            <span>Ви можете повернути кошти протягом 24 годин після покупки.</span><br>
             <form method="POST" style="text-align:center; margin-top:10px;">
                 {% csrf_token %}
                 <button type="submit" name="action" value="refund_subscription" class="btn-refund">
@@ -979,10 +971,10 @@
             </form>
         </div>
     {% endif %}
-</div>      
+</div>
 
 <div class="bin_mouth-form">
-    <h2>Оновити план до Бін+</h2>
+    <h2>Оновіть свій план до Bin+</h2>
     <form method="post">
         {% csrf_token %}
         <p>Гаманець: <span>{{ price_converted }}</span></p>
@@ -993,14 +985,16 @@
         {% endif %}
         <div>
             <input type="checkbox" id="terms-bin">
-            <label for="terms-bin">Я погоджуюсь з <a href="/terms" target="_blank">умовами та правилами</a></label>
+            <label for="terms-bin">Я погоджуюсь з <a href="/terms" target="_blank">умовами та положеннями</a></label>
         </div>
-        <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">Підписатись</button>
+        <button type="submit" name="subscription_plan" value="bin_plus_monthly" id="subscribe-bin" disabled class="subscribe-btn">
+            Підписатися
+        </button>
     </form>
-</div>      
+</div>
 
 <div class="bin_premium_mouth-form">
-    <h2>Оновити план до Бін Преміум</h2>
+    <h2>Оновіть свій план до Bin Premium</h2>
     <form method="post">
         {% csrf_token %}
         <p>Гаманець: <span>{{ price_converted }}</span></p>
@@ -1011,14 +1005,16 @@
         {% endif %}
         <div>
             <input type="checkbox" id="terms-premium">
-            <label for="terms-premium">Я погоджуюсь з <a href="/terms" target="_blank">умовами та правилами</a></label>
+            <label for="terms-premium">Я погоджуюсь з <a href="/terms" target="_blank">умовами та положеннями</a></label>
         </div>
-        <button type="submit" name="subscription_plan" value="bin_premium_monthly" id="subscribe-premium" disabled class="subscribe-btn">Підписатись</button>
+        <button type="submit" name="subscription_plan" value="bin_premium_monthly" id="subscribe-premium" disabled class="subscribe-btn">
+            Підписатися
+        </button>
     </form>
-</div>      
+</div>
 
 <div class="bin_years-form">
-    <h2>Оновити план до Бін+ (рік)</h2>
+    <h2>Оновіть свій план до Bin+ (річна)</h2>
     <form method="post">
         {% csrf_token %}
         <p>Гаманець: <span>{{ price_converted }}</span></p>
@@ -1029,14 +1025,16 @@
         {% endif %}
         <div>
             <input type="checkbox" id="terms-bin-year">
-            <label for="terms-bin-year">Я погоджуюсь з <a href="/terms" target="_blank">умовами та правилами</a></label>
+            <label for="terms-bin-year">Я погоджуюсь з <a href="/terms" target="_blank">умовами та положеннями</a></label>
         </div>
-        <button type="submit" name="subscription_plan" value="bin_plus_yearly" id="subscribe-bin-year" disabled class="subscribe-btn">Підписатись</button>
+        <button type="submit" name="subscription_plan" value="bin_plus_yearly" id="subscribe-bin-year" disabled class="subscribe-btn">
+            Підписатися
+        </button>
     </form>
-</div>      
+</div>
 
 <div class="bin_premium_years-form">
-    <h2>Оновити план до Бін Преміум (рік)</h2>
+    <h2>Оновіть свій план до Bin Premium (річна)</h2>
     <form method="post">
         {% csrf_token %}
         <p>Гаманець: <span>{{ price_converted }}</span></p>
@@ -1047,11 +1045,13 @@
         {% endif %}
         <div>
             <input type="checkbox" id="terms-premium-year">
-            <label for="terms-premium-year">Я погоджуюсь з <a href="/terms" target="_blank">умовами та правилами</a></label>
+            <label for="terms-premium-year">Я погоджуюсь з <a href="/terms" target="_blank">умовами та положеннями</a></label>
         </div>
-        <button type="submit" name="subscription_plan" value="bin_premium_yearly" id="subscribe-premium-year" disabled class="subscribe-btn">Підписатись</button>
+        <button type="submit" name="subscription_plan" value="bin_premium_yearly" id="subscribe-premium-year" disabled class="subscribe-btn">
+            Підписатися
+        </button>
     </form>
-</div>      
+</div>   
 
 <div style="display:flex; gap:5px; align-items:center;">
     <input type="text" id="searchInput"
@@ -1074,10 +1074,10 @@
     <div class="chat-header">
         <h3 onclick="openUserProfile(currentChatUser)" style="flex:1; cursor:pointer; margin:0;"><span id="chat-username"></span></h3>
         <div class="chat-header-kebab" id="chat-kebab" style="position:relative;">
-            <button class="kebab-btn" aria-label="Меню" style="background:none;border:none;font-size:20px;cursor:pointer;padding:6px;">⋮</button>
+            <button class="kebab-btn" aria-label="Menu" style="background:none;border:none;font-size:20px;cursor:pointer;padding:6px;">⋮</button>
             <div class="kebab-menu" id="kebab-menu" style="display:none; position:absolute; right:0; top:30px; background:var(--surface,#fff); border:1px solid #ccc; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,0.12); z-index:2200;">
-                <button type="button" class="kebab-item" id="view-profile-btn" style="display:block; padding:8px 12px; width:160px; background:transparent; border:none; text-align:left; cursor:pointer; color:var(--text);">Переглянути профіль</button>
-                <button type="button" class="kebab-item" id="set-wallpaper-btn" onclick="document.getElementById('wallpaper-toggle').checked = true" style="display:block; padding:8px 12px; width:160px; background:transparent; border:none; text-align:left; cursor:pointer; color:var(--text);">Встановити шпалери</button>
+                <button type="button" class="kebab-item" id="view-profile-btn" style="display:block; padding:8px 12px; width:160px; background:transparent; border:none; text-align:left; cursor:pointer; color:var(--text);">View profile</button>
+                <!-- <button type="button" class="kebab-item" id="set-wallpaper-btn" onclick="document.getElementById('wallpaper-toggle').checked = true" style="display:block; padding:8px 12px; width:160px; background:transparent; border:none; text-align:left; cursor:pointer; color:var(--text);">Set Wallpaper</button> -->
             </div>
         </div>
     </div>
@@ -1085,36 +1085,36 @@
         <div class="chat-messages-spacer"></div>
     </div>
 
-    <button id="chat-scroll-bottom-btn" title="Прокрутити вниз" style="display:none; position: absolute; right: 20px; bottom: 100px; z-index:2100; padding:10px 12px; border-radius:8px; background: #007bff; color: #fff; border: none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.12);">▼</button>
+    <button id="chat-scroll-bottom-btn" title="Scroll to bottom" style="display:none; position: absolute; right: 20px; bottom: 100px; z-index:2100; padding:10px 12px; border-radius:8px; background: #007bff; color: #fff; border: none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.12);">▼</button>
 
     <div class="chat-input-container">
-        <button type="button" class="attach-btn" onclick="openFileInput()" title="Прикріпити файл">
+        <button type="button" class="attach-btn" onclick="openFileInput()" title="Прикрепить файл">
             📎
         </button>
         <input type="file" id="chat-file-input" style="display: none;" onchange="handleFileSelect(event)">
 
-        <div id="chat-input" class="chat-input" contenteditable="true" role="textbox" aria-multiline="true" value="Напишіть повідомлення..."></div>
+        <div id="chat-input" class="chat-input" contenteditable="true" role="textbox" aria-multiline="true" value="Введіть своє повідомлення..."></div>
         <input type="hidden" id="chat-input-hidden" name="message" />
-        <button type="button" id="sticker-btn" title="Стікери" style="padding:10px; border-radius:8px; background:none; border:none; font-size:20px; cursor:pointer;">🙂</button>
-        <button class="chat-send-btn" onclick="sendMessage()">Надіслати</button>
+        <button type="button" id="sticker-btn" title="Stickers" style="padding:10px; border-radius:8px; background:none; border:none; font-size:20px; cursor:pointer;">🙂</button>
+        <button class="chat-send-btn" onclick="sendMessage()">Send</button>
     </div>
 </div>
 
 <div id="sticker-panel" style="position:fixed; top:80px; right:0; width:320px; height:calc(100% - 160px); background: var(--bg-color,#fff); box-shadow: -4px 0 20px rgba(0,0,0,0.15); transform: translateX(100%); transition: transform 0.25s ease; z-index:2101; padding: 16px; overflow-y:auto; overflow-x:hidden; border-radius:12px; display:flex; flex-direction:column; gap:10px;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-        <strong id="sticker-panel-title">Стікери</strong>
-        <button type="button" id="sticker-close" style="background:none; border:none; font-size:20px; cursor:pointer;" aria-label="Закрити">✕</button>
+        <strong id="sticker-panel-title">Stickers</strong>
+        <button type="button" id="sticker-close" style="background:none; border:none; font-size:20px; cursor:pointer;" aria-label="Close">✕</button>
     </div>
     <div id="sticker-list" style="display:flex; gap:10px; flex-wrap:wrap;">
     </div>
 </div>
 
 <div class="security-form">
-    <h2>Безпека</h2>
+    <h2>{% if lang == "Українська" %}Безпека{% else %}Security{% endif %}</h2>
     
     <div class="security-section password-section" id="password-section">
         <div class="password-toggle">
-            <h4>Змінити пароль</h4>
+            <h4>{% if lang == "Українська" %}Змінити пароль{% else %}Change Password{% endif %}</h4>
             <div class="password-toggle-arrow">▼</div>
         </div>
         
@@ -1123,26 +1123,26 @@
                 {% csrf_token %}
                 
                 <div class="form-group">
-                    <label for="current-password">Поточний пароль</label>
+                    <label for="current-password">{% if lang == "Українська" %}Поточний пароль{% else %}Current Password{% endif %}</label>
                     <input type="password" id="current-password" name="current_password" required 
-                           placeholder="Введіть поточний пароль">
+                           placeholder="{% if lang == 'Українська' %}Введіть поточний пароль{% else %}Enter current password{% endif %}">
                 </div>
                 
                 <div class="form-group">
-                    <label for="new-password">Новий пароль</label>
+                    <label for="new-password">{% if lang == "Українська" %}Новий пароль{% else %}New Password{% endif %}</label>
                     <input type="password" id="new-password" name="new_password" required 
-                           placeholder="Введіть новий пароль"
+                           placeholder="{% if lang == 'Українська' %}Введіть новий пароль{% else %}Enter new password{% endif %}"
                            minlength="8">
                 </div>
                 
                 <div class="form-group">
-                    <label for="confirm-password">Підтвердіть пароль</label>
+                    <label for="confirm-password">{% if lang == "Українська" %}Підтвердіть пароль{% else %}Confirm Password{% endif %}</label>
                     <input type="password" id="confirm-password" name="confirm_password" required 
-                           placeholder="Підтвердіть новий пароль">
+                           placeholder="{% if lang == 'Українська' %}Підтвердіть новий пароль{% else %}Confirm new password{% endif %}">
                 </div>
                 
                 <button type="submit" class="security-btn">
-                    Змінити пароль
+                    {% if lang == "Українська" %}Змінити пароль{% else %}Change Password{% endif %}
                 </button>
             </form>
         </div>
@@ -1158,19 +1158,41 @@ const pendingRefreshOnModalClose = {};
 let openVideoUrl = null;
 let fileInput = null;
 let selectedFile = null;
-let isUploadingFile = false; 
+let isUploadingFile = false;
+let editingMessageId = null;
+let isEditingMode = false;
+let editingMessageOriginalText = '';
+const lang = "{{ user.language|default:'English' }}";
 
 function initDescriptionCounters() {
     document.querySelectorAll('.description-input').forEach(function(el){
         const max = parseInt(el.getAttribute('maxlength')) || 0;
-        const counter = (el.parentElement && el.parentElement.querySelector('.desc-counter')) || null;
-        function update(){
-            if (max > 0 && el.value.length > max) {
+        const counter = el.parentElement?.querySelector('.desc-counter') || null;
+
+        if (!counter || max <= 0) return;
+
+        function update() {
+            const len = el.value.length;
+            const left = max - len;
+            if (left <= 0) {
+                counter.textContent = "0 characters left";
+                counter.style.color = "#ff4d4d";
+                counter.style.fontWeight = "600";
+            } else if (left <= 10) {
+                counter.textContent = left + " characters left";
+                counter.style.color = "#ff9800";
+                counter.style.fontWeight = "500";
+            } else {
+                counter.textContent = left + " characters left";
+                counter.style.color = "#666";
+                counter.style.fontWeight = "normal";
+            }
+
+            if (len > max) {
                 el.value = el.value.slice(0, max);
             }
-            const left = max > 0 ? Math.max(0, max - el.value.length) : '';
-            if (counter) counter.textContent = left === '' ? '' : left + ' characters left';
         }
+
         el.addEventListener('input', update);
         update();
     });
@@ -2071,7 +2093,8 @@ function addAttachmentButton() {
 function openChat(username) {
     currentChatUser = username;
     document.getElementById('chat-username').textContent = username;
-    document.getElementById('chat-toggle').checked = true;
+    startChatRefresh();
+    loadChatMessages(username);
     
     const input = document.getElementById('chat-input');
     if (input) {
@@ -2689,7 +2712,7 @@ function showUserProfileModal(userData) {
             </span>`;
         } 
         else if (userData.role === "Moderator" || (userData.display_role && userData.display_role.includes("🛡️"))) {
-            displayText = userData.display_role || '🛡️ Moderator';
+            displayText = userData.display_role || '🛡️ Модератор';
             roleHtml = `<span style="background: linear-gradient(135deg, #ffc107, #e0a800); 
                         color: #212529; 
                         padding: 4px 12px; 
@@ -2816,7 +2839,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function isBinUser(name){ if (!name) return false; const n = String(name).toLowerCase(); return n === 'bin' || n === 'bin_bot' || n === '@bin' || n === '@bin_bot'; }
+function isBinUser(name){ 
+    if (!name) return false; 
+        const n = String(name).toLowerCase(); 
+        return n === 'bin' || n === 'bin_bot' || n === '@bin' || n === '@bin_bot'; 
+}
 
 function loadChatMessages(username) {
     if (isVideoModalOpen) {
@@ -2918,6 +2945,7 @@ function loadChatMessages(username) {
         })
         .catch(err => console.error('Ошибка загрузки чата:', err));
 }
+
 
 let formOpenState = false;
 
@@ -3083,9 +3111,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const chatInput = document.getElementById('chat-input');
     if (chatInput) {
-        chatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendMessage();
+            }
+            if (e.key === 'Enter' && e.shiftKey) {
+                e.preventDefault();
+                document.execCommand('insertHTML', false, '<br>');
             }
         });
     }
@@ -3435,16 +3468,17 @@ function sendMessageToBin(message) {
     });
 }
 
+
 function displayBinMessages(messages) {
     const container = document.getElementById('chat-messages');
     if (!container) return;
 
     const wasAtBottom = isAtBottom(container);
-    const prevScrollTop = container.scrollTop;
     const prevScrollHeight = container.scrollHeight;
+    const prevScrollTop = container.scrollTop;
 
     const existingTimestamps = new Set(
-        Array.from(container.querySelectorAll('.message-time'))
+        Array.from(container.querySelectorAll('.message .message-time'))
             .map(el => el.dataset.timestamp)
     );
 
@@ -3452,20 +3486,19 @@ function displayBinMessages(messages) {
         if (existingTimestamps.has(msg.timestamp)) return;
 
         const messageDiv = document.createElement('div');
-        messageDiv.className = 'message received';
+        messageDiv.className = `message ${msg.is_sent ? 'sent' : 'received'}`;
         messageDiv.dataset.timestamp = msg.timestamp;
 
         const textDiv = document.createElement('div');
-        const processedText = processMentionsStrict(msg.text || '');
+        const processedText = processMentions(msg.text || '');
         textDiv.innerHTML = renderStickersInline(processedText);
 
         messageDiv.appendChild(textDiv);
 
         const timeDiv = document.createElement('div');
         timeDiv.className = 'message-time';
-        timeDiv.dataset.timestamp = msg.timestamp || new Date().toISOString();
-
-        timeDiv.textContent = formatChatTime(timeDiv.dataset.timestamp);
+        timeDiv.dataset.timestamp = msg.timestamp;
+        timeDiv.textContent = formatChatTime(msg.timestamp);
 
         timeDiv.style.fontSize    = '11px';
         timeDiv.style.color       = '#999';
@@ -3473,11 +3506,6 @@ function displayBinMessages(messages) {
         timeDiv.style.textAlign   = 'right';
 
         messageDiv.appendChild(timeDiv);
-
-        messageDiv.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            showMessageContextMenu(e.clientX, e.clientY, messageDiv);
-        });
 
         const spacer = container.querySelector('.chat-messages-spacer');
         if (spacer) {
@@ -3494,11 +3522,6 @@ function displayBinMessages(messages) {
     } else {
         const heightDiff = container.scrollHeight - prevScrollHeight;
         container.scrollTop = prevScrollTop + heightDiff;
-    }
-
-    const scrollBtn = document.getElementById('chat-scroll-bottom-btn');
-    if (scrollBtn) {
-        scrollBtn.style.display = isAtBottom(container) ? 'none' : 'block';
     }
 
     if (messages.length > 0) {
@@ -3561,9 +3584,17 @@ window.__canonical_sendFile = function() {
     }
     const spacer = messagesContainer.querySelector('.chat-messages-spacer');
     if (spacer) messagesContainer.insertBefore(tempDiv, spacer); else messagesContainer.appendChild(tempDiv);
-    try { scrollIfAtBottom(messagesContainer); } catch(e) {}
+    try { 
+        scrollIfAtBottom(messagesContainer); 
+    } 
+    catch(e) {}
 
-    console.log('Uploading file to /upload-chat-file/', { name: selectedFile.name, type: selectedFile.type, size: selectedFile.size, receiver: currentChatUser });
+    console.log('Uploading file to /upload-chat-file/', { 
+        name: selectedFile.name, 
+        type: selectedFile.type,
+        size: selectedFile.size, 
+        receiver: currentChatUser 
+    });
 
     fetch('/upload-chat-file/', {
         method: 'POST',
@@ -3632,16 +3663,82 @@ function saveNoteToStorage(noteText) {
 
 function formatTime(timestamp) {
     if (!timestamp) return '';
-    
     const date = new Date(timestamp);
     const now = new Date();
+    const lang = "{{ user.language|default:'English' }}";
     
     const format24Hour = localStorage.getItem('hourFormat') === '24';
+    
     const isToday = date.toDateString() === now.toDateString();
     
     if (isToday) {
         if (format24Hour) {
-            return date.toLocaleTimeString('en-US', { 
+            if (lang === 'Українська') {
+                return date.toLocaleTimeString('uk-UA', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                }).replace(/^24:/, '00:');
+            } else {
+                return date.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                }).replace(/^24:/, '00:');
+            }
+        } else {
+            if (lang === 'Українська') {
+                return date.toLocaleTimeString('uk-UA', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+            } else {
+                return date.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+            }
+        }
+    } else {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        
+        return `${day}.${month}.${year}`;
+    }
+}
+
+function formatChatTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const format24Hour = localStorage.getItem('hourFormat') === '24';
+    
+    if (!isToday) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        let timeString;
+        if (format24Hour) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            timeString = `${hours}:${minutes}`;
+        } else {
+            timeString = date.toLocaleTimeString(lang === 'Українська' ? 'uk-UA' : 'en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+
+        return `${day}.${month}.${year} ${timeString}`;
+    }
+
+    if (format24Hour) {
+        if (lang === 'Українська') {
+            return date.toLocaleTimeString('uk-UA', { 
                 hour: '2-digit', 
                 minute: '2-digit',
                 hour12: false 
@@ -3650,41 +3747,63 @@ function formatTime(timestamp) {
             return date.toLocaleTimeString('en-US', { 
                 hour: '2-digit', 
                 minute: '2-digit',
+                hour12: false 
+            }).replace(/^24:/, '00:');
+        }
+    } else {
+        if (lang === 'Українська') {
+            return date.toLocaleTimeString('uk-UA', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        } else {
+            return date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
                 hour12: true 
             });
         }
-    } else {
-        const day   = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year  = date.getFullYear();
-        
-        return `${day}.${month}.${year}`;
     }
 }
 
-function formatChatTime(timestamp) {
-    if (!timestamp) return '';
-    
-    const date = new Date(timestamp);
-    const is24 = localStorage.getItem('hourFormat') === '24';
-    
-    const h = date.getHours();
-    const m = date.getMinutes().toString().padStart(2, '0');
-    
-    if (is24) {
-        return `${h.toString().padStart(2, '0')}:${m}`;
+let chatRefreshInterval = null;
+
+function startChatRefresh() {
+    if (chatRefreshInterval !== null) {
+        return;
     }
-    
-    const hour12 = h % 12 || 12;
-    const period = h >= 12 ? 'PM' : 'AM';
-    
-    return `${hour12.toString().padStart(2, '0')}:${m}\u202f${period}`;
+
+    console.log("Запускаем обновление чата каждые 3 секунды");
+
+    chatRefreshInterval = setInterval(() => {
+        if (!currentChatUser) {
+            stopChatRefresh();
+            return;
+        }
+
+        console.log("Периодическое обновление чата →", currentChatUser);
+
+    }, 5000);
+}
+
+function stopChatRefresh() {
+    if (chatRefreshInterval !== null) {
+        clearInterval(chatRefreshInterval);
+        chatRefreshInterval = null;
+        console.log("Остановлено периодическое обновление чата");
+    }
 }
 
 function openChat(username) {
     if (username === 'Bin') {
         openBinLogin();
         return;
+    }
+
+    const container = document.getElementById('chat-messages');
+    if (container) {
+        container.innerHTML = '';
     }
 
     try {
@@ -3770,8 +3889,8 @@ function openChat(username) {
                     }
                     const timeDiv = msgEl.querySelector('.message-time');
                     if (timeDiv) {
-                        timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        timeDiv.dataset.timestamp = data.timestamp || new Date().toISOString();
+                        timeDiv.textContent = formatChatTime(data.timestamp);
+                        timeDiv.dataset.timestamp = data.timestamp;
 
                         if (!msgEl.querySelector('.message-edited')) {
                             const edited = document.createElement('span');
@@ -4102,7 +4221,7 @@ const STICKER_CATEGORIES = (function(){
         'love': {
             'heart': '❤️', 'heart_eyes': '😍', 'kiss': '😘', 'hug': '🤗', 'ring': '💍', 'rose': '🌹', 'sparkles': '✨', 'couple': '👫', 'couple_kiss':'💏', 'beating_heart':'💓'
         },
-        'hands': {
+        'Руки': {
             'thumbs_up': '👍', 'thumbs_down': '👎', 'clap': '👏', 'raised_hands': '🙌', 'handshake': '🤝', 'victory': '✌️', 'love_you_gesture': '🤟', 'metal': '🤘', 'call_me': '🤙', 'raised_back_of_hand': '🤚', 'raised_hand': '✋', 'open_hands': '👐', 'palms_up_together': '🤲', 'folded_hands': '🙏', 'pinching_hand': '🤏', 'point_up': '☝️', 'point_up_2': '👆', 'point_down': '👇', 'point_left': '👈', 'point_right': '👉', 'hand_with_fingers_splayed': '🖐️', 'vulcan': '🖖', 'writing_hand': '✍️', 'flexed_biceps': '💪', 'left_facing_fist': '🤛', 'right_facing_fist': '🤜', 'oncoming_fist': '👊', 'fist': '✊', 'raised_fist': '✊', 'hand_wave': '👋', 'ok_hand': '👌', 'thumbs_up_dark': '👍🏿', 'thumbs_up_light': '👍🏻', 'thumbs_up_medium': '👍🏽', 'thumbs_up_medium_light': '👍🏼', 'thumbs_up_medium_dark': '👍🏾', 'clapping_dark': '👏🏿', 'clapping_light': '👏🏻', 'fist_light': '✊🏻', 'fist_dark': '✊🏿', 'hand_open': '🖐️', 'pinch': '🤏', 'pray': '🙏', 'hand_back': '🤚', 'hand_ok': '👌', 'hand_highfive': '🙌', 'hand_point_right': '👉', 'hand_point_left': '👈', 'raised_eyebrow':'🤨', 'finger_point_up':'☝️'
         },
         'animals': {
@@ -4113,20 +4232,20 @@ const STICKER_CATEGORIES = (function(){
         }
     };
 
-    const flagCodes = [
-        'af',
-        'al',
-        'dz',
-        'as','ad','ao','ai','aq','ag','ar','am','aw','au','at','az','bs','bh','bd','bb','by','be','bz','bj','bm','bt','bo','ba','bw','bv','br','io','bn','bg','bf','bi','kh','cm','ca','cv','ky','cf','td','cl','cn','cx','cc','co','km','cd','cg','ck','cr','ci','hr','cu','cy','cz','dk','dj','dm','do','ec','eg','sv','gq','er','ee','et','fk','fo','fj','fi','fr','gf','pf','tf','ga','gm','ge','de','gh','gi','gr','gl','gd','gp','gu','gt','gg','gn','gw','gy','ht','hm','va','hn','hk','hu','is','in','id','ir','iq','ie','im','il','it','jm','jp','je','jo','kz','ke','ki','kp','kr','kw','kg','la','lv','lb','ls','lr','ly','li','lt','lu','mo','mk','mg','mw','my','mv','ml','mt','mh','mq','mr','mu','yt','mx','fm','md','mc','mn','me','ms','ma','mz','mm','na','nr','np','nl','nc','nz','ni','ne','ng','nu','nf','mp','no','om','pk','pw','ps','pa','pg','py','pe','ph','pn','pl','pt','pr','qa','re','ro','ru','rw','sh','kn','lc','pm','vc','ws','sm','st','sa','sn','rs','sc','sl','sg','sk','si','sb','so','za','gs','ss','es','lk','sd','sr','sj','se','ch','sy','tw','tj','tz','th','tl','tg','tk','to','tt','tn','tr','tm','tc','tv','ug','ua','ae','gb','us','um','uy','uz','vu','ve','vn','vg','vi','wf','eh','ye','zm','zw'
-    ];
+    // const flagCodes = [
+    //     'af',
+    //     'al',
+    //     'dz',
+    //     'as','ad','ao','ai','aq','ag','ar','am','aw','au','at','az','bs','bh','bd','bb','by','be','bz','bj','bm','bt','bo','ba','bw','bv','br','io','bn','bg','bf','bi','kh','cm','ca','cv','ky','cf','td','cl','cn','cx','cc','co','km','cd','cg','ck','cr','ci','hr','cu','cy','cz','dk','dj','dm','do','ec','eg','sv','gq','er','ee','et','fk','fo','fj','fi','fr','gf','pf','tf','ga','gm','ge','de','gh','gi','gr','gl','gd','gp','gu','gt','gg','gn','gw','gy','ht','hm','va','hn','hk','hu','is','in','id','ir','iq','ie','im','il','it','jm','jp','je','jo','kz','ke','ki','kp','kr','kw','kg','la','lv','lb','ls','lr','ly','li','lt','lu','mo','mk','mg','mw','my','mv','ml','mt','mh','mq','mr','mu','yt','mx','fm','md','mc','mn','me','ms','ma','mz','mm','na','nr','np','nl','nc','nz','ni','ne','ng','nu','nf','mp','no','om','pk','pw','ps','pa','pg','py','pe','ph','pn','pl','pt','pr','qa','re','ro','ru','rw','sh','kn','lc','pm','vc','ws','sm','st','sa','sn','rs','sc','sl','sg','sk','si','sb','so','za','gs','ss','es','lk','sd','sr','sj','se','ch','sy','tw','tj','tz','th','tl','tg','tk','to','tt','tn','tr','tm','tc','tv','ug','ua','ae','gb','us','um','uy','uz','vu','ve','vn','vg','vi','wf','eh','ye','zm','zw'
+    // ];
 
-    const flags = {};
-    flagCodes.forEach(cc => {
-        const name = 'flag_' + cc;
-        flags[name] = { src: `/static/flags/${cc}.svg`, code: cc };
-    });
+    // const flags = {};
+    // flagCodes.forEach(cc => {
+        // const name = 'flag_' + cc;
+        // flags[name] = { src: `/static/flags/${cc}.svg`, code: cc };
+    // });
 
-    cats['flags'] = flags;
+    // cats['flags'] = flags;
 
     const extras = {
         'spark': '✨','zap':'⚡','cloud_rain':'🌧️','crescent':'🌙','umbrella':'☂️','phone':'📱','laptop':'💻','camera':'📷','gift':'🎁','medal':'🏅','trophy':'🏆','music':'🎵','microphone':'🎤','movie':'🎬','ball':'⚽','basketball':'🏀','soccer':'⚽','guitar':'🎸','pencil':'✏️','book':'📚','lightbulb':'💡','lock':'🔒','key':'🔑','money':'💰','credit_card':'💳','hourglass':'⏳','calendar':'📅','map':'🗺️','compass':'🧭','anchor':'⚓','leaf':'🍃','cactus':'🌵','herb':'🌿'
@@ -4141,7 +4260,7 @@ const STICKER_CATEGORIES = (function(){
 const STICKER_MAP = {};
 Object.keys(STICKER_CATEGORIES).forEach(cat => {
     Object.keys(STICKER_CATEGORIES[cat]).forEach(name => {
-        STICKER_MAP[name] = STICKER_CATEGORIES[cat][name];
+        STICKER_MAP[name] = STICKER_CATEGORIES[cat][name]; 
     });
 });
 
@@ -4156,54 +4275,53 @@ function codeToEmoji(code) {
     } catch (e) { return '🏳️'; }
 }
 
-function flagImageError(imgEl, code) {
-    try {
-        if (imgEl.dataset.tried === 'png') {
-            const span = document.createElement('span');
-            span.className = 'sticker-emoji';
-            span.textContent = codeToEmoji(code);
-            imgEl.replaceWith(span);
-        } else {
-            imgEl.dataset.tried = 'png';
-            imgEl.src = `/static/flags/${code}.png`;
-        }
-    } catch(e) {
-        try { imgEl.replaceWith(document.createTextNode(codeToEmoji(code))); } catch(_) {}
-    }
-} 
+// function flagImageError(imgEl, code) {
+//     try {
+//         if (imgEl.dataset.tried === 'png') {
+//             const span = document.createElement('span');
+//             span.textContent = codeToEmoji(code);
+//             imgEl.replaceWith(span);
+//         } else {
+//             imgEl.dataset.tried = 'png';
+//             imgEl.src = `/static/flags/${code}.png`;
+//         }
+//     } catch(e) {
+//         try { imgEl.replaceWith(document.createTextNode(codeToEmoji(code))); } catch(_) {}
+//     }
+// } 
 
-const flagImageCache = new Map();
+// const flagImageCache = new Map();
 
-function getOrCreateFlagImage(code) {
-    const cacheKey = 'flag_' + code;
-    
-    if (flagImageCache.has(cacheKey)) {
-        return flagImageCache.get(cacheKey).cloneNode(true);
-    }
-
-    const img = document.createElement('img');
-    img.src = `/static/flags/${code}.svg`;
-    img.alt = code.toUpperCase();
-    img.className = 'sticker-img';
-    img.draggable = false;
-    img.onerror = () => flagImageError(img, code);
-
-    flagImageCache.set(cacheKey, img);
-
-    return img.cloneNode(true);
-}
+// function getOrCreateFlagImage(code) {
+    // const cacheKey = 'flag_' + code;
+    // 
+    // if (flagImageCache.has(cacheKey)) {
+        // return flagImageCache.get(cacheKey).cloneNode(true); 
+    // }
+// 
+    // const img = document.createElement('img');
+    // img.src = `/static/flags/${code}.svg`;
+    // img.alt = code.toUpperCase();
+    // img.className = 'sticker-img';
+    // img.draggable = false;
+    // img.onerror = () => flagImageError(img, code);
+// 
+    // flagImageCache.set(cacheKey, img);
+// 
+    // return img.cloneNode(true); 
+// }
 
 function renderSticker(name, size = 'normal') {
     const v = STICKER_MAP[name];
     if (!v) return '❓';
 
-    if (typeof v === 'object' && v.src && v.code) {
-        const img = getOrCreateFlagImage(v.code);
-        if (size === 'large') {
-            img.className = 'sticker-img sticker-img-large';
-        }
-        return img.outerHTML;
-    }
+    // if (typeof v === 'object' && v.src && v.code) {
+        // const img = getOrCreateFlagImage(v.code);
+        // if (size === 'large') {
+            // img.className = 'sticker-img sticker-img-large';
+        // }
+        // return img.outerHTML;
+    // }
 
     const text = String(v);
     if (size === 'large') {
@@ -4220,6 +4338,8 @@ function displayMessage(text, sender, isSent, messageId = null) {
         messageId = messageId || msgObj.id || msgObj.message_id || null;
         text = msgObj.text || '';
         var msgTimestamp = msgObj.timestamp || null;
+        var msgEditedAt = msgObj.edited_at || null;
+        var msgEdited = msgObj.edited || false;
     }
 
     const messagesContainer = document.getElementById('chat-messages');
@@ -4238,6 +4358,13 @@ function displayMessage(text, sender, isSent, messageId = null) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
     if (messageId) messageDiv.dataset.messageId = messageId;
+    
+    if (msgEdited) {
+        messageDiv.dataset.edited = 'true';
+        if (msgEditedAt) {
+            messageDiv.dataset.editedAt = msgEditedAt;
+        }
+    }
 
     messageDiv.dataset.tokenText = String(text || '').trim();
 
@@ -4326,6 +4453,14 @@ function displayMessage(text, sender, isSent, messageId = null) {
 
     timeDiv.dataset.timestamp = isoTs;
 
+    if (msgEdited || messageDiv.dataset.edited === 'true') {
+        const editedSpan = document.createElement('span');
+        editedSpan.className = 'message-edited';
+        editedSpan.textContent = (lang === 'Українська') ? ' (змінено)' : ' (edited)';
+        editedSpan.style.cssText = 'font-size:10px;color:#888;margin-left:6px;';
+        timeDiv.appendChild(editedSpan);
+    }
+
     messageDiv.appendChild(timeDiv);
     messageDiv.addEventListener('contextmenu', function(e) {
         e.preventDefault();
@@ -4342,8 +4477,6 @@ function displayMessage(text, sender, isSent, messageId = null) {
 
     addMentionEventListeners(messageDiv);
 }
-
-let editingMessageId = null;
 
 function processProfileDescription() {
     const descriptionElements = document.querySelectorAll('.profile-preview-value, .other-profile-description, #my-profile-description');
@@ -4537,6 +4670,35 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 })();
 
+const editPanelStyles = `
+.edit-panel {
+    animation: slideDown 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.cancel-edit-btn {
+    transition: all 0.2s ease !important;
+}
+
+.cancel-edit-btn:hover {
+    color: #000 !important;
+    transform: scale(1.1) !important;
+}
+
+.cancel-edit-btn:active {
+    transform: scale(0.95) !important;
+}
+`;
+
+const styleEl = document.createElement('style');
+styleEl.textContent = editPanelStyles;
+document.head.appendChild(styleEl);
+
 function showMessageContextMenu(x, y, messageDiv, messageId) {
     const existing = document.querySelector('.message-context-menu');
     if (existing) existing.remove();
@@ -4553,7 +4715,7 @@ function showMessageContextMenu(x, y, messageDiv, messageId) {
 
     const menu = document.createElement('div');
     menu.className = 'message-context-menu';
-    menu.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:10050;background:#fff;border:1px solid #ddd;padding:6px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:140px;`;
+    menu.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:10050;background:#fff;border:1px solid #ddd;padding:6px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:40px;`;
 
     const copyBtn = document.createElement('button');
     copyBtn.textContent = copyText;
@@ -4617,6 +4779,9 @@ function showMessageContextMenu(x, y, messageDiv, messageId) {
 
     document.body.appendChild(menu);
 
+    const menuWidth = menu.offsetWidth;
+    menu.style.left = (x - menuWidth) + 'px';
+
     setTimeout(() => {
         document.addEventListener('click', function close(ev) {
             if (!menu.contains(ev.target)) {
@@ -4627,37 +4792,158 @@ function showMessageContextMenu(x, y, messageDiv, messageId) {
     }, 0);
 }
 
+function showEditPanel(messageText) {
+    const oldPanel = document.querySelector('.edit-panel');
+    if (oldPanel) oldPanel.remove();
+    
+    const panel = document.createElement('div');
+    panel.className = 'edit-panel';
+    panel.style.cssText = `
+        position: relative;
+        background: #f0f0f0;
+        color: #333;
+        padding: 12px 15px;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+        border-bottom: 1px solid #ddd;
+        width: 100%;
+        box-sizing: border-box;
+    `;
+    
+    const lang = "{{ user.language|default:'English' }}";
+    const truncatedText = messageText.length > 50 ? messageText.substring(0, 50) + '...' : messageText;
+    
+    panel.innerHTML = `
+        <button type="button" class="cancel-edit-btn" 
+                style="background: none; border: none; color: #666; 
+                       cursor: pointer; font-size: 18px; width: 24px; 
+                       height: 24px; display: flex; align-items: center; 
+                       justify-content: center; flex-shrink: 0; padding: 0;">
+            ✕
+        </button>
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; margin-left: 10px;">
+            <div style="font-size: 13px; color: #666; white-space: nowrap;">
+                ${lang === 'Українська' ? 'Редагування:' : 'Editing:'}
+            </div>
+            <div style="font-size: 14px; font-weight: 500; overflow: hidden; 
+                       text-overflow: ellipsis; white-space: nowrap; color: #333;">
+                ${truncatedText}
+            </div>
+        </div>
+    `;
+    
+    const chatInputContainer = document.querySelector('.chat-input-container');
+    if (chatInputContainer) {
+        const chatContainer = document.querySelector('.chat-container');
+        if (chatContainer) {
+            chatContainer.insertBefore(panel, chatInputContainer);
+        }
+    }
+    
+    const cancelBtn = panel.querySelector('.cancel-edit-btn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            cancelEditMode();
+        });
+        
+        cancelBtn.addEventListener('mouseenter', function() {
+            this.style.color = '#000';
+            this.style.transform = 'scale(1.1)';
+        });
+        
+        cancelBtn.addEventListener('mouseleave', function() {
+            this.style.color = '#666';
+            this.style.transform = 'scale(1)';
+        });
+    }
+    
+    return panel;
+}
+
 function startEditMessage(messageDiv, messageId) {
     const textDiv = messageDiv.querySelector('div');
     if (!textDiv) return;
-    const rawText = messageDiv.dataset.tokenText || textDiv.textContent || '';
+    
+    editingMessageId = messageId || messageDiv.dataset.messageId || messageDiv.id;
+    editingMessageOriginalText = messageDiv.dataset.tokenText || textDiv.textContent || '';
+    
     const input = document.getElementById('chat-input');
     if (!input) return;
-    editingMessageId = messageId || messageDiv.dataset.messageId || messageDiv.id;
-
-    tokenTextToContent(input, rawText);
+    
+    if (!contentEditableToTokenText(input).trim()) {
+        tokenTextToContent(input, editingMessageOriginalText);
+    }
     input.focus();
+
+    isEditingMode = true;
+    
+    showEditPanel(editingMessageOriginalText);
+    
     const sendBtn = document.querySelector('.chat-send-btn');
-    if (sendBtn) sendBtn.textContent = 'Save';
-} 
+    if (sendBtn) {
+        sendBtn.textContent = "{{ user.language|default:'English' }}" === 'Українська' ? 'Зберегти' : 'Save';
+        sendBtn.classList.add('editing-mode');
+    }
+}
+
+function cancelEditMode() {
+    const sendBtn = document.querySelector('.chat-send-btn');
+    if (sendBtn) {
+        sendBtn.textContent = "{{ user.language|default:'English' }}" === 'Українська' ? 'Надіслати' : 'Send';
+        sendBtn.classList.remove('editing-mode');
+    }
+    
+    const panel = document.querySelector('.edit-panel');
+    if (panel) panel.remove();
+    
+    editingMessageId = null;
+    editingMessageOriginalText = '';
+    isEditingMode = false;
+}
 
 function finishEditing() {
     const input = document.getElementById('chat-input');
     const sendBtn = document.querySelector('.chat-send-btn');
-    if (sendBtn) sendBtn.textContent = 'Send';
     const id = editingMessageId;
-    editingMessageId = null;
+    const currentText = contentEditableToTokenText(input).trim();
+    
+    if (!currentText || currentText === editingMessageOriginalText) {
+        cancelEditMode();
+        return;
+    }
+    
+    if (!id) {
+        cancelEditMode();
+        return;
+    }
 
-    if (!id) return;
-    if (!input) return;
-    const newText = contentEditableToTokenText(input).trim();
-    if (!newText) return;
+    const editPanel = document.querySelector('.edit-panel');
+        if (editPanel) {
+            editPanel.remove();
+        }   
 
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.innerHTML = '';
+            chatInput.focus();
+        }   
+
+        const sendButton = document.querySelector('.send-btn');
+        if (sendButton) {
+            sendButton.classList.remove('editing-mode');
+        }
+    
+    console.log('Editing message:', { id, currentText });
+    
     if (String(id).startsWith('temp-')) {
         const msgEl = document.getElementById(id);
         if (msgEl) {
-            msgEl.dataset.tokenText = newText;
-            const stickerOnly = String(newText).trim().match(/^\[sticker:([a-zA-Z0-9_-]+)\]$/);
+            msgEl.dataset.tokenText = currentText;
+            const stickerOnly = String(currentText).trim().match(/^\[sticker:([a-zA-Z0-9_-]+)\]$/);
             const textDiv = msgEl.querySelector('div');
             if (stickerOnly) {
                 const stickerName = stickerOnly[1];
@@ -4666,7 +4952,7 @@ function finishEditing() {
                 if (textDiv) textDiv.innerHTML = `<div class="sticker-render large" data-sticker="${stickerName}" style="cursor:pointer; text-align:center;" onclick="sendSticker('${stickerName}')">${renderSticker(stickerName, 'large')}</div>`;
             } else if (textDiv) {
                 msgEl.dataset.mediaType = msgEl.dataset.mediaType ? msgEl.dataset.mediaType : 'text';
-                textDiv.innerHTML = renderStickersInline(processMentionsStrict(newText));
+                textDiv.innerHTML = renderStickersInline(processMentionsStrict(currentText));
             }
             const timeDiv = msgEl.querySelector('.message-time');
             if (timeDiv) {
@@ -4681,29 +4967,51 @@ function finishEditing() {
             }
             input.innerHTML = '';
         }
+        cancelEditMode();
         return;
     }
-
-    editMessage(id, newText).then(success => {
+    
+    editMessage(id, currentText).then(success => {
         if (success) {
-            input.innerHTML = '';
+            const input = document.getElementById('chat-input');
+            if (input) input.innerHTML = '';
+            
+            cancelEditMode();
+        } else {
+            cancelEditMode();
         }
     });
 }
 
+
 function editMessage(messageId, newText) {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-    if (!csrfToken) { alert('CSRF token missing'); return Promise.resolve(false); }
+    if (!csrfToken) { 
+        alert('CSRF token missing'); 
+        return Promise.resolve(false); 
+    }
 
     return fetch('/edit-message/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
-        body: JSON.stringify({ message_id: messageId, text: newText })
-    }).then(r => r.json()).then(data => {
+        headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': csrfToken, 
+            'X-Requested-With': 'XMLHttpRequest' 
+        },
+        body: JSON.stringify({ 
+            message_id: messageId, 
+            text: newText 
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
         if (data.success) {
             const msgEl = document.querySelector(`[data-message-id="${messageId}"]`);
             if (msgEl) {
                 msgEl.dataset.tokenText = newText;
+                msgEl.dataset.edited = 'true';
+                msgEl.dataset.editedAt = data.timestamp || new Date().toISOString();
+                
                 const textDiv = msgEl.querySelector('div');
 
                 const stickerOnly = String(newText).trim().match(/^\[sticker:([a-zA-Z0-9_-]+)\]$/);
@@ -4719,23 +5027,32 @@ function editMessage(messageId, newText) {
 
                 const timeDiv = msgEl.querySelector('.message-time');
                 if (timeDiv) {
-                    timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    timeDiv.dataset.timestamp = data.timestamp || new Date().toISOString();
+                    const timestamp = data.timestamp || new Date().toISOString();
+                    timeDiv.textContent = formatChatTime(timestamp);
+                    timeDiv.dataset.timestamp = timestamp;
+                    
                     if (!msgEl.querySelector('.message-edited')) {
                         const edited = document.createElement('span');
                         edited.className = 'message-edited';
-                        edited.textContent = ("{{ user.language|default:'English' }}" === 'Українська') ? ' (змінено)' : ' (edited)';
+                        edited.textContent = (lang === 'Українська') ? ' (змінено)' : ' (edited)';
                         edited.style.cssText = 'font-size:10px;color:#888;margin-left:6px;';
                         timeDiv.appendChild(edited);
                     }
                 }
+                
+                localStorage.setItem(`message_${messageId}_edited`, 'true');
+                localStorage.setItem(`message_${messageId}_editedAt`, timestamp);
             }
             return true;
         } else {
             alert('Failed to edit message: ' + (data.error || 'Unknown'));
             return false;
         }
-    }).catch(e => { console.error('Edit message error:', e); return false; });
+    })
+    .catch(e => { 
+        console.error('Edit message error:', e); 
+        return false; 
+    });
 }
 
 function deleteMessage(messageId, messageDiv) {
@@ -5253,23 +5570,42 @@ document.addEventListener('contextmenu', function(e){
     }, 10);
 });
 
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && isEditingMode) {
+        cancelEditMode();
+        e.preventDefault();
+    }
+});
+
 function sendMessage() {
     const input = document.getElementById('chat-input');
     const message = contentEditableToTokenText(input).trim();
     
-    if (!currentChatUser || !message) return;
-
-    if (isBinUser(currentChatUser)) {
-        const lang = "{{ user.language|default:'English' }}";
-        alert(lang === 'Українська' ? 'Неможливо надсилати повідомлення боту Bin' : 'Cannot send messages to Bin');
+    console.log('sendMessage called:', { 
+        currentChatUser, 
+        message, 
+        isEditingMode, 
+        editingMessageId 
+    });
+    
+    if (!currentChatUser || !message) {
+        console.log('No currentChatUser or message');
         return;
     }
-
-    if (editingMessageId) {
+    
+    if (isEditingMode && editingMessageId) {
+        console.log('Finishing edit mode');
         finishEditing();
         return;
     }
     
+    if (isBinUser(currentChatUser)) {
+        console.log('Sending to Bin');
+        getVerificationCodeForBin();
+        return;
+    }
+    
+    console.log('Creating temp message');
     const tempMessageId = 'temp-' + Date.now();
     const messagesContainer = document.getElementById('chat-messages');
     
@@ -5298,7 +5634,42 @@ function sendMessage() {
     timeDiv.style.color = '#999';
     timeDiv.style.marginTop = '4px';
     timeDiv.style.textAlign = 'right';
-    timeDiv.textContent = 'Отправляется...';
+    
+    const now = new Date();
+    const format24Hour = localStorage.getItem('hourFormat') === '24';
+    const lang = "{{ user.language|default:'English' }}";
+    
+    if (format24Hour) {
+        if (lang === 'Українська') {
+            timeDiv.textContent = now.toLocaleTimeString('uk-UA', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            }).replace(/^24:/, '00:');
+        } else {
+            timeDiv.textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            }).replace(/^24:/, '00:');
+        }
+    } else {
+        if (lang === 'Українська') {
+            timeDiv.textContent = now.toLocaleTimeString('uk-UA', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        } else {
+            timeDiv.textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+    }
+    
+    timeDiv.dataset.timestamp = now.toISOString();
     messageDiv.appendChild(timeDiv);
     
     const spacer = messagesContainer.querySelector('.chat-messages-spacer');
@@ -5307,20 +5678,27 @@ function sendMessage() {
     } else {
         messagesContainer.appendChild(messageDiv);
     }
-    try { if (isAtBottom(messagesContainer)) messagesContainer.scrollTop = messagesContainer.scrollHeight; else { const btn = document.getElementById('chat-scroll-bottom-btn'); if (btn) btn.style.display = 'block'; } } catch(e) {}
+    
+    try { 
+        if (isAtBottom(messagesContainer)) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        } else { 
+            const btn = document.getElementById('chat-scroll-bottom-btn'); 
+            if (btn) btn.style.display = 'block'; 
+        } 
+    } catch(e) {}
     
     addMentionEventListeners(messageDiv);
     
-
     input.innerHTML = '';
-    try { localStorage.setItem('chat_input_' + currentChatUser, ''); } catch(e) {}
+    try { 
+        localStorage.setItem('chat_input_' + currentChatUser, ''); 
+    } catch(e) {}
     
-    if (isBinUser(currentChatUser)) {
-        getVerificationCodeForBin(tempMessageId);
-    } else {
-        sendMessageViaAJAX(message, null, tempMessageId);
-    }
+    console.log('Calling sendMessageViaAJAX');
+    sendMessageViaAJAX(message, null, tempMessageId);
 }
+
 
 function getVerificationCodeForBin(tempMessageId = null) {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
@@ -5557,6 +5935,9 @@ function sendMessageToSelfViaAJAX(message) {
 function closeChat() {
     document.getElementById('chat-toggle').checked = false;
     currentChatUser = null;
+
+    stopChatRefresh();
+
     if (chatSocket) {
         chatSocket.close();
         chatSocket = null;
@@ -5713,6 +6094,24 @@ function openUserProfile(username) {
             console.error('Error loading user profile:', error);
             alert('Error loading user profile');
         });
+
+    const roleSection = document.getElementById('other-profile-role-section');
+    const roleValue   = document.getElementById('other-profile-role');  
+
+    if (roleSection && roleValue) {
+        if (data.role === 'Administrator' || data.role === 'Moderator') {
+            let badge = '';
+            if (data.role === 'Administrator') {
+                badge = '<span style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">👑 Administrator</span>';
+            } else if (data.role === 'Moderator') {
+                badge = '<span style="background: linear-gradient(135deg, #ffc107, #e0a800); color: #212529; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">🛡️ Модератор</span>';
+            }
+            roleValue.innerHTML = badge;
+            roleSection.style.display = 'block';
+        } else {
+            roleSection.style.display = 'none';
+        }
+    }
 }
 
 function closeAllModals() {
@@ -5749,6 +6148,57 @@ function showUserProfileModal(userData) {
         const tagEl = otherProfileForm.querySelector('.other-profile-tag');
         if (tagEl) {
             tagEl.textContent = userData.your_tag || userData.username;
+        }
+
+        const roleEl = otherProfileForm.querySelector('#other-profile-role');
+        if (roleEl) {
+            let roleHtml = '';      
+
+            if (userData.role === 'Administrator') {
+                roleHtml = `<span style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                    👑 Administrator
+                </span>`;
+            } else if (userData.role === 'Moderator') {
+                roleHtml = `<span style="background: linear-gradient(135deg, #ffc107, #e0a800); color: #212529; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                    🛡️ Модератор
+                </span>`;
+            } else if (userData.role === 'System Bot') {
+                roleHtml = `<span style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                    🤖 System Bot
+                </span>`;
+            } else {
+                roleHtml = '';
+            }       
+
+            roleEl.innerHTML = roleHtml;
+        }       
+
+        const subscribeEl = otherProfileForm.querySelector('#other-profile-subscribe');
+        if (subscribeEl) {
+            let subHtml = '';       
+
+            if (userData.subscribe === 'Bin_premium') {
+                subHtml = `<span style="background: linear-gradient(135deg, #6f42c1, #5a32a3); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                    💎 Бін преміум
+                </span>`;
+            } else if (userData.subscribe === 'Bin+') {
+                subHtml = `<span style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                    🌟 Бін+
+                </span>`;
+            } else {
+                subHtml = '';
+            }       
+
+            subscribeEl.innerHTML = subHtml;
+        }       
+
+        const separator = otherProfileForm.querySelector('#other-profile-role + span');     
+
+        if (separator) {
+            const hasRoleBadge    = roleEl     && roleEl.innerHTML.trim() !== '';
+            const hasSubscribeBadge = subscribeEl && subscribeEl.innerHTML.trim() !== '';       
+
+            separator.style.display = (hasRoleBadge && hasSubscribeBadge) ? 'inline' : 'none';
         }
         
         const statusEl = otherProfileForm.querySelector('.other-profile-status');
@@ -5988,23 +6438,6 @@ document.addEventListener('DOMContentLoaded', function() {
             previewTag.textContent = value || '{{ user.your_tag }}';
         });
     }
-
-    function updateBirthdayPreview() {
-        const day = birthdayDay.value;
-        const month = birthdayMonth.value;
-        const year = birthdayYear.value;
-        
-        if (day && month && year) {
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                              'July', 'August', 'September', 'October', 'November', 'December'];
-            const monthName = monthNames[parseInt(month) - 1];
-            previewBirthday.textContent = `${monthName} ${day}, ${year}`;
-        }
-    }
-
-    if (birthdayDay) birthdayDay.addEventListener('change', updateBirthdayPreview);
-    if (birthdayMonth) birthdayMonth.addEventListener('change', updateBirthdayPreview);
-    if (birthdayYear) birthdayYear.addEventListener('change', updateBirthdayPreview);
 
     if (avatarInput) {
         avatarInput.addEventListener('change', function(event) {
@@ -6439,6 +6872,234 @@ function setupSubscription(checkboxId, buttonId) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarInput = document.getElementById('avatarInput');
+    const usernameInput = document.getElementById('username-input');
+    const descriptionInput = document.querySelector('.description-input');
+    const tagInput = document.getElementById('tag-input');
+    const birthdayDay = document.getElementById('birthday-day');
+    const birthdayMonth = document.getElementById('birthday-month');
+    const birthdayYear = document.getElementById('birthday-year');
+    const backgroundInput = document.getElementById('backgroundInput');
+    
+    const editAvatarPreview = document.getElementById('edit-avatar-preview');
+    const previewAvatar = document.getElementById('preview-avatar');
+    const avatarInputImg = document.getElementById('avatarInput-img');
+    const previewUsername = document.getElementById('preview-username');
+    const previewDescription = document.getElementById('preview-description');
+    const previewTag = document.getElementById('preview-tag');
+    const previewBirthday = document.getElementById('preview-birthday');
+    const previewBackground = document.getElementById('preview-background');
+    const mainProfileBackground = document.querySelector('.profile-form .profile-preview-background');
+    
+    const initialValues = {
+        avatar: '{% if user.photo and user.photo.url %}{{ user.photo.url }}{% else %}{% static "pictures/login.png" %}{% endif %}',
+        username: '{{ user.username }}',
+        description: '{{ user.description|default:"No description"|escapejs }}',
+        tag: '{{ user.your_tag|default:"No tag"|escapejs }}',
+        birthday: '{{ user.birthday|default:"Not specified"|escapejs }}',
+        background: '{% if user.background and user.background.url %}{{ user.background.url }}{% else %}none{% endif %}'
+    };
+    
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('⚠️ Only JPG, PNG, GIF or WEBP images are allowed.');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                
+                if (editAvatarPreview) editAvatarPreview.src = imageUrl;
+                if (previewAvatar) previewAvatar.src = imageUrl;
+                if (avatarInputImg) avatarInputImg.src = imageUrl;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    if (usernameInput && previewUsername) {
+        usernameInput.addEventListener('input', function() {
+            previewUsername.textContent = this.value || initialValues.username;
+        });
+    }
+    
+    if (descriptionInput && previewDescription) {
+        descriptionInput.addEventListener('input', function() {
+            previewDescription.textContent = this.value || initialValues.description;
+        });
+    }
+    
+    if (tagInput && previewTag) {
+        tagInput.addEventListener('input', function() {
+            previewTag.textContent = this.value || initialValues.tag;
+        });
+    }
+    
+const previewBirthdaySection = document.getElementById('preview-birthday-section');
+    const previewBirthdayValue   = document.getElementById('preview-birthday-value');
+
+    const daySelect   = document.getElementById('birthday-day');
+    const monthSelect = document.getElementById('birthday-month');
+    const yearSelect  = document.getElementById('birthday-year');
+
+    const showBirthdayCheckbox = document.getElementById('show-birthday-checkbox');
+
+    const monthNames = [
+        'Январь', 'Февраль', 'Март',     'Апрель',   'Май',      'Июнь',
+        'Июль',   'Август',  'Сентябрь', 'Октябрь',  'Ноябрь',   'Декабрь'
+    ];
+    function updateBirthdayPreview() {
+        const day   = daySelect?.value;
+        const month = monthSelect?.value;
+        const year  = yearSelect?.value;
+
+        if (showBirthdayCheckbox?.checked && day && month && year) {
+            const monthIndex = parseInt(month, 10) - 1;
+            const monthName = monthNames[monthIndex] || month;
+
+            const formatted = `${day} ${monthName} ${year}`;
+
+            if (previewBirthdayValue) {
+                previewBirthdayValue.textContent = formatted;
+            }
+            if (previewBirthdaySection) {
+                previewBirthdaySection.style.display = 'block';
+            }
+        } else {
+            if (previewBirthdaySection) {
+                previewBirthdaySection.style.display = 'none';
+            }
+        }
+    }
+
+    [daySelect, monthSelect, yearSelect].forEach(select => {
+        if (select) {
+            select.addEventListener('change', updateBirthdayPreview);
+        }
+    });
+
+    if (showBirthdayCheckbox) {
+        showBirthdayCheckbox.addEventListener('change', updateBirthdayPreview);
+    }
+
+    updateBirthdayPreview();
+    
+    function syncBackgrounds() {
+        if (previewBackground && mainProfileBackground) {
+            if (previewBackground.style.backgroundImage && previewBackground.style.backgroundImage !== 'none') {
+                mainProfileBackground.style.backgroundImage = previewBackground.style.backgroundImage;
+                mainProfileBackground.style.display = previewBackground.style.display;
+            }
+            else if (mainProfileBackground.style.backgroundImage && mainProfileBackground.style.backgroundImage !== 'none') {
+                previewBackground.style.backgroundImage = mainProfileBackground.style.backgroundImage;
+                previewBackground.style.display = mainProfileBackground.style.display;
+            }
+        }
+    }
+    
+    if (backgroundInput) {
+        backgroundInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                if (previewBackground) {
+                    previewBackground.style.backgroundImage = `url('${event.target.result}')`;
+                    previewBackground.style.display = 'block';
+                }
+                syncBackgrounds();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    const form1Toggle = document.getElementById('form1-toggle');
+    const form1Overlay = document.querySelector('.form1-overlay');
+    
+    function resetPreviewToInitialValues() {
+        if (editAvatarPreview) editAvatarPreview.src = initialValues.avatar;
+        if (previewAvatar) previewAvatar.src = initialValues.avatar;
+        if (avatarInputImg) avatarInputImg.src = initialValues.avatar;
+        
+        if (previewUsername) previewUsername.textContent = initialValues.username;
+        if (previewDescription) previewDescription.textContent = initialValues.description;
+        if (previewTag) previewTag.textContent = initialValues.tag;
+        if (previewBirthday) previewBirthday.textContent = initialValues.birthday;
+        
+        if (previewBackground) {
+            if (initialValues.background !== 'none') {
+                previewBackground.style.backgroundImage = `url('${initialValues.background}')`;
+                previewBackground.style.display = 'block';
+            } else {
+                previewBackground.style.backgroundImage = 'none';
+                previewBackground.style.display = 'none';
+            }
+        }
+        
+        if (avatarInput) avatarInput.value = '';
+        if (backgroundInput) backgroundInput.value = '';
+    }
+    
+    if (form1Overlay) {
+        form1Overlay.addEventListener('click', function() {
+            setTimeout(resetPreviewToInitialValues, 100);
+        });
+    }
+    
+    if (form1Toggle) {
+        form1Toggle.addEventListener('change', function() {
+            if (!this.checked) {
+                setTimeout(resetPreviewToInitialValues, 100);
+            }
+        });
+    }
+    
+    setTimeout(function() {
+        if (previewBirthday && initialValues.birthday !== 'Not specified') {
+            const dateParts = initialValues.birthday.split(' ');
+            if (dateParts.length === 3) {
+                previewBirthday.textContent = initialValues.birthday;
+            }
+        }
+        
+        if (previewBackground && initialValues.background !== 'none') {
+            previewBackground.style.backgroundImage = `url('${initialValues.background}')`;
+            previewBackground.style.display = 'block';
+        }
+    }, 500);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const checkbox = document.querySelector('input[name="show_birthday"]');
+    const previewSection = document.getElementById('preview-birthday-section');
+    const previewValue = document.getElementById('preview-birthday-value');
+
+    if (!checkbox || !previewSection) return;
+
+    const birthdayDate = "{{ user.birthday|date:'d.m.Y'|default:'' }}";
+
+    function updatePreview() {
+        if (checkbox.checked && birthdayDate) {
+            previewSection.style.display = 'block';
+        } else {
+            previewSection.style.display = 'none';
+        }
+    }
+
+    updatePreview();
+
+    checkbox.addEventListener('change', updatePreview);
+});
+
 window.confirmAvatarReset = function() {
     const lang = "{{ user.language|default:'English' }}";
     const confirmMsg = lang === 'Українська'
@@ -6462,7 +7123,7 @@ window.confirmAvatarReset = function() {
             if (data.success) {
                 const defaultAvatarUrl = data.avatar_url + '?t=' + new Date().getTime();
                 
-                document.querySelectorAll('.avatar, img.avatar').forEach(img => {
+                document.querySelectorAll('.avatar, img.avatar, #preview-avatar, #upload-avatar').forEach(img => {
                     img.src = defaultAvatarUrl;
                 });
                 
@@ -6736,21 +7397,10 @@ window.submitAddCard = function() {
             if (resultEl) resultEl.textContent = data.error;
             return;
         }
-        const cardsList = document.getElementById('cards-list');
-        if (cardsList && data.cards) {
-            let html = '<strong>' + cardMessages.cards_label + '</strong><div style="margin-top:6px;">';
-            if (data.cards.length === 0) html += '<div class="card-item">' + cardMessages.no_cards + '</div>';
-            data.cards.forEach(c => {
-                html += `<div class="card-item" style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee;">**** **** ****${c.last4} — ${c.cardholder || '-'} — ${c.expiry}</div>`;
-            });
-            html += '</div>';
-            cardsList.innerHTML = html;
-        }
-        const addToggle = document.getElementById('add_card-toggle');
-        if (addToggle) addToggle.checked = false;
+        
         if (resultEl) resultEl.textContent = cardMessages.card_added;
-        if (numberEl) numberEl.value = '';
-        if (holderEl) holderEl.value = '';
+        
+        window.location.reload();
     })
     .catch(err => {
         console.error('Add card failed', err);
@@ -6879,57 +7529,98 @@ document.addEventListener('click', function(e) {
 });
 
 // Checkbox in Color theme ======================================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const themeSelect = document.getElementById('themeSelect');
-    const applyThemeBtn = document.getElementById('applyThemeBtn');
+document.addEventListener('DOMContentLoaded', function () {
     const customThemeToggle = document.getElementById('customThemeToggle');
-    const customThemeLabel = document.getElementById('customThemeLabel');
-    const hiddenInput = document.getElementById('custom_button_input');
-    
-    const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
     const additionalContainer = document.getElementById('additional-checkboxes-container');
     const customOptionInput = document.getElementById('custom_option_input');
+    const customOptionRadios = document.querySelectorAll('input[name="customOption"]');
+    const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
 
-    function applySelectedStyle(value) {
-        const allButtons = document.querySelectorAll('.main-btn, .deposit-btn, .add_card-btn, .other-profile-message-btn');
+    const BUTTON_SELECTORS = [
+        '.main-btn',
+        '.deposit-btn',
+        '.add_card-btn',
+        '.other-profile-message-btn',
+        '.subscribe-btn',
+        '.profile-btn',
+        '.setting-btn',
+        'label.main-btn-style-0',
+        'label.main-btn-style-1',
+        'label.main-btn-style-2',
+        'label.main-btn-style-3',
+        'label.main-btn-style-4',
+        '.main-btn.main-btn-style-0',
+        '.main-btn.main-btn-style-1',
+        '.main-btn.main-btn-style-2',
+        '.main-btn.main-btn-style-3',
+        '.main-btn.main-btn-style-4',
+        '.main-btn-style-0',
+        '.main-btn-style-1',
+        '.main-btn-style-2',
+        '.main-btn-style-3',
+        '.main-btn-style-4'
+    ].join(',');    
+
+    function initializeTextColor() {
+        const userColor = "{{ user.color_text_button|default:'black' }}";
+        localStorage.setItem('buttonTextColor', userColor);
+        const savedColor = userColor;
+        applyTextColorToAllButtons(savedColor);
+        textColorRadios.forEach(radio => {
+            if (radio.value === savedColor) {
+                radio.checked = true;
+            }
+        });
+    }
+
+    function applyTextColorToAllButtons(color) {
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        
         allButtons.forEach(btn => {
-            btn.classList.add('changing');
-            setTimeout(() => {
-                btn.classList.remove('main-btn-style-0', 'main-btn-style-1', 'main-btn-style-2', 'main-btn-style-3', 'main-btn-style-4');
+            btn.style.cssText += `color: ${color === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${color === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
+        
+        localStorage.setItem('buttonTextColor', color);
+    }
 
-                if (value === '0') {
-                    btn.classList.remove('main-btn');
-                    btn.classList.add('main-btn-style-0');
-                } else {
-                    btn.classList.add('main-btn', 'main-btn-style-' + value);
-                }
+    function applyButtonStyle() {
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS); 
 
-                setTimeout(() => btn.classList.remove('changing'), 50);
-            }, 10);
+        const isEnabled = customThemeToggle?.checked ?? false;
+        const styleValue = isEnabled
+            ? (customOptionInput?.value || document.querySelector('input[name="customOption"]:checked')?.value || '1')
+            : '0';
+
+        const textColor = document.querySelector('input[name="textColorOption"]:checked')?.value || localStorage.getItem('buttonTextColor') || "{{ user.color_text_button|default:'black' }}";
+
+        allButtons.forEach(btn => {
+            btn.className = btn.className
+                .replace(/main-btn-style-\d+/g, '')
+                .replace(/\bmain-btn\b/g, '')
+                .trim();    
+
+            if (styleValue === '0') {
+                btn.classList.add('main-btn-style-0');
+            } else {
+                btn.classList.add('main-btn', `main-btn-style-${styleValue}`);
+            }
+
+            btn.style.cssText += `color: ${textColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${textColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
         });
     }
 
     function updateAdditionalVisibility() {
-        if (!additionalContainer) return;
-
-        if (customThemeToggle && customThemeToggle.checked) {
-            additionalContainer.style.display = 'block';
-
-            const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-            const selectedValue = selectedRadio ? selectedRadio.value : '1';
-            applySelectedStyle(selectedValue);
-        } else {
-            additionalContainer.style.display = 'none';
-
-            applySelectedStyle('0');
-            if (customOptionInput) customOptionInput.value = '0';
+        if (additionalContainer) {
+            additionalContainer.style.display = customThemeToggle.checked ? 'block' : 'none';
         }
     }
 
     function saveCustomOption(value) {
         const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
         if (!csrf) return;
-        
+
         fetch('/save-custom-option/', {
             method: 'POST',
             headers: {
@@ -6937,211 +7628,240 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': csrf,
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({custom_option: value})
+            body: JSON.stringify({ custom_option: value })
+        }).catch(() => {});
+    }
+
+    function saveTextColor(color) {
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        if (!csrf) return;
+        
+        fetch('/save-button-text-color/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({button_text_color: color})
         })
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
-                console.error('Error saving custom option:', data.error);
+                console.error('Error saving text color:', data.error);
             }
         })
-        .catch(err => console.error('Save custom option error:', err));
+        .catch(err => console.error('Save text color error:', err));
     }
 
-    customOptionRadios.forEach(r => r.addEventListener('change', function() {
-        const selectedValue = this.value;
-        
-        if (customThemeToggle && customThemeToggle.checked) {
-            applySelectedStyle(selectedValue);
-            if (customOptionInput) customOptionInput.value = selectedValue;
-            saveCustomOption(selectedValue);
-        }
-    }));
+    initializeTextColor();
+    updateAdditionalVisibility();
+    applyButtonStyle();
 
     if (customThemeToggle) {
-        customThemeToggle.addEventListener('change', function() {
-            const isChecked = this.checked;
-            
-            if (customThemeLabel) customThemeLabel.textContent = isChecked ? 'Custom enabled' : 'Enable Custom button';
-            
-            if (hiddenInput) hiddenInput.value = isChecked ? '1' : '0';
-            
+        customThemeToggle.addEventListener('change', function () {
             updateAdditionalVisibility();
-            
-            if (!isChecked) {
-                applySelectedStyle('0');
-                if (customOptionInput) customOptionInput.value = '0';
-                saveCustomOption('0');
-            } else {
-                const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-                const selectedValue = selectedRadio ? selectedRadio.value : '1';
-                applySelectedStyle(selectedValue);
-                if (customOptionInput) customOptionInput.value = selectedValue;
-                saveCustomOption(selectedValue);
-            }
-            
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || null;
-            if (!csrf) return;
-            
-            fetch('/toggle-custom-button/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrf,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({enabled: isChecked})
-            }).catch(err => console.error('Persist error', err));
-        });
+            applyButtonStyle();
 
-        const isInitiallyChecked = customThemeToggle.checked;
-        
-        if (customThemeLabel) customThemeLabel.textContent = isInitiallyChecked ? 'Custom enabled' : 'Enable Custom button';
-        if (hiddenInput) hiddenInput.value = isInitiallyChecked ? '1' : '0';
-        
-        if (!isInitiallyChecked) {
-            applySelectedStyle('0');
-            if (customOptionInput) customOptionInput.value = '0';
-        } else {
-            const selectedRadio = document.querySelector('input[name="customOption"]:checked');
-            const initialValue = selectedRadio ? selectedRadio.value : (customOptionInput ? customOptionInput.value : '1');
-            applySelectedStyle(initialValue);
-            if (customOptionInput) customOptionInput.value = initialValue;
-        }
-        
-        updateAdditionalVisibility();
-    }
-    
-    if (colorThemeToggle) {
-        colorThemeToggle.addEventListener('change', updateMenuDisabled);
-        updateMenuDisabled();
-    }
+            const isChecked = this.checked;
+            const selectedValue = isChecked
+                ? (document.querySelector('input[name="customOption"]:checked')?.value || '1')
+                : '0';
 
-    function applyCustomButtonUI(enabled) {
-        const selected = (customOptionInput && customOptionInput.value) ? customOptionInput.value : '1';
-        
-        const allMainBtns = document.querySelectorAll('.main-btn');
-        const otherMsgBtn = document.querySelector('.other-profile-message-btn');   
+            if (customOptionInput) customOptionInput.value = selectedValue;
 
-        const applyStyle = (el) => {
-            if (!el) return;
-            if (enabled) {
-                el.classList.add('main-btn');
-                el.classList.remove('main-btn-style-0', 'main-btn-style-1', 'main-btn-style-2', 'main-btn-style-3', 'main-btn-style-4');
-                el.classList.add('main-btn-style-' + (selected || '1'));
-            } else {
-                el.classList.remove('main-btn');
-                el.classList.remove('main-btn-style-1','main-btn-style-2','main-btn-style-3','main-btn-style-4');
-            }
-        };  
-
-        allMainBtns.forEach(applyStyle);
-        if (otherMsgBtn) applyStyle(otherMsgBtn);
-    }
-
-    function applyButtonTextColor(value) {
-        const buttons = document.querySelectorAll('.main-btn, .deposit-btn, .add_card-btn, .other-profile-message-btn');
-        buttons.forEach(btn => {
-            if (!btn) return;
-            btn.style.color = (value === 'black') ? '#000' : '#fff';
-            
-            if (value === 'white') {
-                btn.style.textShadow = '0 1px 2px rgba(0,0,0,0.3)';
-            } else {
-                btn.style.textShadow = 'none';
+            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (csrf) {
+                fetch('/toggle-custom-button/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ enabled: isChecked })
+                }).catch(() => {});
             }
         });
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Custom button enabled:', {% if user.custom_button_enabled %}true{% else %}false{% endif %});
-        console.log('Custom option:', "{{ user.custom_option|default:'1' }}");
-        
-        const depositBtn = document.querySelector('.deposit-btn');
-        const addCardBtn = document.querySelector('.add_card-btn');
-        console.log('Deposit button classes:', depositBtn?.className);
-        console.log('Add card button classes:', addCardBtn?.className);
-        
-        setTimeout(() => {
-            applyCustomButtonUI({% if user.custom_button_enabled %}true{% else %}false{% endif %});
-            applyButtonTextColor("{{ user.color_text_button|default:'white' }}");
-        }, 200);
+
+    customOptionRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (customThemeToggle?.checked) {
+                applyButtonStyle();
+                if (customOptionInput) customOptionInput.value = this.value;
+                saveCustomOption(this.value);
+            }
+        });
     });
 
-    const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
-    textColorRadios.forEach(r => r.addEventListener('change', function() {
-        const value = this.value;
-        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-        if (!csrf) return;
-        fetch('/save-button-text-color/', {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json', 'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest' },
-            body: JSON.stringify({ button_text_color: value })
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                applyButtonTextColor(value);
-            } else {
-                console.error('Could not save button text color', data.error);
-            }
-        }).catch(e => console.error('Save color error', e));
-    }));
-
-    try {
-        const initialColor = "{{ user.color_text_button|default:'white' }}";
-        applyButtonTextColor(initialColor);
-        applyCustomButtonUI(!!({% if user.custom_button_enabled %}true{% else %}false{% endif %}));
-    } catch(e) {}
-
-    if (customThemeToggle) {
-        customThemeToggle.addEventListener('change', function() {
-            applyCustomButtonUI(this.checked);
+    textColorRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const selectedColor = this.value;
+            
+            applyTextColorToAllButtons(selectedColor);
+            
+            saveTextColor(selectedColor);
+            
+            applyButtonStyle();
         });
-    }
-    
-    if (themeSelect && applyThemeBtn) {
-        const userSubscribe = "{{ user.subscribe }}";  
-        const body = document.body;
+    });
 
-        const savedTheme = localStorage.getItem('selectedTheme');
-        if (savedTheme) {
-            body.classList.add(`theme-${savedTheme}`);
-            themeSelect.value = savedTheme;
-        }
+    const observer = new MutationObserver(applyButtonStyle);
+    observer.observe(document.body, { childList: true, subtree: true });
 
-        if (userSubscribe === "Basic") {
-            themeSelect.querySelector('option[value="pink"]').disabled = true;
-            themeSelect.querySelector('option[value="green"]').disabled = true;
-        }
-
-        applyThemeBtn.addEventListener('click', () => {
-            const selected = themeSelect.value;
-
-            if ((selected === "pink" || selected === "green") && userSubscribe === "Basic") {
-                alert("❌ This theme is available only for subscribers!");
-                return;
-            }
-
-            body.classList.remove('theme-light', 'theme-dark', 'theme-pink', 'theme-green');
-
-            body.classList.add(`theme-${selected}`);
-
-            localStorage.setItem('selectedTheme', selected);
-        });
-    }
+    setTimeout(applyButtonStyle, 500);
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const chatContainer = document.querySelector('.chat-container');
-    const colorThemeToggle = document.getElementById('color_theme-toggle');
-    
-    if (chatContainer && colorThemeToggle) {
-        chatContainer.addEventListener('click', function(e) {
-            if (colorThemeToggle.checked) {
-                colorThemeToggle.checked = false;
-                
-                updateFormOpenState();
-                
-                e.stopPropagation();
+function setupWebSocketForLiveUpdates() {
+    let pendingMessages = [];
+    let processingInterval = null;
+
+    function processBatch() {
+        if (pendingMessages.length > 0) {
+            pendingMessages.forEach(data => {
+                try {
+                    console.log('Processing batched WebSocket message:', data);
+
+                    if (data.type === 'message_edited') {
+                        const msgEl = document.querySelector(`[data-message-id="${data.message_id}"]`);
+                        if (msgEl) {
+                            const textDiv = msgEl.querySelector('div');
+                            if (textDiv) {
+                                msgEl.dataset.tokenText = data.text || '';
+                                const processed = processMentionsStrict(data.text || '');
+                                const stickerMatch = String(processed).trim().match(/^\[sticker:([a-zA-Z0-9_-]+)\]$/);
+                                if (stickerMatch) {
+                                    const name = stickerMatch[1];
+                                    const emoji = renderSticker(name);
+                                    textDiv.innerHTML = `<div class="sticker-render" data-sticker="${name}" style="font-size:44px; display:inline-block; cursor:pointer;" onclick="sendSticker('${name}')">${emoji}</div>`;
+                                } else {
+                                    textDiv.innerHTML = renderStickersInline(processed);
+                                }
+                            }
+                            const timeDiv = msgEl.querySelector('.message-time');
+                            if (timeDiv) {
+                                const now = new Date();
+                                timeDiv.textContent = formatChatTime(data.timestamp || now.toISOString());
+                                timeDiv.dataset.timestamp = data.timestamp || now.toISOString();
+
+                                if (!msgEl.querySelector('.message-edited')) {
+                                    const edited = document.createElement('span');
+                                    edited.className = 'message-edited';
+                                    edited.textContent = ("{{ user.language|default:'English' }}" === 'Українська') ? ' (змінено)' : ' (edited)';
+                                    edited.style.cssText = 'font-size:10px;color:#888;margin-left:6px;';
+                                    timeDiv.appendChild(edited);
+                                }
+                            }
+                            
+                            addMentionEventListeners(msgEl);
+                        }
+                        return;
+                    }
+
+                    if (data.type === 'message_deleted') {
+                        const msgEl = document.querySelector(`[data-message-id="${data.message_id}"]`);
+                        if (msgEl) msgEl.remove();
+                        return;
+                    }
+
+                    if (isVideoModalOpen) {
+                        console.log('Video modal open — deferring WebSocket updates for this chat');
+                        try { if (currentChatUser) pendingRefreshOnModalClose[currentChatUser] = true; } catch(e) {}
+                        return;
+                    }
+                    
+                    if (data.file_url) {
+                        if (isVideoModalOpen && openVideoUrl && data.file_url === openVideoUrl) {
+                            console.log('Received file message for currently open video, skipping UI update to avoid interrupting playback');
+                            return;
+                        }
+                        if (data.sender !== "{{ user.username }}") {
+                            displayFileMessage({
+                                file_url: data.file_url,
+                                file_name: data.file_name,
+                                file_type: data.file_type,
+                                file_size: data.file_size,
+                                text: data.message || '',
+                                sender: data.sender,
+                                timestamp: data.timestamp || new Date().toISOString()
+                            }, false);
+                            loadRecentContacts();
+                        } else {
+                            console.log('Ignoring own file message from WebSocket');
+                        }
+                        return;
+                    }
+                    
+                    if (data.sender !== "{{ user.username }}") {
+                        if (typeof data.message !== 'string' || !data.message.trim()) {
+                            console.log('Ignoring non-string/empty message from WebSocket:', data.message);
+                        } else {
+                            if (data.message_id && document.querySelector(`[data-message-id="${data.message_id}"]`)) {
+                                console.debug('Incoming message already present, skipping render', data.message_id);
+                            } else {
+                                displayMessage({ 
+                                    text: data.message, 
+                                    sender: data.sender, 
+                                    timestamp: data.timestamp || new Date().toISOString(), 
+                                    id: data.message_id, 
+                                    is_sent: false 
+                                });
+                                loadRecentContacts();
+                            }
+                        }
+                    } else {
+                        console.log('Ignoring own message from WebSocket');
+                    }
+                } catch (error) {
+                    console.error('Error processing batched WebSocket message:', error);
+                }
+            });
+
+            pendingMessages = [];
+
+            const messagesContainer = document.getElementById('chat-messages');
+            if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
+        }
+    }
+
+    if (chatSocket) {
+        chatSocket.onmessage = function(e) {
+            try {
+                const data = JSON.parse(e.data);
+                pendingMessages.push(data);
+
+                if (!processingInterval) {
+                    processingInterval = setInterval(processBatch, 5000);
+                }
+            } catch (error) {
+                console.error('Error parsing WebSocket message:', error);
+            }
+        };
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        updateAllMessageTimes();
+        setupWebSocketForLiveUpdates();
+    }, 1000);
+    
+    const hourFormatToggle = document.getElementById('hour-format-toggle');
+    const hourFormatCheckbox = document.getElementById('hour-format-toggle-checkbox');
+    
+    if (hourFormatToggle) {
+        hourFormatToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const is24Hour = !hourFormatCheckbox.checked;
+            hourFormatCheckbox.checked = is24Hour;
+            
+            localStorage.setItem('hourFormat', is24Hour ? '24' : '12');
+            
+            updateAllMessageTimes();
         });
     }
 });
@@ -7270,8 +7990,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const timestamp = element.dataset.timestamp;
             if (timestamp) {
                 element.textContent = formatChatTime(timestamp);
+                
+                const editedSpan = element.querySelector('.message-edited');
+                if (editedSpan) {
+                    editedSpan.textContent = ("{{ user.language|default:'English' }}" === 'Українська') ? ' (змінено)' : ' (edited)';
+                }
             }
-        });
+        }); 
 
         const contactTimeElements = document.querySelectorAll('.contact-time');
         contactTimeElements.forEach(element => {
@@ -7279,7 +8004,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (timestamp) {
                 element.textContent = formatTime(timestamp);
             }
-        });
+        }); 
 
         const binMessages = document.querySelectorAll('.message[data-sender="Bin"], .message[data-sender="Bin_bot"]');
         binMessages.forEach(message => {
@@ -7290,7 +8015,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     timeElement.textContent = formatChatTime(timestamp);
                 }
             }
-        });
+        }); 
 
         const noteMessages = document.querySelectorAll('.message.sent:not([data-sender])');
         noteMessages.forEach(message => {
@@ -7331,6 +8056,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    const chat = document.querySelector('.chat-container');
+    const colorThemeToggle = document.getElementById('color_theme-toggle');
+
+    if (chat && colorThemeToggle) {
+        chat.addEventListener('click', function () {
+            if (colorThemeToggle.checked) {
+                colorThemeToggle.checked = false;
+            }
+        });
+    }
+});
+
 // Color text button
 const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
 const textColorContainer = document.getElementById('text-color-container');
@@ -7347,18 +8085,25 @@ function applyTextColor(color) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const userColor = "{{ user.color_text_button|default:'black' }}";
     
+    const userColor = "{{ user.color_text_button|default:'black' }}";
     setTimeout(() => {
-        applyTextColor(userColor);
+        const savedColor = localStorage.getItem('buttonTextColor') || userColor;
+        
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${savedColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${savedColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
         
         const textColorRadios = document.querySelectorAll('input[name="textColorOption"]');
         textColorRadios.forEach(radio => {
-            if (radio.value === userColor) {
+            if (radio.value === savedColor) {
                 radio.checked = true;
+                saveTextColor(savedColor);
             }
         });
-    }, 100);
+    }, 200);
 });
 
 function saveTextColor(color) {
@@ -7389,10 +8134,32 @@ applyTextColor(initialTextColor);
 textColorRadios.forEach(radio => {
     radio.addEventListener('change', function() {
         const selectedColor = this.value;
-        applyTextColor(selectedColor);
+        const allButtons = document.querySelectorAll(BUTTON_SELECTORS);
+        allButtons.forEach(btn => {
+            btn.style.cssText += `color: ${selectedColor === 'white' ? '#ffffff' : '#000000'} !important;`;
+            btn.style.cssText += `text-shadow: ${selectedColor === 'white' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'} !important;`;
+        });
+        
+        localStorage.setItem('buttonTextColor', selectedColor);
+        
         saveTextColor(selectedColor);
+        
+        applyButtonStyle();
     });
 });
+
+
+function refreshRecentContacts() {
+    loadRecentContacts();
+}
+
+setInterval(refreshRecentContacts, 1000);
+
+setInterval(() => {
+    if (!document.getElementById('chat-toggle')?.checked) {
+        refreshRecentContacts();
+    }
+}, 3000);
 </script>
 
 {% endblock %}
